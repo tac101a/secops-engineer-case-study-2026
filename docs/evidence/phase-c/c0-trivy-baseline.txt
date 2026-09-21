@@ -1,0 +1,654 @@
+UTC collected: 2026-09-21T17:27:55Z
+Assessment-start commit: fcc6251cbf4a1cd1998806ed7ea59f09162166a8
+Trivy was absent from PATH and .local/bin at discovery.
+Source: https://github.com/aquasecurity/trivy/releases/tag/v0.74.0
+Method: pinned official archive + checksums + sigstore bundle; no sudo; .local/bin is ignored by Git.
+Published release-page checksum-file SHA256 verification:
+/tmp/phase-c-trivy.0McvR3/trivy_0.74.0_checksums.txt: OK
+Archive checksum verification against official checksums file:
+trivy_0.74.0_Linux-64bit.tar.gz: OK
+Archive SHA256: 2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a  /tmp/phase-c-trivy.0McvR3/trivy_0.74.0_Linux-64bit.tar.gz
+Signature verification with ghcr.io/sigstore/cosign/cosign:v2.6.5 (image digest sha256:ad281047f85c5e1fc6ffbc30c2b55be3b07b4032bef715a12122ce5829619aca):
+Archive file list:
+LICENSE
+README.md
+contrib/asff.tpl
+contrib/gitlab-codequality.tpl
+contrib/gitlab.tpl
+contrib/html.tpl
+contrib/junit.tpl
+trivy
+Install binary only to .local/bin/trivy
+Installed binary SHA256: d89bcc6510a267f11b773398cbf1be5520ce39f9e8b6633178c4487f05b7d791  .local/bin/trivy
+Version: 0.74.0
+Scan UTC: 2026-09-21T17:28:22Z
+Command: .local/bin/trivy config --scanners misconfig --misconfig-scanners kubernetes --disable-telemetry --skip-version-check --cache-dir .local/trivy-cache task1/insecure/
+Scan config files for misconfigurations
+
+Usage:
+  trivy config [flags] DIR
+
+Aliases:
+  config, conf
+
+Cache Flags
+      --cache-backend string   [EXPERIMENTAL] cache backend (e.g. redis://localhost:6379) (default "memory")
+      --cache-ttl duration     cache TTL when using redis as cache backend
+      --redis-ca string        redis ca file location, if using redis as cache backend
+      --redis-cert string      redis certificate file location, if using redis as cache backend
+      --redis-key string       redis key file location, if using redis as cache backend
+      --redis-tls              enable redis TLS with public certificates, if using redis as cache backend
+
+Misconfiguration Flags
+      --ansible-extra-vars strings        set additional variables as key=value or @file (YAML/JSON)
+      --ansible-inventory strings         specify inventory host path or comma separated host list
+      --ansible-playbook strings          specify playbook file path(s) to scan
+      --cf-params strings                 specify paths to override the CloudFormation parameters files
+      --checks-bundle-repository string   OCI registry URL to retrieve checks bundle from (default "mirror.gcr.io/aquasec/trivy-checks:2")
+      --config-file-schemas strings       specify paths to JSON configuration file schemas to determine that a file matches some configuration and pass the schema to Rego checks for type checking
+      --helm-api-versions strings         Available API versions used for Capabilities.APIVersions. This flag is the same as the api-versions flag of the helm template command. (can specify multiple or separate values with commas: policy/v1/PodDisruptionBudget,apps/v1/Deployment)
+      --helm-kube-version string          Kubernetes version used for Capabilities.KubeVersion. This flag is the same as the kube-version flag of the helm template command.
+      --helm-set strings                  specify Helm values on the command line (can specify multiple or separate values with commas: key1=val1,key2=val2)
+      --helm-set-file strings             specify Helm values from respective files specified via the command line (can specify multiple or separate values with commas: key1=path1,key2=path2)
+      --helm-set-string strings           specify Helm string values on the command line (can specify multiple or separate values with commas: key1=val1,key2=val2)
+      --helm-values strings               specify paths to override the Helm values.yaml files
+      --include-non-failures              include successes, available with '--scanners misconfig'
+      --misconfig-scanners strings        comma-separated list of misconfig scanners to use for misconfiguration scanning (default [azure-arm,cloudformation,dockerfile,helm,kubernetes,terraform,terraformplan-json,terraformplan-snapshot,ansible])
+      --raw-config-scanners strings       specify the types of scanners that will also scan raw configurations. For example, scanners will scan a non-adapted configuration into a shared state (allowed values: terraform)
+      --render-cause strings              specify configuration types for which the rendered causes will be shown in the table report (allowed values: terraform,ansible)
+      --tf-exclude-downloaded-modules     exclude misconfigurations for downloaded terraform modules
+      --tf-vars strings                   specify paths to override the Terraform tfvars files
+
+Module Flags
+      --enable-modules strings   [EXPERIMENTAL] module names to enable
+      --module-dir string        specify directory to the wasm modules that will be loaded (default "/home/tac/.trivy/modules")
+
+Registry Flags
+      --password strings        password. Comma-separated passwords allowed. TRIVY_PASSWORD should be used for security reasons.
+      --password-stdin          password from stdin. Comma-separated passwords are not supported.
+      --registry-token string   registry token
+      --username strings        username. Comma-separated usernames allowed.
+
+Rego Flags
+      --check-namespaces strings    Rego namespaces
+      --config-check strings        specify the paths to the Rego check files or to the directories containing them, applying config files
+      --config-data strings         specify paths from which data for the Rego checks will be recursively loaded
+      --include-deprecated-checks   include deprecated checks
+      --rego-error-limit int        maximum number of compile errors allowed during Rego policy evaluation (default 10)
+      --skip-check-update           skip fetching rego check updates
+      --trace-rego                  enable more verbose trace output for custom queries
+
+Kubernetes Flags
+      --k8s-version string   specify k8s version to validate outdated api by it (example: 1.21.0)
+
+Report Flags
+      --compliance string          compliance report to generate
+      --exit-code int              specify exit code when any security issues are found
+  -f, --format string              format
+                                   Allowed values:
+                                     - table
+                                     - json
+                                     - template
+                                     - sarif
+                                     - cyclonedx
+                                     - spdx
+                                     - spdx-json
+                                     - github
+                                     - cosign-vuln
+                                    (default "table")
+      --ignore-policy string       specify the Rego file path to evaluate each vulnerability
+      --ignorefile string          specify .trivyignore file (default ".trivyignore")
+  -o, --output string              output file name
+      --output-plugin-arg string   [EXPERIMENTAL] output plugin arguments
+      --report string              specify a compliance report format for the output (allowed values: all,summary) (default "all")
+  -s, --severity strings           severities of security issues to be displayed
+                                   Allowed values:
+                                     - UNKNOWN
+                                     - LOW
+                                     - MEDIUM
+                                     - HIGH
+                                     - CRITICAL
+                                    (default [UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL])
+      --table-mode strings         [EXPERIMENTAL] tables that will be displayed in 'table' format (allowed values: summary,detailed) (default [summary,detailed])
+  -t, --template string            output template (file path must have .tpl extension)
+
+Scan Flags
+      --disable-telemetry       disable sending anonymous usage data to Aqua
+      --file-patterns strings   specify config file patterns
+      --skip-dirs strings       specify the directories or glob patterns to skip
+      --skip-files strings      specify the files or glob patterns to skip
+      --skip-version-check      suppress notices about version updates and Trivy announcements
+
+Global Flags:
+      --cacert string             Path to PEM-encoded CA certificate file
+      --cache-dir string          cache directory (default "/home/tac/.cache/trivy")
+  -c, --config string             config path (default "trivy.yaml")
+  -d, --debug                     debug mode
+      --generate-default-config   write the default config to trivy-default.yaml
+      --insecure                  allow insecure server connections
+  -q, --quiet                     suppress progress bar and log output
+      --timeout duration          timeout (default 5m0s)
+  -v, --version                   show version
+
+2026-09-22T00:28:21+07:00	FATAL	Fatal error	unknown flag: --scanners
+Corrected scan UTC: 2026-09-21T17:28:35Z
+Previous invocation failed: v0.74.0 config has no --scanners flag; no scan occurred.
+Command: .local/bin/trivy config --misconfig-scanners kubernetes --disable-telemetry --skip-version-check --cache-dir .local/trivy-cache task1/insecure/
+2026-09-22T00:28:35+07:00	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-09-22T00:28:35+07:00	INFO	[checks-client] Need to update the checks bundle
+2026-09-22T00:28:35+07:00	INFO	[checks-client] Downloading the checks bundle...
+159.26 KiB / 234.65 KiB [---------------------------------------->__________________] 67.87% ? p/s ?234.65 KiB / 234.65 KiB [-----------------------------------------------] 100.00% 1.64 MiB p/s 300ms2026-09-22T00:28:37+07:00	INFO	Detected config files	num=4
+
+Report Summary
+
+┌───────────────────┬────────────┬───────────────────┐
+│      Target       │    Type    │ Misconfigurations │
+├───────────────────┼────────────┼───────────────────┤
+│ demo-api.yaml     │ kubernetes │        11         │
+├───────────────────┼────────────┼───────────────────┤
+│ demo-backend.yaml │ kubernetes │        11         │
+├───────────────────┼────────────┼───────────────────┤
+│ namespace.yaml    │ kubernetes │         0         │
+├───────────────────┼────────────┼───────────────────┤
+│ rbac.yaml         │ kubernetes │         1         │
+└───────────────────┴────────────┴───────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+demo-api.yaml (kubernetes)
+==========================
+Tests: 126 (SUCCESSES: 115, FAILURES: 11)
+Failures: 11 (UNKNOWN: 0, LOW: 6, MEDIUM: 3, HIGH: 2, CRITICAL: 0)
+
+KSV-0001 (MEDIUM): Container 'demo-api' of Deployment 'demo-api' should set 'securityContext.allowPrivilegeEscalation' to false
+════════════════════════════════════════
+A program inside the container can elevate its own privileges and run as root, which might give the program control over the container and node.
+
+See https://avd.aquasec.com/misconfig/ksv-0001
+────────────────────────────────────────
+ demo-api.yaml:18-48
+────────────────────────────────────────
+  18 ┌         - name: demo-api
+  19 │           image: secops-demo-api:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8080
+  24 │           env:
+  25 │             - name: BACKEND_URL
+  26 └               value: http://demo-backend:8081
+  ..   
+────────────────────────────────────────
+
+
+KSV-0003 (LOW): Container 'demo-api' of Deployment 'demo-api' should add 'ALL' to 'securityContext.capabilities.drop'
+════════════════════════════════════════
+The container should drop all default capabilities and add only those that are needed for its execution.
+
+See https://avd.aquasec.com/misconfig/ksv-0003
+────────────────────────────────────────
+ demo-api.yaml:18-48
+────────────────────────────────────────
+  18 ┌         - name: demo-api
+  19 │           image: secops-demo-api:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8080
+  24 │           env:
+  25 │             - name: BACKEND_URL
+  26 └               value: http://demo-backend:8081
+  ..   
+────────────────────────────────────────
+
+
+KSV-0004 (LOW): Container 'demo-api' of 'deployment' 'demo-api' in 'secops-demo' namespace should set securityContext.capabilities.drop
+════════════════════════════════════════
+Security best practices require containers to run with minimal required capabilities.
+
+See https://avd.aquasec.com/misconfig/ksv-0004
+────────────────────────────────────────
+ demo-api.yaml:18-48
+────────────────────────────────────────
+  18 ┌         - name: demo-api
+  19 │           image: secops-demo-api:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8080
+  24 │           env:
+  25 │             - name: BACKEND_URL
+  26 └               value: http://demo-backend:8081
+  ..   
+────────────────────────────────────────
+
+
+KSV-0012 (MEDIUM): Container 'demo-api' of Deployment 'demo-api' should set 'securityContext.runAsNonRoot' to true
+════════════════════════════════════════
+Force the running image to run as a non-root user to ensure least privileges.
+
+See https://avd.aquasec.com/misconfig/ksv-0012
+────────────────────────────────────────
+ demo-api.yaml:18-48
+────────────────────────────────────────
+  18 ┌         - name: demo-api
+  19 │           image: secops-demo-api:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8080
+  24 │           env:
+  25 │             - name: BACKEND_URL
+  26 └               value: http://demo-backend:8081
+  ..   
+────────────────────────────────────────
+
+
+KSV-0014 (HIGH): Container 'demo-api' of Deployment 'demo-api' should set 'securityContext.readOnlyRootFilesystem' to true
+════════════════════════════════════════
+An immutable root file system prevents applications from writing to their local disk. This can limit intrusions, as attackers will not be able to tamper with the file system or write foreign executables to disk.
+
+See https://avd.aquasec.com/misconfig/ksv-0014
+────────────────────────────────────────
+ demo-api.yaml:18-48
+────────────────────────────────────────
+  18 ┌         - name: demo-api
+  19 │           image: secops-demo-api:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8080
+  24 │           env:
+  25 │             - name: BACKEND_URL
+  26 └               value: http://demo-backend:8081
+  ..   
+────────────────────────────────────────
+
+
+KSV-0020 (LOW): Container 'demo-api' of Deployment 'demo-api' should set 'securityContext.runAsUser' > 10000
+════════════════════════════════════════
+Force the container to run with user ID > 10000 to avoid conflicts with the host’s user table.
+
+See https://avd.aquasec.com/misconfig/ksv-0020
+────────────────────────────────────────
+ demo-api.yaml:18-48
+────────────────────────────────────────
+  18 ┌         - name: demo-api
+  19 │           image: secops-demo-api:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8080
+  24 │           env:
+  25 │             - name: BACKEND_URL
+  26 └               value: http://demo-backend:8081
+  ..   
+────────────────────────────────────────
+
+
+KSV-0021 (LOW): Container 'demo-api' of Deployment 'demo-api' should set 'securityContext.runAsGroup' > 10000
+════════════════════════════════════════
+Force the container to run with group ID > 10000 to avoid conflicts with the host’s user table.
+
+See https://avd.aquasec.com/misconfig/ksv-0021
+────────────────────────────────────────
+ demo-api.yaml:18-48
+────────────────────────────────────────
+  18 ┌         - name: demo-api
+  19 │           image: secops-demo-api:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8080
+  24 │           env:
+  25 │             - name: BACKEND_URL
+  26 └               value: http://demo-backend:8081
+  ..   
+────────────────────────────────────────
+
+
+KSV-0030 (LOW): Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'
+════════════════════════════════════════
+According to pod security standard 'Seccomp', the RuntimeDefault seccomp profile must be required, or allow specific additional profiles.
+
+See https://avd.aquasec.com/misconfig/ksv-0030
+────────────────────────────────────────
+ demo-api.yaml:18-48
+────────────────────────────────────────
+  18 ┌         - name: demo-api
+  19 │           image: secops-demo-api:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8080
+  24 │           env:
+  25 │             - name: BACKEND_URL
+  26 └               value: http://demo-backend:8081
+  ..   
+────────────────────────────────────────
+
+
+KSV-0104 (MEDIUM): container "demo-api" of deployment "demo-api" in "secops-demo" namespace should specify a seccomp profile
+════════════════════════════════════════
+A program inside the container can bypass Seccomp protection policies.
+
+See https://avd.aquasec.com/misconfig/ksv-0104
+────────────────────────────────────────
+ demo-api.yaml:18-48
+────────────────────────────────────────
+  18 ┌         - name: demo-api
+  19 │           image: secops-demo-api:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8080
+  24 │           env:
+  25 │             - name: BACKEND_URL
+  26 └               value: http://demo-backend:8081
+  ..   
+────────────────────────────────────────
+
+
+KSV-0106 (LOW): container should drop all
+════════════════════════════════════════
+Containers must drop ALL capabilities, and are only permitted to add back the NET_BIND_SERVICE capability.
+
+See https://avd.aquasec.com/misconfig/ksv-0106
+────────────────────────────────────────
+ demo-api.yaml:18-48
+────────────────────────────────────────
+  18 ┌         - name: demo-api
+  19 │           image: secops-demo-api:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8080
+  24 │           env:
+  25 │             - name: BACKEND_URL
+  26 └               value: http://demo-backend:8081
+  ..   
+────────────────────────────────────────
+
+
+KSV-0118 (HIGH): deployment demo-api in secops-demo namespace is using the default security context, which allows root privileges
+════════════════════════════════════════
+Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.
+
+See https://avd.aquasec.com/misconfig/ksv-0118
+────────────────────────────────────────
+ demo-api.yaml:15-48
+────────────────────────────────────────
+  15 ┌     spec:
+  16 │       serviceAccountName: demo-api
+  17 │       containers:
+  18 │         - name: demo-api
+  19 │           image: secops-demo-api:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 └               containerPort: 8080
+  ..   
+────────────────────────────────────────
+
+
+
+demo-backend.yaml (kubernetes)
+==============================
+Tests: 126 (SUCCESSES: 115, FAILURES: 11)
+Failures: 11 (UNKNOWN: 0, LOW: 6, MEDIUM: 3, HIGH: 2, CRITICAL: 0)
+
+KSV-0001 (MEDIUM): Container 'demo-backend' of Deployment 'demo-backend' should set 'securityContext.allowPrivilegeEscalation' to false
+════════════════════════════════════════
+A program inside the container can elevate its own privileges and run as root, which might give the program control over the container and node.
+
+See https://avd.aquasec.com/misconfig/ksv-0001
+────────────────────────────────────────
+ demo-backend.yaml:18-44
+────────────────────────────────────────
+  18 ┌         - name: demo-backend
+  19 │           image: secops-demo-backend:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8081
+  24 │           # Same permissive process/filesystem baseline as demo-api.
+  25 │           securityContext:
+  26 └             readOnlyRootFilesystem: false
+  ..   
+────────────────────────────────────────
+
+
+KSV-0003 (LOW): Container 'demo-backend' of Deployment 'demo-backend' should add 'ALL' to 'securityContext.capabilities.drop'
+════════════════════════════════════════
+The container should drop all default capabilities and add only those that are needed for its execution.
+
+See https://avd.aquasec.com/misconfig/ksv-0003
+────────────────────────────────────────
+ demo-backend.yaml:18-44
+────────────────────────────────────────
+  18 ┌         - name: demo-backend
+  19 │           image: secops-demo-backend:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8081
+  24 │           # Same permissive process/filesystem baseline as demo-api.
+  25 │           securityContext:
+  26 └             readOnlyRootFilesystem: false
+  ..   
+────────────────────────────────────────
+
+
+KSV-0004 (LOW): Container 'demo-backend' of 'deployment' 'demo-backend' in 'secops-demo' namespace should set securityContext.capabilities.drop
+════════════════════════════════════════
+Security best practices require containers to run with minimal required capabilities.
+
+See https://avd.aquasec.com/misconfig/ksv-0004
+────────────────────────────────────────
+ demo-backend.yaml:18-44
+────────────────────────────────────────
+  18 ┌         - name: demo-backend
+  19 │           image: secops-demo-backend:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8081
+  24 │           # Same permissive process/filesystem baseline as demo-api.
+  25 │           securityContext:
+  26 └             readOnlyRootFilesystem: false
+  ..   
+────────────────────────────────────────
+
+
+KSV-0012 (MEDIUM): Container 'demo-backend' of Deployment 'demo-backend' should set 'securityContext.runAsNonRoot' to true
+════════════════════════════════════════
+Force the running image to run as a non-root user to ensure least privileges.
+
+See https://avd.aquasec.com/misconfig/ksv-0012
+────────────────────────────────────────
+ demo-backend.yaml:18-44
+────────────────────────────────────────
+  18 ┌         - name: demo-backend
+  19 │           image: secops-demo-backend:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8081
+  24 │           # Same permissive process/filesystem baseline as demo-api.
+  25 │           securityContext:
+  26 └             readOnlyRootFilesystem: false
+  ..   
+────────────────────────────────────────
+
+
+KSV-0014 (HIGH): Container 'demo-backend' of Deployment 'demo-backend' should set 'securityContext.readOnlyRootFilesystem' to true
+════════════════════════════════════════
+An immutable root file system prevents applications from writing to their local disk. This can limit intrusions, as attackers will not be able to tamper with the file system or write foreign executables to disk.
+
+See https://avd.aquasec.com/misconfig/ksv-0014
+────────────────────────────────────────
+ demo-backend.yaml:18-44
+────────────────────────────────────────
+  18 ┌         - name: demo-backend
+  19 │           image: secops-demo-backend:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8081
+  24 │           # Same permissive process/filesystem baseline as demo-api.
+  25 │           securityContext:
+  26 └             readOnlyRootFilesystem: false
+  ..   
+────────────────────────────────────────
+
+
+KSV-0020 (LOW): Container 'demo-backend' of Deployment 'demo-backend' should set 'securityContext.runAsUser' > 10000
+════════════════════════════════════════
+Force the container to run with user ID > 10000 to avoid conflicts with the host’s user table.
+
+See https://avd.aquasec.com/misconfig/ksv-0020
+────────────────────────────────────────
+ demo-backend.yaml:18-44
+────────────────────────────────────────
+  18 ┌         - name: demo-backend
+  19 │           image: secops-demo-backend:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8081
+  24 │           # Same permissive process/filesystem baseline as demo-api.
+  25 │           securityContext:
+  26 └             readOnlyRootFilesystem: false
+  ..   
+────────────────────────────────────────
+
+
+KSV-0021 (LOW): Container 'demo-backend' of Deployment 'demo-backend' should set 'securityContext.runAsGroup' > 10000
+════════════════════════════════════════
+Force the container to run with group ID > 10000 to avoid conflicts with the host’s user table.
+
+See https://avd.aquasec.com/misconfig/ksv-0021
+────────────────────────────────────────
+ demo-backend.yaml:18-44
+────────────────────────────────────────
+  18 ┌         - name: demo-backend
+  19 │           image: secops-demo-backend:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8081
+  24 │           # Same permissive process/filesystem baseline as demo-api.
+  25 │           securityContext:
+  26 └             readOnlyRootFilesystem: false
+  ..   
+────────────────────────────────────────
+
+
+KSV-0030 (LOW): Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'
+════════════════════════════════════════
+According to pod security standard 'Seccomp', the RuntimeDefault seccomp profile must be required, or allow specific additional profiles.
+
+See https://avd.aquasec.com/misconfig/ksv-0030
+────────────────────────────────────────
+ demo-backend.yaml:18-44
+────────────────────────────────────────
+  18 ┌         - name: demo-backend
+  19 │           image: secops-demo-backend:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8081
+  24 │           # Same permissive process/filesystem baseline as demo-api.
+  25 │           securityContext:
+  26 └             readOnlyRootFilesystem: false
+  ..   
+────────────────────────────────────────
+
+
+KSV-0104 (MEDIUM): container "demo-backend" of deployment "demo-backend" in "secops-demo" namespace should specify a seccomp profile
+════════════════════════════════════════
+A program inside the container can bypass Seccomp protection policies.
+
+See https://avd.aquasec.com/misconfig/ksv-0104
+────────────────────────────────────────
+ demo-backend.yaml:18-44
+────────────────────────────────────────
+  18 ┌         - name: demo-backend
+  19 │           image: secops-demo-backend:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8081
+  24 │           # Same permissive process/filesystem baseline as demo-api.
+  25 │           securityContext:
+  26 └             readOnlyRootFilesystem: false
+  ..   
+────────────────────────────────────────
+
+
+KSV-0106 (LOW): container should drop all
+════════════════════════════════════════
+Containers must drop ALL capabilities, and are only permitted to add back the NET_BIND_SERVICE capability.
+
+See https://avd.aquasec.com/misconfig/ksv-0106
+────────────────────────────────────────
+ demo-backend.yaml:18-44
+────────────────────────────────────────
+  18 ┌         - name: demo-backend
+  19 │           image: secops-demo-backend:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 │               containerPort: 8081
+  24 │           # Same permissive process/filesystem baseline as demo-api.
+  25 │           securityContext:
+  26 └             readOnlyRootFilesystem: false
+  ..   
+────────────────────────────────────────
+
+
+KSV-0118 (HIGH): deployment demo-backend in secops-demo namespace is using the default security context, which allows root privileges
+════════════════════════════════════════
+Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.
+
+See https://avd.aquasec.com/misconfig/ksv-0118
+────────────────────────────────────────
+ demo-backend.yaml:15-44
+────────────────────────────────────────
+  15 ┌     spec:
+  16 │       serviceAccountName: demo-backend
+  17 │       containers:
+  18 │         - name: demo-backend
+  19 │           image: secops-demo-backend:phase-b
+  20 │           imagePullPolicy: Never
+  21 │           ports:
+  22 │             - name: http
+  23 └               containerPort: 8081
+  ..   
+────────────────────────────────────────
+
+
+
+rbac.yaml (kubernetes)
+======================
+Tests: 116 (SUCCESSES: 115, FAILURES: 1)
+Failures: 1 (UNKNOWN: 0, LOW: 0, MEDIUM: 1, HIGH: 0, CRITICAL: 0)
+
+KSV-0049 (MEDIUM): Role 'demo-api-fixture-access' should not have access to resource 'configmaps' for verbs ["create", "update", "patch", "delete", "deletecollection", "impersonate", "*"]
+════════════════════════════════════════
+Some workloads leverage configmaps to store sensitive data or configuration parameters that affect runtime behavior that can be modified by an attacker or combined with another issue to potentially lead to compromise.
+
+See https://avd.aquasec.com/misconfig/ksv-0049
+────────────────────────────────────────
+ rbac.yaml:28-31
+────────────────────────────────────────
+  28 ┌   name: demo-api-fixture-access
+  29 │   namespace: secops-demo
+  30 │ rules:
+  31 └   - apiGroups: [""]
+────────────────────────────────────────
+
+
+Trivy scan exit code: 0

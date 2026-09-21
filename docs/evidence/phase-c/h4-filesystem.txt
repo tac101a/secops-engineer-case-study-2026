@@ -1,0 +1,30 @@
+UTC collected: 2026-09-21T17:25:18Z
+Assessment-start commit: fcc6251cbf4a1cd1998806ed7ea59f09162166a8
+Target: namespace=secops-demo pod=demo-api-b8dcfccdf-gnv9c UID=d5601ad2-6919-4d58-bedf-5b984f0be056 container=demo-api
+Method: kubectl exec -i current demo-api container -- python3; /proc/1/mountinfo, /proc/1/status, os.stat, os.statvfs; read-only inspection
+application Uid:	0	0	0	0
+application Gid:	0	0	0	0
+probe exec uid/gid: 0 0
+/ mountpoint= / exact_mount= True mount= {'root': '/', 'mount_options': 'rw,relatime', 'filesystem': 'overlay', 'super_options_first': 'rw'} uid= 0 gid= 0 mode= 0o755 device= 1048658 statvfs_readonly= False
+/app mountpoint= / exact_mount= False mount= {'root': '/', 'mount_options': 'rw,relatime', 'filesystem': 'overlay', 'super_options_first': 'rw'} uid= 0 gid= 0 mode= 0o755 device= 1048658 statvfs_readonly= False
+/tmp mountpoint= / exact_mount= False mount= {'root': '/', 'mount_options': 'rw,relatime', 'filesystem': 'overlay', 'super_options_first': 'rw'} uid= 0 gid= 0 mode= 0o1777 device= 1048658 statvfs_readonly= False
+UTC collected: 2026-09-21T17:25:37Z
+Assessment-start commit: fcc6251cbf4a1cd1998806ed7ea59f09162166a8
+Target: namespace=secops-demo pod=demo-api-b8dcfccdf-gnv9c UID=d5601ad2-6919-4d58-bedf-5b984f0be056 container=demo-api
+Method: kubectl exec -i current demo-api container -- python3; exclusive create, write, readback, remove; names scoped to Pod UID prefix
+probe process Uid: 0	0	0	0
+probe process Gid: 0	0	0	0
+probe process CapEff: 00000000a80425fb
+probe process NoNewPrivs: 0
+probe path: /tmp/phase-c-h4-probe-d5601ad2
+create/write: SUCCESS; readback: b'phase-c-h4-probe:/tmp\n' matches: True
+remove: SUCCESS; path absent: True
+probe path: /app/phase-c-h4-probe-d5601ad2
+create/write: SUCCESS; readback: b'phase-c-h4-probe:/app\n' matches: True
+remove: SUCCESS; path absent: True
+Post-probe UTC: 2026-09-21T17:28:52Z
+Command: kubectl exec current demo-api -- python3 check assessor probe paths absent
+/tmp/phase-c-h4-probe-d5601ad2 absent= True
+/app/phase-c-h4-probe-d5601ad2 absent= True
+Pod identity still current:
+demo-api-b8dcfccdf-gnv9c   d5601ad2-6919-4d58-bedf-5b984f0be056   Running   0
