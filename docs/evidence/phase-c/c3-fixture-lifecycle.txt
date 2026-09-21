@@ -1,0 +1,28 @@
+UTC start: 2026-09-21T18:17:43Z
+Assessment-start commit: dbf618a761f0099981a044a90c325571c72364c9
+Assessor fixture creation uses operator credentials; the attacker is not assumed to create Pods or Services.
+UTC name check: 2026-09-21T18:17:45Z; exact Pod/phase-c3-untrusted-8f8d61d1, Pod/phase-c3-target-8f8d61d1, Service/phase-c3-target-8f8d61d1 absent.
+Sanitized manifests (exact assessor fixture specs):
+{"apiVersion": "v1", "kind": "Pod", "metadata": {"labels": {"assessment.id": "8f8d61d1", "assessment.phase": "c3", "assessment.role": "unrelated-source"}, "name": "phase-c3-untrusted-8f8d61d1", "namespace": "secops-demo"}, "spec": {"automountServiceAccountToken": false, "containers": [{"command": ["python", "-c", "import time; time.sleep(3600)"], "image": "secops-demo-api:phase-b", "imagePullPolicy": "Never", "name": "source"}]}}
+{"apiVersion": "v1", "kind": "Pod", "metadata": {"labels": {"assessment.id": "8f8d61d1", "assessment.phase": "c3", "assessment.role": "unrelated-target"}, "name": "phase-c3-target-8f8d61d1", "namespace": "secops-demo"}, "spec": {"automountServiceAccountToken": false, "containers": [{"image": "secops-demo-backend:phase-b", "imagePullPolicy": "Never", "name": "target", "ports": [{"containerPort": 8081, "name": "http"}], "readinessProbe": {"httpGet": {"path": "/healthz", "port": 8081}, "periodSeconds": 2}}]}}
+{"apiVersion": "v1", "kind": "Service", "metadata": {"labels": {"assessment.id": "8f8d61d1", "assessment.phase": "c3"}, "name": "phase-c3-target-8f8d61d1", "namespace": "secops-demo"}, "spec": {"ports": [{"name": "http", "port": 8081, "protocol": "TCP", "targetPort": 8081}], "selector": {"assessment.id": "8f8d61d1", "assessment.phase": "c3", "assessment.role": "unrelated-target"}, "type": "ClusterIP"}}
+UTC created pod/phase-c3-untrusted-8f8d61d1: 2026-09-21T18:17:45Z
+UTC created pod/phase-c3-target-8f8d61d1: 2026-09-21T18:17:45Z
+UTC created service/phase-c3-target-8f8d61d1: 2026-09-21T18:17:46Z
+UTC fixtures Ready: 2026-09-21T18:17:48Z
+Source fixture identity: {"image": "secops-demo-api:phase-b", "imageID": "sha256:80e1fd9bd1afe996dfb03d6b2839c88d00fc3bca1269a74b10b13acf777a6e1f", "ip": "10.244.0.9", "name": "phase-c3-untrusted-8f8d61d1", "phase": "Running", "ready": true, "uid": "26fd4fc1-3a40-48ef-9450-561121fb3324"}; labels={"assessment.id": "8f8d61d1", "assessment.phase": "c3", "assessment.role": "unrelated-source"}; automountServiceAccountToken=false
+Target fixture identity: {"image": "secops-demo-backend:phase-b", "imageID": "sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41", "ip": "10.244.0.10", "name": "phase-c3-target-8f8d61d1", "phase": "Running", "ready": true, "uid": "53e4c12a-9f04-46ba-94c6-efc6838b5837"}; labels={"assessment.id": "8f8d61d1", "assessment.phase": "c3", "assessment.role": "unrelated-target"}; automountServiceAccountToken=false
+Control 1, target Pod-local 127.0.0.1:8081/healthz: {"body": {"status": "ok"}, "status": 200, "url": "http://127.0.0.1:8081/healthz", "utc": "2026-09-21T18:17:48Z"}
+Control 2, target Service: {"clusterIP": "10.96.106.109", "name": "phase-c3-target-8f8d61d1", "ports": [{"name": "http", "port": 8081, "protocol": "TCP", "targetPort": 8081}], "selector": {"assessment.id": "8f8d61d1", "assessment.phase": "c3", "assessment.role": "unrelated-target"}}
+Control 2, target EndpointSlice: [{"endpoints": [{"addresses": ["10.244.0.10"], "conditions": {"ready": true, "serving": true, "terminating": false}, "targetRef": {"kind": "Pod", "name": "phase-c3-target-8f8d61d1", "namespace": "secops-demo", "uid": "53e4c12a-9f04-46ba-94c6-efc6838b5837"}}], "name": "phase-c3-target-8f8d61d1-lp8sn", "ports": [{"name": "http", "port": 8081, "protocol": "TCP"}]}]
+Control 2 check: selector uniquely matches target labels; EndpointSlice targetRef UID, Pod IP and port 8081 match.
+UTC probes completed: 2026-09-21T18:17:50Z; TEST B success=True; TEST A success=True
+UTC cleanup service/phase-c3-target-8f8d61d1: 2026-09-21T18:17:50Z; exit=0; output=service "phase-c3-target-8f8d61d1" deleted from secops-demo namespace 
+UTC cleanup pod/phase-c3-target-8f8d61d1: 2026-09-21T18:18:20Z; exit=0; output=pod "phase-c3-target-8f8d61d1" deleted from secops-demo namespace 
+UTC cleanup pod/phase-c3-untrusted-8f8d61d1: 2026-09-21T18:18:50Z; exit=0; output=pod "phase-c3-untrusted-8f8d61d1" deleted from secops-demo namespace 
+UTC verify pod/phase-c3-untrusted-8f8d61d1 absent: 2026-09-21T18:18:50Z; True
+UTC verify pod/phase-c3-target-8f8d61d1 absent: 2026-09-21T18:18:51Z; True
+UTC verify service/phase-c3-target-8f8d61d1 absent: 2026-09-21T18:18:51Z; True
+NetworkPolicy count after assessment: 0; no C3 NetworkPolicy created.
+Cleanup errors: none
+Assessment result: TEST B success=True; TEST A success=True

@@ -1,0 +1,10 @@
+UTC: 2026-09-21T18:17:44Z
+Assessment-start commit: dbf618a761f0099981a044a90c325571c72364c9
+Namespace: secops-demo
+NetworkPolicy count: 0; selecting demo-api: none; selecting demo-backend: none.
+Services: [{"clusterIP": "10.96.161.44", "name": "demo-api", "ports": [{"name": "http", "port": 8080, "protocol": "TCP", "targetPort": "http"}], "selector": {"app": "demo-api"}}, {"clusterIP": "10.96.32.207", "name": "demo-backend", "ports": [{"name": "http", "port": 8081, "protocol": "TCP", "targetPort": "http"}], "selector": {"app": "demo-backend"}}]
+EndpointSlices: {"demo-api": [{"endpoints": [{"addresses": ["10.244.0.7"], "conditions": {"ready": true, "serving": true, "terminating": false}, "targetRef": {"kind": "Pod", "name": "demo-api-b8dcfccdf-gnv9c", "namespace": "secops-demo", "uid": "d5601ad2-6919-4d58-bedf-5b984f0be056"}}], "name": "demo-api-mnzvl", "ports": [{"name": "http", "port": 8080, "protocol": "TCP"}]}], "demo-backend": [{"endpoints": [{"addresses": ["10.244.0.8"], "conditions": {"ready": true, "serving": true, "terminating": false}, "targetRef": {"kind": "Pod", "name": "demo-backend-549b8f665f-npfsp", "namespace": "secops-demo", "uid": "71156c57-8a45-46aa-a365-7566292e6d61"}}], "name": "demo-backend-kkzv6", "ports": [{"name": "http", "port": 8081, "protocol": "TCP"}]}]}
+Pods: [{"image": "secops-demo-api:phase-b", "imageID": "sha256:80e1fd9bd1afe996dfb03d6b2839c88d00fc3bca1269a74b10b13acf777a6e1f", "ip": "10.244.0.7", "name": "demo-api-b8dcfccdf-gnv9c", "phase": "Running", "ready": true, "uid": "d5601ad2-6919-4d58-bedf-5b984f0be056"}, {"image": "secops-demo-backend:phase-b", "imageID": "sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41", "ip": "10.244.0.8", "name": "demo-backend-549b8f665f-npfsp", "phase": "Running", "ready": true, "uid": "71156c57-8a45-46aa-a365-7566292e6d61"}]
+CNI: kindnet; image/version: docker.io/kindest/kindnetd:v20251212-v0.29.0-alpha-105-g20ccfc88; imageID: sha256:4921d7a6dffa922dd679732ba4797085c4f39e9a53bee8b6fdb1d463e8571251
+CNI NetworkPolicy support/enforcement was not tested.
+Missing NetworkPolicy is configuration context, not reachability proof.

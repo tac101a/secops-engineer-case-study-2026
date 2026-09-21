@@ -1,0 +1,59 @@
+Assessment-start commit: dbf618a761f0099981a044a90c325571c72364c9
+UTC evidence write: 2026-09-21T18:17:50Z
+Legitimate positive control: pre-assessment make task1-check FUNCTIONALITY = PASS, including demo-api -> demo-backend:8081.
+Target local and Service wiring positive controls: see c3-fixture-lifecycle.txt.
+
+PRIMARY TEST B
+UTC: 2026-09-21T18:17:49Z
+Source: {"image": "secops-demo-api:phase-b", "imageID": "sha256:80e1fd9bd1afe996dfb03d6b2839c88d00fc3bca1269a74b10b13acf777a6e1f", "ip": "10.244.0.7", "name": "demo-api-b8dcfccdf-gnv9c", "phase": "Running", "ready": true, "uid": "d5601ad2-6919-4d58-bedf-5b984f0be056"}
+Destination Service: {"clusterIP": "10.96.106.109", "name": "phase-c3-target-8f8d61d1", "ports": [{"name": "http", "port": 8081, "protocol": "TCP", "targetPort": 8081}], "selector": {"assessment.id": "8f8d61d1", "assessment.phase": "c3", "assessment.role": "unrelated-target"}}
+Destination Pod: {"image": "secops-demo-backend:phase-b", "imageID": "sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41", "ip": "10.244.0.10", "name": "phase-c3-target-8f8d61d1", "phase": "Running", "ready": true, "uid": "53e4c12a-9f04-46ba-94c6-efc6838b5837"}
+Protocol/port: TCP/8081; request GET /data
+Traffic-budget classification: NOT INTENDED — demo-api has no dependency on this unrelated target.
+PRIMARY TEST B — existing demo-api to unrelated target
+Transport: kubectl exec as assessor; fresh Python process, DNS lookup and TCP socket.
+Raw probe result: {"exit": 0, "stderr": "", "stdout": "{\"dns\": {\"addresses\": [\"10.96.106.109\"], \"result\": \"resolved\"}, \"host\": \"phase-c3-target-8f8d61d1.secops-demo.svc.cluster.local\", \"http\": {\"safe_response\": {\"source\": \"demo-backend\", \"value\": \"representative-data\"}, \"status\": 200}, \"path\": \"/data\", \"port\": 8081, \"tcp\": {\"peer\": [\"10.96.106.109\", 8081], \"result\": \"CONNECTED\"}, \"utc\": \"2026-09-21T18:17:49Z\"}"}
+Parsed result: {"dns": {"addresses": ["10.96.106.109"], "result": "resolved"}, "host": "phase-c3-target-8f8d61d1.secops-demo.svc.cluster.local", "http": {"safe_response": {"source": "demo-backend", "value": "representative-data"}, "status": 200}, "path": "/data", "port": 8081, "tcp": {"peer": ["10.96.106.109", 8081], "result": "CONNECTED"}, "utc": "2026-09-21T18:17:49Z"}
+Conclusion: selected unintended listener reachable
+
+CORROBORATING TEST A
+UTC: 2026-09-21T18:17:50Z
+Source: {"image": "secops-demo-api:phase-b", "imageID": "sha256:80e1fd9bd1afe996dfb03d6b2839c88d00fc3bca1269a74b10b13acf777a6e1f", "ip": "10.244.0.9", "name": "phase-c3-untrusted-8f8d61d1", "phase": "Running", "ready": true, "uid": "26fd4fc1-3a40-48ef-9450-561121fb3324"}
+Destination Service: {"clusterIP": "10.96.32.207", "name": "demo-backend", "ports": [{"name": "http", "port": 8081, "protocol": "TCP", "targetPort": "http"}], "selector": {"app": "demo-backend"}}
+Destination Pod: {"image": "secops-demo-backend:phase-b", "imageID": "sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41", "ip": "10.244.0.8", "name": "demo-backend-549b8f665f-npfsp", "phase": "Running", "ready": true, "uid": "71156c57-8a45-46aa-a365-7566292e6d61"}
+Protocol/port: TCP/8081; request GET /data
+Traffic-budget classification: NOT INTENDED — unrelated source has no legitimate caller relationship.
+CORROBORATING TEST A — unrelated source to existing demo-backend
+Transport: kubectl exec as assessor; fresh Python process, DNS lookup and TCP socket.
+Raw probe result: {"exit": 0, "stderr": "", "stdout": "{\"dns\": {\"addresses\": [\"10.96.32.207\"], \"result\": \"resolved\"}, \"host\": \"demo-backend.secops-demo.svc.cluster.local\", \"http\": {\"safe_response\": {\"source\": \"demo-backend\", \"value\": \"representative-data\"}, \"status\": 200}, \"path\": \"/data\", \"port\": 8081, \"tcp\": {\"peer\": [\"10.96.32.207\", 8081], \"result\": \"CONNECTED\"}, \"utc\": \"2026-09-21T18:17:50Z\"}"}
+Parsed result: {"dns": {"addresses": ["10.96.32.207"], "result": "resolved"}, "host": "demo-backend.secops-demo.svc.cluster.local", "http": {"safe_response": {"source": "demo-backend", "value": "representative-data"}, "status": 200}, "path": "/data", "port": 8081, "tcp": {"peer": ["10.96.32.207", 8081], "result": "CONNECTED"}, "utc": "2026-09-21T18:17:50Z"}
+Conclusion: selected unintended listener reachable
+
+Executed safe probe code (each test used a separate kubectl exec python -c invocation with Service FQDN, 8081, /data arguments):
+import datetime, http.client, json, socket, sys
+host, port, path = sys.argv[1], int(sys.argv[2]), sys.argv[3]
+out = {"utc": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds").replace("+00:00","Z"),
+       "host": host, "port": port, "path": path, "dns": None, "tcp": None, "http": None}
+try:
+    infos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
+    addrs = sorted(set(i[4][0] for i in infos))
+    out["dns"] = {"result": "resolved", "addresses": addrs}
+    family, kind, proto, _, address = infos[0]
+    sock = socket.socket(family, kind, proto)
+    sock.settimeout(5)
+    try:
+        sock.connect(address)
+        out["tcp"] = {"result": "CONNECTED", "peer": sock.getpeername()[0:2]}
+        req = "GET " + path + " HTTP/1.1\r\nHost: " + host + "\r\nConnection: close\r\n\r\n"
+        sock.sendall(req.encode("ascii"))
+        response = http.client.HTTPResponse(sock)
+        response.begin()
+        body = response.read(4097)
+        payload = json.loads(body)
+        out["http"] = {"status": response.status,
+                       "safe_response": {k: payload.get(k) for k in ("source", "value")}}
+    finally:
+        sock.close()
+except Exception as e:
+    out["error"] = type(e).__name__ + ": " + str(e)
+print(json.dumps(out, sort_keys=True))

@@ -1,0 +1,64 @@
+UTC: 2026-09-21T18:19:05Z
+Assessment-start commit: dbf618a761f0099981a044a90c325571c72364c9
+Command: make task1-check
+./task1/scripts/check-functional.sh
+deployment "demo-backend" successfully rolled out
+deployment "demo-api" successfully rolled out
+NAME                            READY   STATUS    RESTARTS   AGE    IP           NODE                       NOMINATED NODE   READINESS GATES
+demo-api-b8dcfccdf-gnv9c        1/1     Running   0          106m   10.244.0.7   secops-lab-control-plane   <none>           <none>
+demo-backend-549b8f665f-npfsp   1/1     Running   0          106m   10.244.0.8   secops-lab-control-plane   <none>           <none>
+backend /healthz: HTTP 200, {"status": "ok"}
+backend /data: HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+api /healthz: HTTP 200, {"status": "ok"}
+api /data (first): HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+api /data (repeat): HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+/tmp/demo-cache.json: {"source": "demo-backend", "value": "representative-data"}
+Recent backend request logs:
+10.244.0.1 - - [21/Sep/2026 18:18:57] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:18:59] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:19:01] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:19:03] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:19:03] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:19:05] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:19:07] "GET /healthz HTTP/1.1" 200 -
+127.0.0.1 - - [21/Sep/2026 18:19:08] "GET /healthz HTTP/1.1" 200 -
+127.0.0.1 - - [21/Sep/2026 18:19:08] "GET /data HTTP/1.1" 200 -
+10.244.0.7 - - [21/Sep/2026 18:19:08] "GET /data HTTP/1.1" 200 -
+10.244.0.7 - - [21/Sep/2026 18:19:08] "GET /data HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:19:09] "GET /healthz HTTP/1.1" 200 -
+
+FUNCTIONALITY = PASS
+H1–H4 remain hypotheses; security assessment occurs in Phase C.
+UTC final verification: 2026-09-21T18:19:45Z
+Phase B workload source SHA-256 verification:
+Makefile: OK
+task1/BASELINE.md: OK
+task1/app/demo-api/.dockerignore: OK
+task1/app/demo-api/Dockerfile: OK
+task1/app/demo-api/app.py: OK
+task1/app/demo-backend/.dockerignore: OK
+task1/app/demo-backend/Dockerfile: OK
+task1/app/demo-backend/app.py: OK
+task1/insecure/demo-api.yaml: OK
+task1/insecure/demo-backend.yaml: OK
+task1/insecure/namespace.yaml: OK
+task1/insecure/rbac.yaml: OK
+task1/kind.yaml: OK
+task1/scripts/build.sh: OK
+task1/scripts/check-functional.sh: OK
+task1/scripts/cleanup.sh: OK
+task1/scripts/cluster-up.sh: OK
+task1/scripts/common.sh: OK
+task1/scripts/deploy-insecure.sh: OK
+Protected tracked files unchanged: PASS
+Current Pods and Services:
+NAME                                READY   STATUS    RESTARTS   AGE    IP           NODE                       NOMINATED NODE   READINESS GATES
+pod/demo-api-b8dcfccdf-gnv9c        1/1     Running   0          106m   10.244.0.7   secops-lab-control-plane   <none>           <none>
+pod/demo-backend-549b8f665f-npfsp   1/1     Running   0          106m   10.244.0.8   secops-lab-control-plane   <none>           <none>
+
+NAME                   TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE    SELECTOR
+service/demo-api       ClusterIP   10.96.161.44   <none>        8080/TCP   106m   app=demo-api
+service/demo-backend   ClusterIP   10.96.32.207   <none>        8081/TCP   106m   app=demo-backend
+Remaining C3 Pods:
+Remaining C3 Services:
+Current NetworkPolicies:

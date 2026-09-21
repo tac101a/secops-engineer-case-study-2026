@@ -1,0 +1,31 @@
+UTC: 2026-09-21T18:15:17Z
+Assessment-start commit: dbf618a761f0099981a044a90c325571c72364c9
+Command: make task1-check
+./task1/scripts/check-functional.sh
+deployment "demo-backend" successfully rolled out
+deployment "demo-api" successfully rolled out
+NAME                            READY   STATUS    RESTARTS   AGE    IP           NODE                       NOMINATED NODE   READINESS GATES
+demo-api-b8dcfccdf-gnv9c        1/1     Running   0          102m   10.244.0.7   secops-lab-control-plane   <none>           <none>
+demo-backend-549b8f665f-npfsp   1/1     Running   0          102m   10.244.0.8   secops-lab-control-plane   <none>           <none>
+backend /healthz: HTTP 200, {"status": "ok"}
+backend /data: HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+api /healthz: HTTP 200, {"status": "ok"}
+api /data (first): HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+api /data (repeat): HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+/tmp/demo-cache.json: {"source": "demo-backend", "value": "representative-data"}
+Recent backend request logs:
+10.244.0.1 - - [21/Sep/2026 18:15:09] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:15:10] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:15:12] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:15:12] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:15:14] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:15:16] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:15:18] "GET /healthz HTTP/1.1" 200 -
+127.0.0.1 - - [21/Sep/2026 18:15:19] "GET /healthz HTTP/1.1" 200 -
+127.0.0.1 - - [21/Sep/2026 18:15:19] "GET /data HTTP/1.1" 200 -
+10.244.0.7 - - [21/Sep/2026 18:15:19] "GET /data HTTP/1.1" 200 -
+10.244.0.7 - - [21/Sep/2026 18:15:19] "GET /data HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 18:15:20] "GET /healthz HTTP/1.1" 200 -
+
+FUNCTIONALITY = PASS
+H1–H4 remain hypotheses; security assessment occurs in Phase C.
