@@ -1,0 +1,38 @@
+Cluster environment UTC: 2026-09-21T16:32:24Z
+Client Version: v1.35.0
+Kustomize Version: v5.7.1
+Server Version: v1.34.3
+NAME                       STATUS   ROLES           AGE     VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION                       CONTAINER-RUNTIME
+secops-lab-control-plane   Ready    control-plane   3m34s   v1.34.3   172.18.0.2    <none>        Debian GNU/Linux 12 (bookworm)   5.15.167.4-microsoft-standard-WSL2   containerd://2.2.0
+NAME         DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+kindnet      1         1         1       1            1           kubernetes.io/os=linux   3m27s
+kube-proxy   1         1         1       1            1           kubernetes.io/os=linux   3m31s
+kindnet-cni image=docker.io/kindest/kindnetd:v20251212-v0.29.0-alpha-105-g20ccfc88
+Workload state UTC: 2026-09-21T16:33:53Z
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS     IMAGES                        SELECTOR
+deployment.apps/demo-api       1/1     1            1           52s   demo-api       secops-demo-api:phase-b       app=demo-api
+deployment.apps/demo-backend   1/1     1            1           52s   demo-backend   secops-demo-backend:phase-b   app=demo-backend
+
+NAME                                READY   STATUS    RESTARTS   AGE   IP           NODE                       NOMINATED NODE   READINESS GATES
+pod/demo-api-b8dcfccdf-gnv9c        1/1     Running   0          52s   10.244.0.7   secops-lab-control-plane   <none>           <none>
+pod/demo-backend-549b8f665f-npfsp   1/1     Running   0          52s   10.244.0.8   secops-lab-control-plane   <none>           <none>
+
+NAME                   TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE   SELECTOR
+service/demo-api       ClusterIP   10.96.161.44   <none>        8080/TCP   52s   app=demo-api
+service/demo-backend   ClusterIP   10.96.32.207   <none>        8081/TCP   52s   app=demo-backend
+NAME                            UID                                    IMAGE                         IMAGE_ID
+demo-api-b8dcfccdf-gnv9c        d5601ad2-6919-4d58-bedf-5b984f0be056   secops-demo-api:phase-b       sha256:80e1fd9bd1afe996dfb03d6b2839c88d00fc3bca1269a74b10b13acf777a6e1f
+demo-backend-549b8f665f-npfsp   71156c57-8a45-46aa-a365-7566292e6d61   secops-demo-backend:phase-b   sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41
+Host image [secops-demo-api:phase-b] ID=sha256:95dd04cfef5a6d31e10adf7b2371676f0a5ae11d94772790dbd8467ec627ff18
+Deployed demo-api /app/app.py SHA256:
+0e565be4528f33bcae39857c92d413585c6005600410fa4fcac1ebd01ddb7ce1
+Host image [secops-demo-backend:phase-b] ID=sha256:8359a9eb05508d097f51680085662c793afef1355c49dfe2ab28fcb92179ff57
+Deployed demo-backend /app/app.py SHA256:
+0988ee420a3c13597f3455ea9163b53a9f871866bbf092205c94a06f8186c4fa
+
+Loaded container image manifest -> image config identity mapping:
+Metadata parser correction: Kubernetes imageID identifies the config here, not the manifest. First attempted config.digest lookup failed with KeyError; no workload changed.
+demo-api host image ID=sha256:95dd04cfef5a6d31e10adf7b2371676f0a5ae11d94772790dbd8467ec627ff18 -> loaded manifest config: time="2026-09-21T16:34:58Z" level=warning msg="DEPRECATION: The support for cgroup v1 is deprecated since containerd v2.2 and will be removed by no later than May 2029. Upgrade the host to use cgroup v2."
+sha256:80e1fd9bd1afe996dfb03d6b2839c88d00fc3bca1269a74b10b13acf777a6e1f
+demo-backend host image ID=sha256:8359a9eb05508d097f51680085662c793afef1355c49dfe2ab28fcb92179ff57 -> loaded manifest config: time="2026-09-21T16:34:58Z" level=warning msg="DEPRECATION: The support for cgroup v1 is deprecated since containerd v2.2 and will be removed by no later than May 2029. Upgrade the host to use cgroup v2."
+sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41

@@ -1,0 +1,48 @@
+# Representative H2 fixture; neither application needs Kubernetes API access.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo-api
+  namespace: secops-demo
+automountServiceAccountToken: true
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo-backend
+  namespace: secops-demo
+automountServiceAccountToken: true
+---
+# Synthetic assessment target only; never consumed as application configuration.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: phase-c-fixture
+  namespace: secops-demo
+data:
+  marker: baseline
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: demo-api-fixture-access
+  namespace: secops-demo
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["phase-c-fixture"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: demo-api-fixture-access
+  namespace: secops-demo
+subjects:
+  - kind: ServiceAccount
+    name: demo-api
+    namespace: secops-demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: demo-api-fixture-access

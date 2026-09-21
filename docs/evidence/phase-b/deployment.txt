@@ -1,0 +1,38 @@
+Deployment UTC: 2026-09-21T16:32:59Z
+./task1/scripts/deploy-insecure.sh
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+namespace/secops-demo created
+deployment.apps/demo-api created
+service/demo-api created
+deployment.apps/demo-backend created
+service/demo-backend created
+namespace/secops-demo unchanged
+serviceaccount/demo-api created
+serviceaccount/demo-backend created
+configmap/phase-c-fixture created
+role.rbac.authorization.k8s.io/demo-api-fixture-access created
+rolebinding.rbac.authorization.k8s.io/demo-api-fixture-access created
+deployment.apps/demo-api restarted
+deployment.apps/demo-backend restarted
+Waiting for deployment "demo-backend" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "demo-backend" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "demo-backend" rollout to finish: 1 old replicas are pending termination...
+deployment "demo-backend" successfully rolled out
+Waiting for deployment "demo-api" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "demo-api" rollout to finish: 1 old replicas are pending termination...
+deployment "demo-api" successfully rolled out
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/demo-api       1/1     1            1           5s
+deployment.apps/demo-backend   1/1     1            1           5s
+
+NAME                                READY   STATUS        RESTARTS   AGE
+pod/demo-api-6c485f89b-bprlx        1/1     Terminating   0          5s
+pod/demo-api-b8dcfccdf-gnv9c        1/1     Running       0          5s
+pod/demo-backend-549b8f665f-npfsp   1/1     Running       0          5s
+pod/demo-backend-749dcdc6f4-c6sqh   1/1     Terminating   0          5s
+
+NAME                   TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+service/demo-api       ClusterIP   10.96.161.44   <none>        8080/TCP   5s
+service/demo-backend   ClusterIP   10.96.32.207   <none>        8081/TCP   5s
+Representative permissive baseline deployed; run make task1-check.
+Deployment exit code: 0

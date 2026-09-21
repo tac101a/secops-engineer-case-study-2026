@@ -1,0 +1,45 @@
+Final working-tree inventory UTC: 2026-09-21T16:37:15.135378+00:00
+Command: git status --short --untracked-files=all
+ M .gitignore
+ M Makefile
+ M README.md
+?? docs/evidence/phase-b/build.txt
+?? docs/evidence/phase-b/cluster-state.txt
+?? docs/evidence/phase-b/cluster-up.txt
+?? docs/evidence/phase-b/deployment.txt
+?? docs/evidence/phase-b/environment.txt
+?? docs/evidence/phase-b/functional-baseline.txt
+?? docs/evidence/phase-b/resume-state.txt
+?? docs/evidence/phase-b/static-validation.txt
+?? docs/evidence/phase-b/tool-installation.txt
+?? docs/evidence/phase-b/working-tree.txt
+?? docs/evidence/phase-b/workload-revision.txt
+?? docs/phase-b-report.md
+?? task1/BASELINE.md
+?? task1/app/demo-api/.dockerignore
+?? task1/app/demo-api/Dockerfile
+?? task1/app/demo-api/app.py
+?? task1/app/demo-backend/.dockerignore
+?? task1/app/demo-backend/Dockerfile
+?? task1/app/demo-backend/app.py
+?? task1/insecure/demo-api.yaml
+?? task1/insecure/demo-backend.yaml
+?? task1/insecure/namespace.yaml
+?? task1/insecure/rbac.yaml
+?? task1/kind.yaml
+?? task1/scripts/build.sh
+?? task1/scripts/check-functional.sh
+?? task1/scripts/cleanup.sh
+?? task1/scripts/cluster-up.sh
+?? task1/scripts/common.sh
+?? task1/scripts/deploy-insecure.sh
+
+Final review checks:
+Recorded workload SHA256 inputs still match current files: PASS
+Report file inventory equals git status (33 files): PASS
+Local Markdown document/evidence links resolve: PASS
+Required 20 report sections and single final exit decision: PASS
+Changed text files contain no private-key/kubeconfig/JWT markers: PASS (plus manual synthetic-data review)
+Architecture, Task 2 and CI tracked files unchanged: PASS
+Final git diff --check: PASS
+Downloaded binaries and local lab credentials/ownership state are ignored: PASS

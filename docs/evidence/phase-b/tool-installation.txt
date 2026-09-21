@@ -1,0 +1,63 @@
+Phase B CLI installation
+Started UTC: 2026-09-21T09:22:50Z
+Permission: sandbox escalation requested for official upstream network downloads. No sudo or system package manager; user-owned repository-local installation only.
+Host architecture: x86_64
+Installation destination: /home/tac/projects/secops-engineer-case-study-2026/.local/bin
+
+Download URL: https://github.com/kubernetes-sigs/kind/releases/download/v0.31.0/kind-linux-amd64
+Started UTC: 2026-09-21T09:22:50Z
+HTTP status: 200
+Downloaded bytes: 11097044
+Download exit code: 0
+
+Download URL: https://github.com/kubernetes-sigs/kind/releases/download/v0.31.0/kind-linux-amd64.sha256sum
+Started UTC: 2026-09-21T09:23:01Z
+HTTP status: 200
+Downloaded bytes: 83
+Download exit code: 0
+
+Download URL: https://dl.k8s.io/release/v1.35.0/bin/linux/amd64/kubectl
+Started UTC: 2026-09-21T09:23:02Z
+HTTP status: 200
+Downloaded bytes: 58597560
+Download exit code: 0
+
+Download URL: https://dl.k8s.io/release/v1.35.0/bin/linux/amd64/kubectl.sha256
+Started UTC: 2026-09-21T09:23:31Z
+HTTP status: 200
+Downloaded bytes: 64
+Download exit code: 0
+
+Official kind SHA256: eb244cbafcc157dff60cf68693c14c9a75c4e6e6fedaf9cd71c58117cb93e3fa
+Official kubectl SHA256: a2e984a18a0c063279d692533031c1eff93a262afcc0afdc517375432d060989
+/tmp/phase-b-clis.delKq6/kind: OK
+/tmp/phase-b-clis.delKq6/kubectl: OK
+Checksum verification exit codes: kind=0 kubectl=0
+.local/bin/kind
+.local/bin/kubectl
+
+Installed file hashes:
+eb244cbafcc157dff60cf68693c14c9a75c4e6e6fedaf9cd71c58117cb93e3fa  .local/bin/kind
+a2e984a18a0c063279d692533031c1eff93a262afcc0afdc517375432d060989  .local/bin/kubectl
+
+Installed kind version:
+kind v0.31.0 go1.25.5 linux/amd64
+
+Installed kubectl client version:
+clientVersion:
+  buildDate: "2025-12-17T12:41:05Z"
+  compiler: gc
+  gitCommit: 66452049f3d692768c39c797b21b793dce80314e
+  gitTreeState: clean
+  gitVersion: v1.35.0
+  goVersion: go1.25.5
+  major: "1"
+  minor: "35"
+  platform: linux/amd64
+kustomizeVersion: v5.7.1
+
+
+Version command exit codes: kind=0 kubectl=0
+Elevated OS privileges used: none (no sudo). Sandbox escalation used: yes.
+Overall installation exit code: 0
+Finished UTC: 2026-09-21T09:23:32Z

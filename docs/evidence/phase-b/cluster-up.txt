@@ -1,0 +1,189 @@
+Started UTC: 2026-09-21T09:24:38Z
+./task1/scripts/cluster-up.sh
+make: ./task1/scripts/cluster-up.sh: Permission denied
+make: *** [Makefile:4: task1-cluster-up] Error 127
+Retry UTC: 2026-09-21T09:24:52Z
+./task1/scripts/cluster-up.sh
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-ai" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-ai: no such file or directory
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-buildx" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-buildx: no such file or directory
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-compose" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-compose: no such file or directory
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-debug" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-debug: no such file or directory
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-desktop" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-desktop: no such file or directory
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-extension" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-extension: no such file or directory
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-init" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-init: no such file or directory
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-mcp" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-mcp: no such file or directory
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-model" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-model: no such file or directory
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-offload" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-offload: no such file or directory
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-pass" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-pass: no such file or directory
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-sandbox" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-sandbox: no such file or directory
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-sbom" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-sbom: no such file or directory
+WARNING: Plugin "/usr/local/lib/docker/cli-plugins/docker-scout" is not valid: failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-scout: no such file or directory
+WARNING: No blkio throttle.read_bps_device support
+WARNING: No blkio throttle.write_bps_device support
+WARNING: No blkio throttle.read_iops_device support
+WARNING: No blkio throttle.write_iops_device support
+WARNING: Support for cgroup v1 is deprecated and planned to be removed by no later than May 2029 (https://github.com/moby/moby/issues/51111)
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+No kind clusters found.
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+Creating cluster "secops-lab" ...
+ • Ensuring node image (kindest/node:v1.35.0) 🖼  ...
+ ✓ Ensuring node image (kindest/node:v1.35.0) 🖼
+ • Preparing nodes 📦   ...
+ ✓ Preparing nodes 📦 
+ • Writing configuration 📜  ...
+ ✓ Writing configuration 📜
+ • Starting control-plane 🕹️  ...
+ ✗ Starting control-plane 🕹️
+Deleted nodes: ["secops-lab-control-plane"]
+ERROR: failed to create cluster: failed to init node with kubeadm: command "docker exec --privileged secops-lab-control-plane kubeadm init --config=/kind/kubeadm.conf --skip-token-print --v=6" failed with error: exit status 1
+
+Command Output: I0921 09:32:20.613256     249 initconfiguration.go:260] loading configuration from "/kind/kubeadm.conf"
+W0921 09:32:20.613901     249 common.go:100] your configuration file uses a deprecated API spec: "kubeadm.k8s.io/v1beta3" (kind: "ClusterConfiguration"). Please use 'kubeadm config migrate --old-config old-config-file --new-config new-config-file', which will write the new, similar spec using a newer API version.
+W0921 09:32:20.614450     249 common.go:100] your configuration file uses a deprecated API spec: "kubeadm.k8s.io/v1beta3" (kind: "InitConfiguration"). Please use 'kubeadm config migrate --old-config old-config-file --new-config new-config-file', which will write the new, similar spec using a newer API version.
+W0921 09:32:20.614792     249 common.go:100] your configuration file uses a deprecated API spec: "kubeadm.k8s.io/v1beta3" (kind: "JoinConfiguration"). Please use 'kubeadm config migrate --old-config old-config-file --new-config new-config-file', which will write the new, similar spec using a newer API version.
+W0921 09:32:20.615056     249 initconfiguration.go:361] [config] WARNING: Ignored configuration document with GroupVersionKind kubeadm.k8s.io/v1beta3, Kind=JoinConfiguration
+[init] Using Kubernetes version: v1.35.0
+[certs] Using certificateDir folder "/etc/kubernetes/pki"
+I0921 09:32:20.616924     249 certs.go:111] creating a new certificate authority for ca
+[certs] Generating "ca" certificate and key
+I0921 09:32:20.682740     249 certs.go:472] validating certificate period for ca certificate
+[certs] Generating "apiserver" certificate and key
+[certs] apiserver serving cert is signed for DNS names [kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local localhost secops-lab-control-plane] and IPs [10.96.0.1 172.18.0.2 127.0.0.1]
+[certs] Generating "apiserver-kubelet-client" certificate and key
+I0921 09:32:20.784139     249 certs.go:111] creating a new certificate authority for front-proxy-ca
+[certs] Generating "front-proxy-ca" certificate and key
+I0921 09:32:20.883536     249 certs.go:472] validating certificate period for front-proxy-ca certificate
+[certs] Generating "front-proxy-client" certificate and key
+I0921 09:32:20.948103     249 certs.go:111] creating a new certificate authority for etcd-ca
+[certs] Generating "etcd/ca" certificate and key
+I0921 09:32:21.032800     249 certs.go:472] validating certificate period for etcd/ca certificate
+[certs] Generating "etcd/server" certificate and key
+[certs] etcd/server serving cert is signed for DNS names [localhost secops-lab-control-plane] and IPs [172.18.0.2 127.0.0.1 ::1]
+[certs] Generating "etcd/peer" certificate and key
+[certs] etcd/peer serving cert is signed for DNS names [localhost secops-lab-control-plane] and IPs [172.18.0.2 127.0.0.1 ::1]
+[certs] Generating "etcd/healthcheck-client" certificate and key
+[certs] Generating "apiserver-etcd-client" certificate and key
+I0921 09:32:21.316589     249 certs.go:77] creating new public/private key files for signing service account users
+[certs] Generating "sa" key and public key
+[kubeconfig] Using kubeconfig folder "/etc/kubernetes"
+I0921 09:32:21.409568     249 kubeconfig.go:111] creating kubeconfig file for admin.conf
+[kubeconfig] Writing "admin.conf" kubeconfig file
+I0921 09:32:21.475887     249 kubeconfig.go:111] creating kubeconfig file for super-admin.conf
+[kubeconfig] Writing "super-admin.conf" kubeconfig file
+I0921 09:32:21.556384     249 kubeconfig.go:111] creating kubeconfig file for kubelet.conf
+[kubeconfig] Writing "kubelet.conf" kubeconfig file
+I0921 09:32:21.638361     249 kubeconfig.go:111] creating kubeconfig file for controller-manager.conf
+[kubeconfig] Writing "controller-manager.conf" kubeconfig file
+I0921 09:32:21.783705     249 kubeconfig.go:111] creating kubeconfig file for scheduler.conf
+[kubeconfig] Writing "scheduler.conf" kubeconfig file
+[etcd] Creating static Pod manifest for local etcd in "/etc/kubernetes/manifests"
+I0921 09:32:21.906554     249 local.go:67] [etcd] wrote Static Pod manifest for a local etcd member to "/etc/kubernetes/manifests/etcd.yaml"
+I0921 09:32:21.906611     249 manifests.go:125] [control-plane] getting StaticPodSpecs
+[control-plane] Using manifest folder "/etc/kubernetes/manifests"
+[control-plane] Creating static Pod manifest for "kube-apiserver"
+I0921 09:32:21.906827     249 certs.go:472] validating certificate period for CA certificate
+I0921 09:32:21.906913     249 manifests.go:151] [control-plane] adding volume "ca-certs" for component "kube-apiserver"
+I0921 09:32:21.906923     249 manifests.go:151] [control-plane] adding volume "etc-ca-certificates" for component "kube-apiserver"
+I0921 09:32:21.906926     249 manifests.go:151] [control-plane] adding volume "k8s-certs" for component "kube-apiserver"
+I0921 09:32:21.906928     249 manifests.go:151] [control-plane] adding volume "usr-local-share-ca-certificates" for component "kube-apiserver"
+I0921 09:32:21.906930     249 manifests.go:151] [control-plane] adding volume "usr-share-ca-certificates" for component "kube-apiserver"
+I0921 09:32:21.907649     249 manifests.go:178] [control-plane] wrote static Pod manifest for component "kube-apiserver" to "/etc/kubernetes/manifests/kube-apiserver.yaml"
+I0921 09:32:21.907684     249 manifests.go:125] [control-plane] getting StaticPodSpecs
+[control-plane] Creating static Pod manifest for "kube-controller-manager"
+I0921 09:32:21.907881     249 manifests.go:151] [control-plane] adding volume "ca-certs" for component "kube-controller-manager"
+I0921 09:32:21.907917     249 manifests.go:151] [control-plane] adding volume "etc-ca-certificates" for component "kube-controller-manager"
+I0921 09:32:21.907921     249 manifests.go:151] [control-plane] adding volume "flexvolume-dir" for component "kube-controller-manager"
+I0921 09:32:21.907924     249 manifests.go:151] [control-plane] adding volume "k8s-certs" for component "kube-controller-manager"
+I0921 09:32:21.907926     249 manifests.go:151] [control-plane] adding volume "kubeconfig" for component "kube-controller-manager"
+I0921 09:32:21.907928     249 manifests.go:151] [control-plane] adding volume "usr-local-share-ca-certificates" for component "kube-controller-manager"
+I0921 09:32:21.907930     249 manifests.go:151] [control-plane] adding volume "usr-share-ca-certificates" for component "kube-controller-manager"
+[control-plane] Creating static Pod manifest for "kube-scheduler"
+I0921 09:32:21.908725     249 manifests.go:178] [control-plane] wrote static Pod manifest for component "kube-controller-manager" to "/etc/kubernetes/manifests/kube-controller-manager.yaml"
+I0921 09:32:21.908786     249 manifests.go:125] [control-plane] getting StaticPodSpecs
+I0921 09:32:21.909057     249 manifests.go:151] [control-plane] adding volume "kubeconfig" for component "kube-scheduler"
+I0921 09:32:21.909659     249 manifests.go:178] [control-plane] wrote static Pod manifest for component "kube-scheduler" to "/etc/kubernetes/manifests/kube-scheduler.yaml"
+I0921 09:32:21.909701     249 kubelet.go:69] Stopping the kubelet
+[kubelet-start] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/instance-config.yaml"
+[patches] Applied patch of type "application/strategic-merge-patch+json" to target "kubeletconfiguration"
+[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+[kubelet-start] Starting the kubelet
+I0921 09:32:22.045012     249 loader.go:405] Config loaded from file:  /etc/kubernetes/admin.conf
+I0921 09:32:22.045462     249 envvar.go:172] "Feature gate default state" feature="InOrderInformers" enabled=true
+I0921 09:32:22.045493     249 envvar.go:172] "Feature gate default state" feature="InOrderInformersBatchProcess" enabled=true
+I0921 09:32:22.045500     249 envvar.go:172] "Feature gate default state" feature="InformerResourceVersion" enabled=true
+I0921 09:32:22.045504     249 envvar.go:172] "Feature gate default state" feature="WatchListClient" enabled=true
+I0921 09:32:22.045507     249 envvar.go:172] "Feature gate default state" feature="ClientsAllowCBOR" enabled=false
+I0921 09:32:22.045510     249 envvar.go:172] "Feature gate default state" feature="ClientsPreferCBOR" enabled=false
+[wait-control-plane] Waiting for the kubelet to boot up the control plane as static Pods from directory "/etc/kubernetes/manifests"
+[kubelet-check] Waiting for a healthy kubelet at http://127.0.0.1:10248/healthz. This can take up to 4m0s
+[kubelet-check] The kubelet is not healthy after 4m0.000974929s
+
+Unfortunately, an error has occurred, likely caused by:
+	- The kubelet is not running
+	- The kubelet is unhealthy due to a misconfiguration of the node in some way (required cgroups disabled)
+
+If you are on a systemd-powered system, you can try to troubleshoot the error with the following commands:
+	- 'systemctl status kubelet'
+	- 'journalctl -xeu kubelet'
+
+error: error execution phase wait-control-plane: failed while waiting for the kubelet to start: The HTTP call equal to 'curl -sSL http://127.0.0.1:10248/healthz' returned error: Get "http://127.0.0.1:10248/healthz": context deadline exceeded
+
+k8s.io/kubernetes/cmd/kubeadm/app/cmd/phases/workflow.(*Runner).Run.func1
+	k8s.io/kubernetes/cmd/kubeadm/app/cmd/phases/workflow/runner.go:262
+k8s.io/kubernetes/cmd/kubeadm/app/cmd/phases/workflow.(*Runner).visitAll
+	k8s.io/kubernetes/cmd/kubeadm/app/cmd/phases/workflow/runner.go:450
+k8s.io/kubernetes/cmd/kubeadm/app/cmd/phases/workflow.(*Runner).Run
+	k8s.io/kubernetes/cmd/kubeadm/app/cmd/phases/workflow/runner.go:234
+k8s.io/kubernetes/cmd/kubeadm/app/cmd.newCmdInit.func1
+	k8s.io/kubernetes/cmd/kubeadm/app/cmd/init.go:135
+github.com/spf13/cobra.(*Command).execute
+	github.com/spf13/cobra@v1.10.0/command.go:1015
+github.com/spf13/cobra.(*Command).ExecuteC
+	github.com/spf13/cobra@v1.10.0/command.go:1148
+github.com/spf13/cobra.(*Command).Execute
+	github.com/spf13/cobra@v1.10.0/command.go:1071
+k8s.io/kubernetes/cmd/kubeadm/app.Run
+	k8s.io/kubernetes/cmd/kubeadm/app/kubeadm.go:48
+main.main
+	k8s.io/kubernetes/cmd/kubeadm/kubeadm.go:25
+runtime.main
+	runtime/proc.go:285
+runtime.goexit
+	runtime/asm_amd64.s:1693
+make: *** [Makefile:4: task1-cluster-up] Error 1
+Resumed attempt with pinned v1.34.3 UTC: 2026-09-21T16:28:06Z
+./task1/scripts/cluster-up.sh
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+No kind clusters found.
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+Creating cluster "secops-lab" ...
+ • Ensuring node image (kindest/node:v1.34.3) 🖼  ...
+ ✓ Ensuring node image (kindest/node:v1.34.3) 🖼
+ • Preparing nodes 📦   ...
+ ✓ Preparing nodes 📦 
+ • Writing configuration 📜  ...
+ ✓ Writing configuration 📜
+ • Starting control-plane 🕹️  ...
+ ✓ Starting control-plane 🕹️
+ • Installing CNI 🔌  ...
+ ✓ Installing CNI 🔌
+ • Installing StorageClass 💾  ...
+ ✓ Installing StorageClass 💾
+ • Waiting ≤ 3m0s for control-plane = Ready ⏳  ...
+ ✓ Waiting ≤ 3m0s for control-plane = Ready ⏳
+ • Ready after 14s 💚
+Set kubectl context to "kind-secops-lab"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-secops-lab --kubeconfig /home/tac/projects/secops-engineer-case-study-2026/.local/kubeconfig
+
+Have a nice day! 👋
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+Set kubectl context to "kind-secops-lab"
+node/secops-lab-control-plane condition met
+NAME                       STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION                       CONTAINER-RUNTIME
+secops-lab-control-plane   Ready    control-plane   29s   v1.34.3   172.18.0.2    <none>        Debian GNU/Linux 12 (bookworm)   5.15.167.4-microsoft-standard-WSL2   containerd://2.2.0
+Cluster ready; operator kubeconfig: /home/tac/projects/secops-engineer-case-study-2026/.local/kubeconfig (context kind-secops-lab).
+Cluster-up exit code: 0

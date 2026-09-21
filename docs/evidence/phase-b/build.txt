@@ -1,0 +1,91 @@
+Build UTC: 2026-09-21T16:31:49Z
+./task1/scripts/build.sh
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-buildx: no such file or directory
+
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  6.144kB
+Step 1/7 : FROM python:3.12.12-slim-bookworm@sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c
+3.12.12-slim-bookworm: Pulling from library/python
+dbeb2af0e7bd: Pulling fs layer
+84a2afebaf4d: Pulling fs layer
+2e8ff2a71e95: Pulling fs layer
+f9f25941dc13: Pulling fs layer
+dbeb2af0e7bd: Download complete
+2e8ff2a71e95: Download complete
+f9f25941dc13: Download complete
+5f1e92462ded: Download complete
+b5f799b765ea: Download complete
+84a2afebaf4d: Download complete
+84a2afebaf4d: Pull complete
+2e8ff2a71e95: Pull complete
+dbeb2af0e7bd: Pull complete
+f9f25941dc13: Pull complete
+Digest: sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c
+Status: Downloaded newer image for python:3.12.12-slim-bookworm@sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c
+ ---> 593bd06efe90
+Step 2/7 : ENV PYTHONDONTWRITEBYTECODE=1     PYTHONUNBUFFERED=1
+ ---> Running in 998797e76292
+ ---> Removed intermediate container 998797e76292
+ ---> 115876de7889
+Step 3/7 : WORKDIR /app
+ ---> Running in ae7f276f9274
+ ---> Removed intermediate container ae7f276f9274
+ ---> 14273b689071
+Step 4/7 : COPY app.py ./app.py
+ ---> 984ce199938f
+Step 5/7 : USER 0
+ ---> Running in 08d9d75cf740
+ ---> Removed intermediate container 08d9d75cf740
+ ---> 57dd2e67ef47
+Step 6/7 : EXPOSE 8080
+ ---> Running in 4ee4d86b8e6e
+ ---> Removed intermediate container 4ee4d86b8e6e
+ ---> 824c0e28be2d
+Step 7/7 : CMD ["python", "app.py"]
+ ---> Running in 6a4a5fae7b30
+ ---> Removed intermediate container 6a4a5fae7b30
+ ---> 95dd04cfef5a
+Successfully built 95dd04cfef5a
+Successfully tagged secops-demo-api:phase-b
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+Image: "secops-demo-api:phase-b" with ID "sha256:95dd04cfef5a6d31e10adf7b2371676f0a5ae11d94772790dbd8467ec627ff18" not yet present on node "secops-lab-control-plane", loading...
+Built [secops-demo-api:phase-b] image ID sha256:95dd04cfef5a6d31e10adf7b2371676f0a5ae11d94772790dbd8467ec627ff18
+failed to fetch metadata: fork/exec /usr/local/lib/docker/cli-plugins/docker-buildx: no such file or directory
+
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  4.608kB
+Step 1/7 : FROM python:3.12.12-slim-bookworm@sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c
+ ---> 593bd06efe90
+Step 2/7 : ENV PYTHONDONTWRITEBYTECODE=1     PYTHONUNBUFFERED=1
+ ---> Using cache
+ ---> 115876de7889
+Step 3/7 : WORKDIR /app
+ ---> Using cache
+ ---> 14273b689071
+Step 4/7 : COPY app.py ./app.py
+ ---> 36ae1df54ad7
+Step 5/7 : USER 0
+ ---> Running in b35edcf43138
+ ---> Removed intermediate container b35edcf43138
+ ---> db66f4c4732a
+Step 6/7 : EXPOSE 8081
+ ---> Running in f2e13e4da94b
+ ---> Removed intermediate container f2e13e4da94b
+ ---> 9ac7b0c055a0
+Step 7/7 : CMD ["python", "app.py"]
+ ---> Running in 746fd0447f18
+ ---> Removed intermediate container 746fd0447f18
+ ---> 8359a9eb0550
+Successfully built 8359a9eb0550
+Successfully tagged secops-demo-backend:phase-b
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+Image: "secops-demo-backend:phase-b" with ID "sha256:8359a9eb05508d097f51680085662c793afef1355c49dfe2ab28fcb92179ff57" not yet present on node "secops-lab-control-plane", loading...
+Built [secops-demo-backend:phase-b] image ID sha256:8359a9eb05508d097f51680085662c793afef1355c49dfe2ab28fcb92179ff57
+Build exit code: 0

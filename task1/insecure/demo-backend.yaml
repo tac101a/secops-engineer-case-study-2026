@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-backend
+  namespace: secops-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-backend
+  template:
+    metadata:
+      labels:
+        app: demo-backend
+    spec:
+      serviceAccountName: demo-backend
+      containers:
+        - name: demo-backend
+          image: secops-demo-backend:phase-b
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8081
+          # Same permissive process/filesystem baseline as demo-api.
+          securityContext:
+            readOnlyRootFilesystem: false
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-backend
+  namespace: secops-demo
+spec:
+  selector:
+    app: demo-backend
+  ports:
+    - name: http
+      port: 8081
+      targetPort: http

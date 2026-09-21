@@ -1,0 +1,10 @@
+Validation UTC: 2026-09-21T16:28:36Z
+Bash syntax: PASS
+Python syntax: PASS task1/app/demo-api/app.py
+Python syntax: PASS task1/app/demo-backend/app.py
+YAML parse: PASS task1/insecure/demo-api.yaml (2 document(s))
+YAML parse: PASS task1/insecure/demo-backend.yaml (2 document(s))
+YAML parse: PASS task1/insecure/namespace.yaml (1 document(s))
+YAML parse: PASS task1/insecure/rbac.yaml (5 document(s))
+YAML parse: PASS task1/kind.yaml (1 document(s))
+git diff --check: PASS

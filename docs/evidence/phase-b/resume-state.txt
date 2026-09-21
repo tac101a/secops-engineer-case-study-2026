@@ -1,0 +1,15 @@
+Resume check UTC: 2026-09-21T16:27:14Z
+ServerVersion=29.3.0 OSType=linux Architecture=x86_64 CgroupVersion=1
+NAMES     IMAGE     STATUS
+kind v0.31.0 go1.25.5 linux/amd64
+No kind clusters found.
+Client Version: v1.35.0
+Kustomize Version: v5.7.1
+
+Existing lab runtime file names (contents omitted):
+total 12
+drwxr-xr-x  3 tac tac 4096 Sep 21 16:36 .
+drwxr-xr-x 10 tac tac 4096 Sep 21 16:24 ..
+drwxr-xr-x  2 tac tac 4096 Sep 21 16:23 bin
+
+Existing app images:

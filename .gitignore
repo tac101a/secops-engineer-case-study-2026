@@ -31,3 +31,6 @@ Thumbs.db
 *.log
 *.tmp
 *.swp
+
+# Repository-local downloaded tools and private lab kubeconfig
+/.local/
