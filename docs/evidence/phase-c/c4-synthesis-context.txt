@@ -1,0 +1,48 @@
+Synthesis UTC: 2026-09-21T18:47:35Z
+Synthesis-start Git HEAD: d5c91435982e268ea2923f2c7a1e11d85a137c81
+Branch: temp/work-in-progress
+Synthesis-start git status --short --untracked-files=all: clean (no output)
+
+Reports reviewed completely:
+- docs/architecture.md (Phase A frame)
+- task1/BASELINE.md (Phase B legitimate requirements)
+- docs/phase-b-report.md
+- docs/phase-c-c0-c1-report.md
+- docs/phase-c-c2-report.md
+- docs/phase-c-c3-report.md
+
+Major raw Phase C evidence reviewed:
+- docs/evidence/phase-c/assessment-context.txt
+- docs/evidence/phase-c/c0-static-review.txt
+- docs/evidence/phase-c/c0-trivy-baseline.txt
+- docs/evidence/phase-c/h1-container-privilege.txt
+- docs/evidence/phase-c/h4-filesystem.txt
+- docs/evidence/phase-c/c2-assessment-context.txt
+- docs/evidence/phase-c/h2-credential-exposure.txt
+- docs/evidence/phase-c/h2-authorization-model.txt
+- docs/evidence/phase-c/h2-runtime-api.txt
+- docs/evidence/phase-c/c3-assessment-context.txt
+- docs/evidence/phase-c/h3-policy-network-inventory.txt
+- docs/evidence/phase-c/h3-network-reachability.txt
+- docs/evidence/phase-c/c3-fixture-lifecycle.txt
+- docs/evidence/phase-c/c0-pre-assessment-functional.txt
+- docs/evidence/phase-c/c1-post-assessment-functional.txt
+- docs/evidence/phase-c/c2-pre-assessment-functional.txt
+- docs/evidence/phase-c/c2-post-assessment-functional.txt
+- docs/evidence/phase-c/c3-pre-assessment-functional.txt
+- docs/evidence/phase-c/c3-post-assessment-functional.txt
+
+Phase B baseline integrity: PASS. All 19 SHA-256 entries in
+docs/evidence/phase-b/workload-revision.txt matched current files using the
+recorded hashes and sha256sum -c. git diff --name-only HEAD on Phase A/Phase B
+baseline, prior reports and evidence returned no paths. Prior C0-C3 context
+and post-assessment records also report matching hashes and stable Pod/image
+identities through those assessments. No live cluster reread was necessary for C4.
+
+Material contradictory evidence found: NO. The H4 /app write is qualified by
+its root execution context; the C2 restored ConfigMap has a later resourceVersion
+but the original semantic value was verified; the C3 target reuses the backend
+image, while its unique Service/Pod wiring identifies the tested destination.
+These are interpretation and overlap points, not unresolved contradictions.
+New runtime security test required: NO.
+No credentials or credential contents were collected in C4.
