@@ -1,0 +1,17 @@
+UTC start: 2026-09-21T17:54:27Z
+Assessment-start commit: 8b82eade2fbdff125aa340fa76ff470ffdd1bfb7
+Namespace: secops-demo
+Target Pod: demo-api-b8dcfccdf-gnv9c
+Pod UID: d5601ad2-6919-4d58-bedf-5b984f0be056
+ServiceAccount: demo-api
+Method: assessor kubectl exec -i transports ephemeral Python stdlib code into existing demo-api container; workload token stays in process memory; verified TLS to kubernetes.default.svc using projected CA.
+2026-09-21T17:54:28Z allowed GET: HTTP 200; kind=ConfigMap; name=phase-c-fixture; namespace=secops-demo; marker=baseline
+original marker=baseline; original resourceVersion=834
+2026-09-21T17:54:28Z negative LIST configmaps: HTTP 403; reason=Forbidden
+2026-09-21T17:54:29Z PATCH data.marker: HTTP 200; returned marker=phase-c-h2-d5601ad2
+2026-09-21T17:54:29Z mutation verification GET: HTTP 200; marker=phase-c-h2-d5601ad2
+2026-09-21T17:54:29Z restoration PATCH: HTTP 200; returned marker=baseline
+2026-09-21T17:54:29Z restoration verification GET: HTTP 200; marker=baseline; resourceVersion=7526
+Synthetic fixture semantic state restored: YES
+Result: runtime GET, bounded negative LIST, PATCH, mutation verification, and restoration completed with TLS verification.
+UTC end: 2026-09-21T17:54:29Z

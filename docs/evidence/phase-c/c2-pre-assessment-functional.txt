@@ -1,0 +1,37 @@
+UTC: 2026-09-21T17:52:11Z
+Assessment-start commit: 8b82eade2fbdff125aa340fa76ff470ffdd1bfb7
+Namespace: secops-demo
+Target Pod: demo-api-b8dcfccdf-gnv9c
+Pod UID: d5601ad2-6919-4d58-bedf-5b984f0be056
+ServiceAccount: demo-api
+Method: make task1-check (operator-managed loopback forwarding and app responses)
+--- command output ---
+./task1/scripts/check-functional.sh
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+deployment "demo-backend" successfully rolled out
+deployment "demo-api" successfully rolled out
+NAME                            READY   STATUS    RESTARTS   AGE   IP           NODE                       NOMINATED NODE   READINESS GATES
+demo-api-b8dcfccdf-gnv9c        1/1     Running   0          79m   10.244.0.7   secops-lab-control-plane   <none>           <none>
+demo-backend-549b8f665f-npfsp   1/1     Running   0          79m   10.244.0.8   secops-lab-control-plane   <none>           <none>
+backend /healthz: HTTP 200, {"status": "ok"}
+backend /data: HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+api /healthz: HTTP 200, {"status": "ok"}
+api /data (first): HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+api /data (repeat): HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+/tmp/demo-cache.json: {"source": "demo-backend", "value": "representative-data"}
+Recent backend request logs:
+10.244.0.1 - - [21/Sep/2026 17:52:02] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 17:52:04] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 17:52:06] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 17:52:08] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 17:52:10] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 17:52:10] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 17:52:12] "GET /healthz HTTP/1.1" 200 -
+127.0.0.1 - - [21/Sep/2026 17:52:13] "GET /healthz HTTP/1.1" 200 -
+127.0.0.1 - - [21/Sep/2026 17:52:13] "GET /data HTTP/1.1" 200 -
+10.244.0.7 - - [21/Sep/2026 17:52:13] "GET /data HTTP/1.1" 200 -
+10.244.0.7 - - [21/Sep/2026 17:52:13] "GET /data HTTP/1.1" 200 -
+10.244.0.1 - - [21/Sep/2026 17:52:14] "GET /healthz HTTP/1.1" 200 -
+
+FUNCTIONALITY = PASS
+H1–H4 remain hypotheses; security assessment occurs in Phase C.

@@ -1,0 +1,32 @@
+UTC: 2026-09-21T17:52:54Z
+Assessment-start commit: 8b82eade2fbdff125aa340fa76ff470ffdd1bfb7
+Namespace: secops-demo
+Target Pod: demo-api-b8dcfccdf-gnv9c
+Pod UID: d5601ad2-6919-4d58-bedf-5b984f0be056
+ServiceAccount: demo-api
+Method: filtered kubectl get serviceaccount, pod, role, rolebinding, configmap -o json; source task1/insecure/rbac.yaml and workload manifests.
+Source/live comparison: PASS.
+ServiceAccount/demo-api automountServiceAccountToken=True
+ServiceAccount/demo-backend automountServiceAccountToken=True
+API Pod automount override=None (absent means SA setting applies)
+Backend Pod automount override=None
+API Pod mounts=[('kube-api-access-7gmmp', '/var/run/secrets/kubernetes.io/serviceaccount', True)]
+API Pod projected volume sources (token values omitted)=[('kube-api-access-7gmmp', [{'serviceAccountToken': {'expirationSeconds': 3607, 'path': 'token'}}, {'configMap': {'items': [{'key': 'ca.crt', 'path': 'ca.crt'}], 'name': 'kube-root-ca.crt'}}, {'downwardAPI': {'items': [{'fieldRef': {'apiVersion': 'v1', 'fieldPath': 'metadata.namespace'}, 'path': 'namespace'}]}}])]
+Backend Pod mounts=[('kube-api-access-rwn96', '/var/run/secrets/kubernetes.io/serviceaccount', True)]
+Backend Pod projected volume sources (token values omitted)=[('kube-api-access-rwn96', [{'serviceAccountToken': {'expirationSeconds': 3607, 'path': 'token'}}, {'configMap': {'items': [{'key': 'ca.crt', 'path': 'ca.crt'}], 'name': 'kube-root-ca.crt'}}, {'downwardAPI': {'items': [{'fieldRef': {'apiVersion': 'v1', 'fieldPath': 'metadata.namespace'}, 'path': 'namespace'}]}}])]
+Role namespace=secops-demo name=demo-api-fixture-access rules=[{'apiGroups': [''], 'resourceNames': ['phase-c-fixture'], 'resources': ['configmaps'], 'verbs': ['get', 'patch']}]
+RoleBinding namespace=secops-demo name=demo-api-fixture-access subject=[{'kind': 'ServiceAccount', 'name': 'demo-api', 'namespace': 'secops-demo'}] roleRef={'apiGroup': 'rbac.authorization.k8s.io', 'kind': 'Role', 'name': 'demo-api-fixture-access'}
+Fixture namespace=secops-demo name=phase-c-fixture data keys=['marker'] marker=baseline resourceVersion=834
+Result: exact named ConfigMap get/patch grant; source and current object agree.
+
+Authorization query UTC: 2026-09-21T17:53:41Z
+Method: kubectl auth can-i with explicit ServiceAccount username and all three standard groups; operator credential used for impersonation only.
+Modeled username: system:serviceaccount:secops-demo:demo-api
+Modeled groups: system:serviceaccounts, system:serviceaccounts:secops-demo, system:authenticated
+get named fixture: YES (exit 0); operation=get configmaps/phase-c-fixture; namespace=secops-demo
+patch named fixture: YES (exit 0); operation=patch configmaps/phase-c-fixture; namespace=secops-demo
+list configmaps: NO (exit 1); operation=list configmaps; namespace=secops-demo
+get secrets: NO (exit 1); operation=get secrets; namespace=secops-demo
+get other named configmap: NO (exit 1); operation=get configmaps/demo-api-other; namespace=secops-demo
+Result: policy model permits only demonstrated named fixture get/patch among these checks; it does not prove runtime exercise.
+Legitimate application API permission budget: NONE.

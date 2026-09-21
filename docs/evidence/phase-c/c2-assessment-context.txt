@@ -1,0 +1,32 @@
+UTC: 2026-09-21T17:52:54Z
+Assessment-start commit: 8b82eade2fbdff125aa340fa76ff470ffdd1bfb7
+Namespace: secops-demo
+Target Pod: demo-api-b8dcfccdf-gnv9c
+Pod UID: d5601ad2-6919-4d58-bedf-5b984f0be056
+ServiceAccount: demo-api
+Method: Git SHA256 comparison, kind/kubectl versions, owned cluster verification by make task1-check, filtered kubectl JSON.
+Branch: temp/work-in-progress
+Initial git status --short --untracked-files=all: clean
+Cluster: secops-lab
+Context: kind-secops-lab
+Cluster lifecycle: reused; API Pod UID and image ID match Phase B/C0+C1; no recreation.
+Kind: kind v0.31.0 go1.25.5 linux/amd64
+Kubectl client: v1.35.0
+Kubernetes server: v1.34.3
+API Pod: demo-api-b8dcfccdf-gnv9c UID=d5601ad2-6919-4d58-bedf-5b984f0be056 Phase=Running SA=demo-api ImageID=sha256:80e1fd9bd1afe996dfb03d6b2839c88d00fc3bca1269a74b10b13acf777a6e1f Ready=True Restarts=0
+Backend Pod: demo-backend-549b8f665f-npfsp UID=71156c57-8a45-46aa-a365-7566292e6d61 Phase=Running SA=demo-backend ImageID=sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41 Ready=True Restarts=0
+Baseline source hashes: PASS (19 of 19)
+C0+C1 artifacts and H1/H4 decisions: present
+Pre-assessment functionality: PASS
+Result: baseline and assessment context verified.
+Final inventory UTC: 2026-09-21T17:57:42Z
+Protected tracked-file changes: NONE
+Final git status --short --untracked-files=all:
+?? docs/evidence/phase-c/c2-assessment-context.txt
+?? docs/evidence/phase-c/c2-post-assessment-functional.txt
+?? docs/evidence/phase-c/c2-pre-assessment-functional.txt
+?? docs/evidence/phase-c/h2-authorization-model.txt
+?? docs/evidence/phase-c/h2-credential-exposure.txt
+?? docs/evidence/phase-c/h2-runtime-api.txt
+?? docs/phase-c-c2-report.md
+Result: only the seven C2 report/evidence artifacts are untracked; protected source and existing evidence unchanged.
