@@ -39,3 +39,55 @@ Evidence boundary:
   F3 enforcement: BLOCKED / NOT VERIFIED
   current runtime security verification: NOT RUN
   full integrated AFTER verification: BLOCKED / NOT VERIFIED
+
+F1-PATCH chronology — 2026-09-23
+
+STAGE A — ORIGINAL F1 LOCAL VALIDATION
+  Result: LOCAL PASS.
+  Hosted verification at that time: NOT YET EXECUTED.
+  The original local-validation transcript remains intact.
+
+STAGE B — PRE-PATCH HOSTED VERIFICATION
+  Run ID: 35757941160
+  Run URL: https://github.com/tac101a/secops-engineer-case-study-2026/actions/runs/35757941160
+  Commit/tested SHA: f84f719db788736c620af37b0c466c923331c02c
+  Event: push
+  Conclusion: SUCCESS
+  Job name observed: Task 1 offline security
+  Hosted self-tests: 24 passed, 0 failed; runtime guard PASS.
+  Boundary: this run verified the original workflow before trigger correction.
+
+STAGE C — POST-PATCH LOCAL VALIDATION
+  Workflow correction: exactly pull_request.branches=[main] and
+  push.branches=[temp/work-in-progress]. No third event, path filter, or
+  pull_request_target remains.
+  Job ID: offline-security (unchanged).
+  Job display name: Task 1 offline security (unchanged).
+  Full commands, outputs and exit codes are appended to
+  f1-local-validation.txt. Result: LOCAL PASS; 24 passed, 0 failed.
+  actionlint was unavailable and was not installed. Validation level:
+  LOCAL STRUCTURAL VALIDATION ONLY.
+
+STAGE D — POST-PATCH HOSTED VERIFICATION
+  PENDING OWNER COMMIT, PUSH AND NEW GITHUB ACTIONS RUN.
+  The pre-patch run is not evidence for the corrected event map.
+  Record actual event and tested SHA for each future run. A branch push and
+  pull-request synthetic merge may have different SHAs; neither substitutes
+  for the other.
+
+STAGE E — REQUIRED MERGE GATE
+  NOT VERIFIED. No ruleset or branch-protection mutation occurred.
+  Select the exact check-run name observed after a successful post-patch run,
+  then verify that check on a pull request and demonstrate its enforcement.
+  Do not infer the displayed required-check context from the YAML job ID.
+
+F1-PATCH mutation boundary:
+  Existing four files only:
+    .github/workflows/task1-offline-security.yml
+    docs/phase-f1-offline-ci.md
+    docs/evidence/phase-f/f1-local-validation.txt
+    docs/evidence/phase-f/f1-scope-record.txt
+  E1 was not modified. No cluster, Kubernetes, Docker, kind, nftables,
+  deployment, runtime probe, branch-protection configuration, commit or push.
+
+TASK1-F1-PATCH LOCAL READY

@@ -261,3 +261,297 @@ FULL INTEGRATED AFTER VERIFICATION: BLOCKED / NOT VERIFIED
 HOSTED WORKFLOW VERIFICATION: NOT RUN
 REQUIRED MERGE GATE: NOT VERIFIED
 F1 LOCAL VALIDATION RESULT: PASS
+
+F1-PATCH VALIDATION APPENDIX — 2026-09-23
+
+STAGE A — ORIGINAL F1 LOCAL VALIDATION
+  Result: LOCAL PASS.
+  Hosted verification at that time: NOT YET EXECUTED.
+  The preceding original F1 local execution record is preserved verbatim.
+
+STAGE B — PRE-PATCH HOSTED VERIFICATION
+  Run ID: 35757941160
+  Run URL: https://github.com/tac101a/secops-engineer-case-study-2026/actions/runs/35757941160
+  Commit/tested SHA: f84f719db788736c620af37b0c466c923331c02c
+  Event: push
+  Conclusion: SUCCESS
+  Observed job name: Task 1 offline security
+  Hosted self-tests: 24 passed, 0 failed.
+  Runtime guard: PASS.
+  Boundary: original workflow before trigger correction.
+
+STAGE C — POST-PATCH LOCAL VALIDATION
+Validation UTC: 2026-09-22T17:23:47Z
+HEAD: f84f719db788736c620af37b0c466c923331c02c
+Python: 3.12.3; PyYAML: 6.0.1
+
+YAML structural validation command: python3 -I -B - (PyYAML BaseLoader; exact event-map and job/step assertions)
+YAML structural validation exit: 0
+Parsed on map: pull_request.branches=[main]; push.branches=[temp/work-in-progress]; no other events or keys
+Job ID/display name, mandatory step IDs/commands, Bash failure semantics, and summary mapping: PASS
+LOCAL STRUCTURAL VALIDATION ONLY: PASS
+
+actionlint discovery command: command -v actionlint
+actionlint: unavailable; no install; STATIC WORKFLOW LINT NOT RUN
+
+BASH SYNTAX command: bash -n task1/scripts/verify.sh task1/scripts/test-verify-offline.sh
+BASH SYNTAX exit: 0
+
+HARDENED OFFLINE VERIFIER command: task1/scripts/verify.sh --offline hardened
+HARDENED OFFLINE VERIFIER exit: 0
+F1 BASELINE: PASS — selected source fields match reviewed profile
+F2 BASELINE: PASS — selected source fields match reviewed profile
+F3 BASELINE: PASS — selected source fields match reviewed profile
+F1 STATIC: PASS — selected source fields match reviewed profile
+F2 STATIC: PASS — selected source fields match reviewed profile
+F3 STATIC: PASS — selected source fields match reviewed profile
+F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+MODE RESULT: PASS
+CURRENT RUNTIME VERIFICATION: NOT RUN
+FULL AFTER RESULT: BLOCKED
+MODE EXIT: 0
+
+CURRENT OFFLINE SELF-TEST SUITE command: task1/scripts/test-verify-offline.sh
+CURRENT OFFLINE SELF-TEST SUITE exit: 0
+01 help is offline — PASS (exit 0)
+02 no arguments use safe offline mode — PASS (exit 0)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: PASS — selected source fields match reviewed profile
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  F1 STATIC: PASS — selected source fields match reviewed profile
+  F2 STATIC: PASS — selected source fields match reviewed profile
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: PASS
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 0
+03 valid hardened static set — PASS (exit 0)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: PASS — selected source fields match reviewed profile
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  F1 STATIC: PASS — selected source fields match reviewed profile
+  F2 STATIC: PASS — selected source fields match reviewed profile
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: PASS
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 0
+04 weakened F1 — PASS (exit 1)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: PASS — selected source fields match reviewed profile
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  F1 STATIC: FAIL — runAsNonRoot is true
+  F2 STATIC: PASS — selected source fields match reviewed profile
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+05 weakened F2 — PASS (exit 1)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: PASS — selected source fields match reviewed profile
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  F1 STATIC: PASS — selected source fields match reviewed profile
+  F2 STATIC: FAIL — API ServiceAccount automount is false
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+06 broadened F3 policy — PASS (exit 1)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: PASS — selected source fields match reviewed profile
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  F1 STATIC: PASS — selected source fields match reviewed profile
+  F2 STATIC: PASS — selected source fields match reviewed profile
+  F3 STATIC: FAIL — API allows only backend TCP/8081 and DNS UDP/TCP 53
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+07 unavailable safe YAML parser — PASS (exit 2)
+  YAML PARSER: BLOCKED — safe structured YAML loader missing (simulated unavailable YAML parser); install nothing during E1
+  F1 BASELINE: BLOCKED — selected YAML could not be inspected
+  F2 BASELINE: BLOCKED — selected YAML could not be inspected
+  F3 BASELINE: BLOCKED — selected YAML could not be inspected
+  F1 STATIC: BLOCKED — selected YAML could not be inspected
+  F2 STATIC: BLOCKED — selected YAML could not be inspected
+  F3 STATIC: BLOCKED — selected YAML could not be inspected
+  MODE RESULT: BLOCKED
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 2
+08 curated historical summary — PASS (exit 0)
+  HISTORICAL MAPPING: PASS — rendered 10 reviewed historical claims
+  MODE RESULT: HISTORICAL SUMMARY RENDERED
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 0
+09 runtime fails closed — PASS (exit 2)
+  RUNTIME REQUEST: BLOCKED — no live probes are authorized in E1
+  CURRENT CLUSTER STATE: UNKNOWN
+  POSSIBLE DIAGNOSTIC RESIDUE: UNKNOWN
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE RESULT: BLOCKED
+  MODE EXIT: 2
+10 distinct PASS FAIL BLOCKED invalid exit codes — PASS (exit 3)
+  MODE EXIT: 3
+11 static F3 cannot become full PASS — PASS (exit 0)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: PASS — selected source fields match reviewed profile
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  F1 STATIC: PASS — selected source fields match reviewed profile
+  F2 STATIC: PASS — selected source fields match reviewed profile
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: PASS
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 0
+12 FAIL outranks BLOCKED and both remain visible — PASS (exit 1)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: PASS — selected source fields match reviewed profile
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  F1 STATIC: FAIL — runAsNonRoot is true
+  F2 STATIC: PASS — selected source fields match reviewed profile
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  F3 ENFORCEMENT: BLOCKED — fresh positive and negative Pod-to-Service traffic and DNS not run
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+13 historical mode is not current PASS — PASS (exit 0)
+  HISTORICAL MAPPING: PASS — rendered 10 reviewed historical claims
+  MODE RESULT: HISTORICAL SUMMARY RENDERED
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 0
+14 insecure profile correctly labeled — PASS (exit 0)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: PASS — selected source fields match reviewed profile
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  INSECURE PROFILE: declarative baseline comparison completed; static PASS is not a hardened security PASS
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — historical reachability is not a current runtime probe
+  MODE RESULT: PASS
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 0
+15 explicit token projection rejected — PASS (exit 1)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: PASS — selected source fields match reviewed profile
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  F1 STATIC: PASS — selected source fields match reviewed profile
+  F2 STATIC: FAIL — API template has no projected token or unintended credential mount
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+16 missing curated mapping blocks — PASS (exit 2)
+  HISTORICAL MAPPING: BLOCKED — required curated mapping missing: docs/evidence/phase-e/e1-historical-claims.md
+  MODE RESULT: BLOCKED
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 2
+17 malformed curated mapping errors — PASS (exit 3)
+  HISTORICAL MAPPING: INFRASTRUCTURE ERROR — malformed or inconsistent mapping: unsupported historical mapping schema
+  MODE RESULT: INFRASTRUCTURE ERROR
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 3
+18 historically inconsistent mapping errors — PASS (exit 3)
+  HISTORICAL MAPPING: INFRASTRUCTURE ERROR — malformed or inconsistent mapping: status contradicts the reviewed historical outcome for ('F3', 'D3/hardened-candidate')
+  MODE RESULT: INFRASTRUCTURE ERROR
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 3
+19 insecure F1 configuration drift — PASS (exit 1)
+  F1 BASELINE: FAIL — insecure API declares writable root
+  F2 BASELINE: PASS — selected source fields match reviewed profile
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  INSECURE PROFILE: declarative baseline comparison completed; static PASS is not a hardened security PASS
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — historical reachability is not a current runtime probe
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+20 insecure Role permission drift — PASS (exit 1)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: FAIL — insecure fixture Role has exact named GET/PATCH rule
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  INSECURE PROFILE: declarative baseline comparison completed; static PASS is not a hardened security PASS
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — historical reachability is not a current runtime probe
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+21 insecure RoleBinding drift — PASS (exit 1)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: FAIL — insecure fixture RoleBinding has exact API ServiceAccount subject and roleRef
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  INSECURE PROFILE: declarative baseline comparison completed; static PASS is not a hardened security PASS
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — historical reachability is not a current runtime probe
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+22 newly discovered insecure NetworkPolicy — PASS (exit 1)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: PASS — selected source fields match reviewed profile
+  F3 BASELINE: FAIL — discovered insecure source set declares no NetworkPolicy (found: unexpected-policy)
+  INSECURE PROFILE: declarative baseline comparison completed; static PASS is not a hardened security PASS
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — historical reachability is not a current runtime probe
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+23 insecure automount baseline drift — PASS (exit 1)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: FAIL — insecure API ServiceAccount automount is true
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  INSECURE PROFILE: declarative baseline comparison completed; static PASS is not a hardened security PASS
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — historical reachability is not a current runtime probe
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+24 RBAC verb order is equivalent — PASS (exit 0)
+  F1 BASELINE: PASS — selected source fields match reviewed profile
+  F2 BASELINE: PASS — selected source fields match reviewed profile
+  F3 BASELINE: PASS — selected source fields match reviewed profile
+  INSECURE PROFILE: declarative baseline comparison completed; static PASS is not a hardened security PASS
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — historical reachability is not a current runtime probe
+  MODE RESULT: PASS
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 0
+RUNTIME GUARD: PASS — no shimmed runtime tool was invoked
+SELF-TEST SUMMARY: 24 passed, 0 failed
+
+Counted current self-tests: 24 executed; 24 passed; 0 failed
+
+STAGE C RESULT: LOCAL PASS
+STAGE D — POST-PATCH HOSTED VERIFICATION
+  PENDING OWNER COMMIT, PUSH AND NEW GITHUB ACTIONS RUN.
+  The Stage B run is not reused for this corrected workflow.
+  Record the actual event and tested SHA for each future run. A push event
+  normally checks the branch commit; a pull_request event normally checks
+  GitHub's synthetic merge result. Their SHAs may differ.
+
+STAGE E — REQUIRED MERGE GATE
+  NOT VERIFIED.
+  No branch ruleset or branch-protection configuration was changed.
+  After a successful post-patch run, select the exact observed check-run name;
+  do not infer it from the offline-security YAML job ID. Verify the selected
+  check on a pull request and demonstrate its enforcement.
+
+TASK1-F1-PATCH LOCAL READY
