@@ -1,5 +1,9 @@
 TASK1-E1 continuation scope record — 2026-09-22
 
+The section through "Prohibited operations not performed" records the earlier
+E1 continuation. The E1-PATCH amendment record at the end is the current
+five-file mutation inventory.
+
 Starting checkpoint
   Branch: temp/work-in-progress
   HEAD: 1f8892d4d812d38a2f19b9709e70127bdc8d8097 (wip: verify)
@@ -89,3 +93,66 @@ Prohibited operations not performed
   No workflow, policy, manifest, Make target, deployment script, or runtime
   diagnostic was created. No commit, push, reset, stash, rebase, branch switch,
   or worktree creation occurred.
+
+E1-PATCH final amendment — 2026-09-22
+
+Starting state for this patch
+  Branch: temp/work-in-progress
+  HEAD: 130cedbc4dec9077820eccb2b0e0853554b44f87 (wip: e1)
+  git status --short --untracked-files=all: empty.
+  git diff --name-only: empty. No staged or untracked changes.
+
+Canonical source provenance established before edits
+  task1/insecure/rbac.yaml directly declares both ServiceAccounts, the
+  phase-c-fixture ConfigMap with data.marker=baseline, and the named fixture
+  Role and RoleBinding. Its exact Role rule and binding were read.
+  task1/insecure/demo-api.yaml declares the baseline API Deployment/Service;
+  task1/insecure/demo-backend.yaml declares the backend Deployment/Service;
+  task1/insecure/namespace.yaml declares the Namespace.
+  These are declarative files. Phase B/C/D observations remain historical
+  runtime evidence. Current cluster and possible residue remain UNKNOWN.
+
+Implementation and test scope
+  The verifier and self-test use the same deterministic source rule: sorted
+  top-level *.yaml and *.yml regular files in task1/insecure/. Every YAML
+  document in that set is parsed by the existing safe loader.
+  F1/F2/F3 BASELINE statuses are separate. F2 checks both automount flags,
+  fixture marker, exact Role rule and exact RoleBinding subject/roleRef.
+  Role permission-list ordering is semantically ignored, while extra rules,
+  permissions, subjects and changed references fail. F3 detects any declared
+  NetworkPolicy in the discovered insecure set.
+  The test harness copied this same source set into temporary fixtures.
+  The added unexpected-policy.yaml existed only in an isolated fixture copy.
+  Canonical task1/insecure/ files were not changed.
+
+Commands and observed results for this patch
+  Read-only: git branch --show-current; git rev-parse HEAD;
+  git status --short --untracked-files=all; git diff --name-only;
+  git log -4 --oneline; rg --files; rg; cat; sed; tail.
+  bash -n task1/scripts/verify.sh task1/scripts/test-verify-offline.sh -> 0.
+  task1/scripts/verify.sh --offline insecure -> 0, F1/F2/F3 BASELINE PASS.
+  task1/scripts/verify.sh --offline -> 0, F1/F2/F3 BASELINE and STATIC PASS.
+  task1/scripts/verify.sh --historical-summary -> 0, ten curated claims.
+  task1/scripts/test-verify-offline.sh -> 0, 24 PASS, 0 FAIL.
+  Tests 01–18 retained and passed. New tests 19–23 returned the expected
+  baseline FAIL / verifier exit 1; test 24 reordered RBAC verbs and returned
+  baseline PASS / verifier exit 0. The separate newly discovered policy test
+  returned F3 BASELINE FAIL / MODE EXIT 1 and named unexpected-policy.
+  Runtime guard recorded zero shim calls. FULL AFTER remains BLOCKED.
+  Final review: git branch --show-current; git rev-parse HEAD;
+  git status --short --untracked-files=all; git diff --name-only;
+  git diff --stat; git diff --cached --name-only;
+  git diff --cached --stat; git diff --check. The last returned 0.
+
+Current patch mutation inventory
+  Exactly five modified tracked files:
+    task1/scripts/verify.sh
+    task1/scripts/test-verify-offline.sh
+    docs/phase-e-e1-verification.md
+    docs/evidence/phase-e/e1-offline-tests.txt
+    docs/evidence/phase-e/e1-scope.txt
+  No new repository artifact, no staging, no other tracked or untracked edit.
+  The historical mapping and all canonical insecure/hardened manifests remain
+  unchanged. No branch switch, commit or push.
+  No live Kubernetes, Docker, kind, nftables or node operation; no PREP/EXEC
+  ignored workspace access, deployment, smoke, diagnostic or cleanup run.

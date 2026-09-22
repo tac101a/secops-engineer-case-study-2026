@@ -250,17 +250,57 @@ def credential_mount_free(template, expected_mounts):
     return actual_volumes == {name for name, _ in expected_mounts} and actual_mounts == expected_mounts
 
 
+def exact_strings(value, expected):
+    return isinstance(value, list) and len(value) == len(expected) and all(isinstance(item, str) for item in value) and set(value) == set(expected)
+
+
+def baseline_role_valid(role):
+    rules = role.get("rules")
+    if role.get("apiVersion") != "rbac.authorization.k8s.io/v1" or not isinstance(rules, list) or len(rules) != 1 or not isinstance(rules[0], dict):
+        return False
+    rule = rules[0]
+    return (set(rule) == {"apiGroups", "resources", "resourceNames", "verbs"}
+            and exact_strings(rule.get("apiGroups"), [""])
+            and exact_strings(rule.get("resources"), ["configmaps"])
+            and exact_strings(rule.get("resourceNames"), ["phase-c-fixture"])
+            and exact_strings(rule.get("verbs"), ["get", "patch"]))
+
+
+def baseline_binding_valid(binding):
+    return (binding.get("apiVersion") == "rbac.authorization.k8s.io/v1"
+            and binding.get("subjects") == [{"kind": "ServiceAccount", "name": "demo-api", "namespace": "secops-demo"}]
+            and binding.get("roleRef") == {"apiGroup": "rbac.authorization.k8s.io", "kind": "Role", "name": "demo-api-fixture-access"})
+
+
 def static_checks(profile):
-    insecure = [
-        "task1/insecure/namespace.yaml", "task1/insecure/rbac.yaml",
-        "task1/insecure/demo-api.yaml", "task1/insecure/demo-backend.yaml",
-    ]
+    # One level only: every top-level *.yaml and *.yml file, sorted by path.
+    insecure_dir = ROOT / "task1/insecure"
+    insecure = [str(path.relative_to(ROOT)) for path in sorted({path for pattern in ("*.yaml", "*.yml") for path in insecure_dir.glob(pattern) if path.is_file()})]
     hardened = ["task1/hardened/demo-api.yaml", "task1/hardened/identity.yaml", "task1/hardened/network-policy.yaml"]
     baseline = load_yaml(insecure)
     if baseline is None:
-        for label in ("F1 STATIC", "F2 STATIC", "F3 STATIC"):
+        for label in ("F1 BASELINE", "F2 BASELINE", "F3 BASELINE", "F1 STATIC", "F2 STATIC", "F3 STATIC"):
             result(label, "BLOCKED", "selected YAML could not be inspected")
         return
+    baseline_api = obj(baseline, "Deployment", "demo-api")
+    baseline_template = as_dict(nested(baseline_api, "spec", "template", "spec"))
+    baseline_containers = baseline_template.get("containers", [])
+    baseline_container = next((entry for entry in baseline_containers if isinstance(entry, dict) and entry.get("name") == "demo-api"), {}) if isinstance(baseline_containers, list) else {}
+    baseline_context = as_dict(baseline_container.get("securityContext"))
+    check("F1 BASELINE", [
+        ("insecure API uses phase-b image", baseline_container.get("image") == "secops-demo-api:phase-b"),
+        ("insecure API declares writable root", baseline_context.get("readOnlyRootFilesystem") is False),
+        ("insecure API has no nonroot restriction", baseline_context.get("runAsNonRoot") is not True),
+    ])
+    check("F2 BASELINE", [
+        ("insecure API ServiceAccount automount is true", obj(baseline, "ServiceAccount", "demo-api").get("automountServiceAccountToken") is True),
+        ("insecure backend ServiceAccount automount is true", obj(baseline, "ServiceAccount", "demo-backend").get("automountServiceAccountToken") is True),
+        ("insecure fixture ConfigMap marker is baseline", nested(obj(baseline, "ConfigMap", "phase-c-fixture"), "data") == {"marker": "baseline"}),
+        ("insecure fixture Role has exact named GET/PATCH rule", baseline_role_valid(obj(baseline, "Role", "demo-api-fixture-access"))),
+        ("insecure fixture RoleBinding has exact API ServiceAccount subject and roleRef", baseline_binding_valid(obj(baseline, "RoleBinding", "demo-api-fixture-access"))),
+    ])
+    baseline_policies = sorted(key[2] for key in baseline if key[0] == "NetworkPolicy")
+    check("F3 BASELINE", [(f"discovered insecure source set declares no NetworkPolicy (found: {', '.join(baseline_policies) or 'none'})", not baseline_policies)])
     candidate = load_yaml(hardened) if profile == "hardened" else {}
     if candidate is None:
         for label in ("F1 STATIC", "F2 STATIC", "F3 STATIC"):
@@ -324,18 +364,7 @@ def static_checks(profile):
         ])
         print("F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement")
     else:
-        check("F1 STATIC", [
-            ("insecure API uses phase-b image", api_container.get("image") == "secops-demo-api:phase-b"),
-            ("insecure API declares writable root", nested(context, "readOnlyRootFilesystem") is False),
-            ("insecure API has no nonroot restriction", nested(context, "runAsNonRoot") is not True),
-        ])
-        check("F2 STATIC", [
-            ("insecure API ServiceAccount automounts token", obj(objects, "ServiceAccount", "demo-api").get("automountServiceAccountToken") is True),
-            ("insecure fixture Role exists", bool(obj(objects, "Role", "demo-api-fixture-access"))),
-            ("insecure fixture RoleBinding exists", bool(obj(objects, "RoleBinding", "demo-api-fixture-access"))),
-        ])
-        check("F3 STATIC", [("insecure profile declares no NetworkPolicy", not any(key[0] == "NetworkPolicy" for key in objects))])
-        print("INSECURE PROFILE: baseline configuration identified; static PASS is not a hardened security PASS")
+        print("INSECURE PROFILE: declarative baseline comparison completed; static PASS is not a hardened security PASS")
         print("F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — historical reachability is not a current runtime probe")
 
 
