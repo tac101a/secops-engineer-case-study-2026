@@ -1,0 +1,33 @@
+D3R-1B-PREP module resolution — 2026-09-22 UTC
+Isolated probe: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-toolchain/module-probe
+Probe go.mod (not a repository go.mod):
+module d3r1b-prep-module-probe
+
+go 1.24.0
+
+require github.com/google/nftables v0.3.0
+
+Direct request: github.com/google/nftables v0.3.0
+Resolved direct version: v0.3.0
+Direct Sum: h1:bkyZ0cbpVeMHXOrtlFc8ISmfVqq5gPJukoYieyVmITg=
+Direct GoModSum: h1:BCp9FsrbF1Fn/Yu6CLUc9GGZFw/+hsxfluNXXmxBfRM=
+`go mod download -json` reported the direct module zip, go.mod and extracted directory in the isolated GOMODCACHE.
+`go mod download all` exit: 0, after a sandbox-only DNS/socket failure and successful rerun with network access to the official Go proxy/checksum infrastructure. No checksum bypass or alternate proxy was used.
+`go list -m all` exit: 0. Full resolved graph:
+d3r1b-prep-module-probe
+github.com/google/go-cmp v0.6.0
+github.com/google/nftables v0.3.0
+github.com/mdlayher/netlink v1.7.3-0.20250113171957-fbb4dce95f42
+github.com/mdlayher/socket v0.5.0
+github.com/vishvananda/netlink v1.3.0
+github.com/vishvananda/netns v0.0.4
+golang.org/x/net v0.33.0
+golang.org/x/sync v0.6.0
+golang.org/x/sys v0.28.0
+Nine external module zip files, matching all nine external modules above, are present under the isolated module cache.
+`go mod verify` output: all modules verified. Exit: 0, both before and after promotion.
+Transitive graph: RESOLVED / DOWNLOADED / CHECKSUM-VERIFIED.
+Effective GOMODCACHE: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-toolchain/gomodcache
+Effective GOPROXY: https://proxy.golang.org
+Effective GOSUMDB: sum.golang.org
+No nftables package was imported by executable PREP source and no nftables runtime function was called.

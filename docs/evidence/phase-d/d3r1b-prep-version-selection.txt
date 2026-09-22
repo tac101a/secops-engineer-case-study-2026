@@ -1,0 +1,9 @@
+D3R-1B-PREP version selection — 2026-09-22 UTC
+Kind source correlation commit: 20ccfc88055ce538b79b1685d6a497d35311d7d1
+Exact upstream `.go-version`: 1.25.5
+Source: https://raw.githubusercontent.com/kubernetes-sigs/kind/20ccfc88055ce538b79b1685d6a497d35311d7d1/.go-version
+Exact upstream `images/kindnetd/go.mod` Go directive: go 1.24.0
+Source: https://raw.githubusercontent.com/kubernetes-sigs/kind/20ccfc88055ce538b79b1685d6a497d35311d7d1/images/kindnetd/go.mod
+Selected toolchain: go1.25.5. Selected archive platform: linux/amd64.
+Reason: the exact pinned kind source requests 1.25.5 in `.go-version`, and kindnet's Go directive is compatible. This is version correlation with upstream source, not proof that the historical running kindnet binary was built with Go 1.25.5. No newer or substituted compiler was selected.
+Host `uname -m`: x86_64. Kind node `uname -m`: x86_64. Mapping: x86_64 -> amd64. Future helper target: GOOS=linux, GOARCH=amd64.

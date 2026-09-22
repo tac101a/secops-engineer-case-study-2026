@@ -1,0 +1,16 @@
+D3R-1B-PREP generic compiler/linker smoke — 2026-09-22 UTC
+Staging source path: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-prep-staging.PssaZjsV/generic-smoke/main.go
+Exact source:
+package main
+
+func main() {}
+
+Source imported nftables: NO. Source imported networking/kernel libraries: NO. No D3R diagnostic logic exists in it.
+Build command in the staging smoke directory: `<STAGING_ROOT>/go/bin/go build -o build-smoke main.go`, with GOENV=off, GOTOOLCHAIN=local, GOWORK=off, and staging-isolated GOROOT/GOCACHE/GOMODCACHE/GOPATH.
+Build exit: 0. Binary produced: YES.
+Binary path: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-prep-staging.PssaZjsV/generic-smoke/build-smoke
+`file`: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, with debug_info, not stripped.
+Binary SHA-256: 2c62424d769026626e4e6a9c399a3f4d7b4464f7fbb1de4df77b5636bb79b95c
+`go version -m`: go1.25.5; buildmode=exe; compiler=gc; GOARCH=amd64; GOOS=linux; GOAMD64=v1.
+Binary executed: NO. Binary removed after evidence capture: YES, confirmed absent. Trivial source and smoke directory also removed before promotion.
+Meaning: the isolated compiler and linker can produce a trivial linux/amd64 executable; this does not establish that the D3R helper compiles or that nftables/netlink runtime calls work.

@@ -1,0 +1,13 @@
+D3R-1B-PREP mutation scope — 2026-09-22 UTC
+Authorized tooling mutations: current-run-owned ignored staging tree; checksum-verified persistent ignored toolchain tree; isolated Go caches; isolated module probe; one trivial non-nftables source and temporary binary; PREP report/evidence.
+Actual tooling mutations: staging created with ownership marker, official metadata/archive downloaded and checksum-verified, toolchain extracted and verified, module graph cached and verified, trivial generic smoke built and removed, verified stage atomically promoted to ignored canonical root, env.sh then READY created. The official archive and smoke source/binary were removed before promotion.
+System-under-test mutations: NONE.
+Kubernetes mutations: NONE. NetworkPolicy reapply: NO.
+nftables mutations: NONE. Primary Flush count: 0. Diagnostic helper source created/built/executed: NO/NO/NO.
+iptables mutations: NONE. Route/link/tc mutations: NONE. Sysctl/kernel module mutations: NONE.
+Network-component restarts: NONE. CNI changes: NONE. Docker/WSL configuration changes: NONE.
+System package installation/sudo: NONE. Shell-profile changes: NONE. `go env -w`: NOT USED. User global Go cache: UNCHANGED by scoped Go operations.
+Repository source/task1 mutation: NONE. Existing D0/D1/D2/D3/D3R artifact mutation: NONE. `.gitignore` mutation: NONE. Commit/push/branch switch: NONE.
+Final read-only runtime inventory: NetworkPolicy count 0, D3 fixtures absent, API/backend Ready, kindnet Ready with unchanged UID, restartCount 4, and container start time.
+Repository allowlist: only docs/phase-d-d3r1b-prep-report.md and docs/evidence/phase-d/d3r1b-prep-* may appear; isolated toolchain remains ignored under `.local/`.
+Final scope: PASS.

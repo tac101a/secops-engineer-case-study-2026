@@ -1,0 +1,25 @@
+D3R-1B-PREP isolated environment — 2026-09-22 UTC
+Final root: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-toolchain
+Absolute Go binary: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-toolchain/go/bin/go
+`go version`: go version go1.25.5 linux/amd64
+`go tool compile -V=full`: compile version go1.25.5
+Effective final `go env` values with all scoped exports set:
+GOENV: "" (empty output; see explanation below)
+GOOS: linux
+GOARCH: amd64
+GOVERSION: go1.25.5
+GOROOT: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-toolchain/go
+GOPATH: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-toolchain/gopath
+GOMODCACHE: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-toolchain/gomodcache
+GOCACHE: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-toolchain/gocache
+GOTOOLCHAIN: local
+GOWORK: off
+GOPROXY: https://proxy.golang.org
+GOSUMDB: sum.golang.org
+Process GOENV export: off. `go env GOENV` exit status: 0, output: empty (not the literal `off` anticipated in the PREP specification). This is understood from the checksum-verified Go 1.25.5 source: `src/cmd/go/internal/cfg/cfg.go` EnvFile returns an empty path and `GOENV=off` error when the process variable is `off`; `src/cmd/go/internal/envcmd/env.go` MkEnv ignores that error and prints the empty path. The user Go environment file is disabled. No global Go environment file was read, written, or changed.
+Host architecture: x86_64. Kind node architecture: x86_64. Mapping: x86_64 -> amd64. Future helper target: linux/amd64.
+env.sh: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-toolchain/env.sh
+env.sh SHA-256: 10f736ea5ab9aa8f256d1fd7d32b0c7960cede15e223e09315737ca5862473ec
+READY: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-toolchain/READY
+READY creation UTC: 2026-09-22T10:27:54Z; created after env.sh and its hash, as the final canonical handoff artifact.
+The env.sh file was sourced only inside a verification subshell, never globally or from shell startup files.

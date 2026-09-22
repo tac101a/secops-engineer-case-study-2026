@@ -1,0 +1,20 @@
+D3R-1B-PREP toolchain provenance — 2026-09-22 UTC
+Official metadata source: https://go.dev/dl/?mode=json&include=all
+Selected metadata entry: version=go1.25.5, filename=go1.25.5.linux-amd64.tar.gz, os=linux, arch=amd64, kind=archive, size=59768009 bytes.
+Official archive request: https://go.dev/dl/go1.25.5.linux-amd64.tar.gz
+Effective download URL after official redirect: https://dl.google.com/go/go1.25.5.linux-amd64.tar.gz
+HTTP result: 200. Downloaded bytes: 59768009.
+Expected SHA-256 from official release metadata: 9e9b755d63b36acf30c12a9a3fc379243714c1c6d3dd72861da637f336ebb35b
+Actual local archive SHA-256: 9e9b755d63b36acf30c12a9a3fc379243714c1c6d3dd72861da637f336ebb35b
+Expected versus actual comparison: PASS. Size comparison: PASS. Archive was not extracted until both passed.
+Extracted only to staging: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-prep-staging.PssaZjsV/go
+Staging `go` binary SHA-256: d29b19f04e57fa2f35d4725a8743b663289ac29832128a235c4a3f76f885b150
+Staging version: go version go1.25.5 linux/amd64
+Staging compiler: compile version go1.25.5
+Verified staging state promoted by same-filesystem `mv -T` to /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-toolchain; the staging path then no longer existed.
+Final isolated Go binary: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-toolchain/go/bin/go
+Final Go binary SHA-256: d29b19f04e57fa2f35d4725a8743b663289ac29832128a235c4a3f76f885b150
+Final version: go version go1.25.5 linux/amd64
+Final compiler: compile version go1.25.5
+The large downloaded archive was removed from staging after verification; the selected official release metadata entry persists in canonical `metadata/release-selection.json`.
+No system Go installation, package manager, sudo, user Go cache, or shell profile change occurred.

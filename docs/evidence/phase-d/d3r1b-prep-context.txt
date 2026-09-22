@@ -1,0 +1,17 @@
+D3R-1B-PREP context — 2026-09-22 UTC
+PREP start commit: bc49d7e46ce733d2f43c9419be3f3831ad2eb86b
+Branch: temp/work-in-progress
+Initial `git status --short --untracked-files=all`: empty; clean.
+Prior report final line: D3R-1B NOT READY — VERSION-CORRELATED DIAGNOSTIC NOT EXECUTABLE
+D3: NOT READY. F1 and F2 accepted; F3 not accepted. Runtime remains accepted D2.
+Owned cluster/context/namespace: secops-lab / kind-secops-lab / secops-demo. `require_cluster` checked Docker, kind cluster, and this checkout's owner record. `kubectl config current-context` returned kind-secops-lab; namespace read returned secops-demo.
+Starting NetworkPolicy inventory: `[]` (count 0). D3 temporary Pods and Services absent: inventory contained only the two accepted D2 Pods and Services.
+Starting application Pods: demo-api-6d49d5c8bd-nmjr5 and demo-backend-5d4449cb58-vzhs2, Running/Ready, restartCount 0.
+Accepted F2 identity: dedicated demo-api and demo-backend ServiceAccounts each automountServiceAccountToken=false; no namespace Role/RoleBinding; phase-c-fixture marker=baseline.
+Starting kindnet: kindnet-n2pj4, UID 6e4afac8-6fc5-491d-9a0d-f96b7007c540, Ready, restartCount 4, current container started 2026-09-22T03:41:12Z; DaemonSet desired/ready 1/1.
+Host and kind node `uname -m`: x86_64 and x86_64.
+STAGING_ROOT: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-prep-staging.PssaZjsV
+CANONICAL_ROOT: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-toolchain
+Canonical root existed initially: NO. Staging run ID: PssaZjsV. Ownership marker creation UTC: 2026-09-22T10:23:39Z; marker recorded start commit, run ID, creation UTC, and intended canonical root.
+Location: persistent repository-local `.local/`, already ignored by `.gitignore:36:/.local/`. `git check-ignore -v` confirmed the exact canonical READY path is ignored. No Git ignore rule was changed.
+Final runtime check UTC: 2026-09-22T10:28:23Z. NetworkPolicies still `[]`; only the same two application Pods and Services; both Pods Ready with zero restarts; both ServiceAccounts still automount=false; no Role/RoleBinding; fixture marker=baseline. Kindnet retained the same Pod name, UID, Ready state, restartCount 4, and container start time.
