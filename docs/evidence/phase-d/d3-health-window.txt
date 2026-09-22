@@ -1,0 +1,10 @@
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+Health observation start UTC=2026-09-22T08:18:27Z
+demo-api-6d49d5c8bd-nmjr5 UID=67e10621-03de-45f3-a6f2-8bcc30f0d9d4 ready=true restarts=0 readinessPeriod=2 livenessPeriod=10 livenessInitialDelay=3
+demo-backend-5d4449cb58-vzhs2 UID=65aa8380-cd09-4da0-85af-4ec762f68f37 ready=true restarts=0 readinessPeriod=2 livenessPeriod=10 livenessInitialDelay=3
+Health observation end UTC=2026-09-22T08:18:49Z
+demo-api-6d49d5c8bd-nmjr5 UID=67e10621-03de-45f3-a6f2-8bcc30f0d9d4 ready=true restarts=0
+demo-backend-5d4449cb58-vzhs2 UID=65aa8380-cd09-4da0-85af-4ec762f68f37 ready=true restarts=0
+LAST SEEN   TYPE      REASON      OBJECT                              MESSAGE
+48m         Warning   Unhealthy   pod/demo-backend-5d4449cb58-vzhs2   Readiness probe failed: Get "http://10.244.0.8:8081/healthz": dial tcp 10.244.0.8:8081: connect: connection refused
+48m         Warning   Unhealthy   pod/demo-api-6d49d5c8bd-nmjr5       Readiness probe failed: Get "http://10.244.0.9:8080/healthz": dial tcp 10.244.0.9:8080: connect: connection refused

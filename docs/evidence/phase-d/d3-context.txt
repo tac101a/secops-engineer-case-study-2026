@@ -1,0 +1,26 @@
+D3 start UTC: 2026-09-22, before the first recorded runtime check at 08:04Z. An exact start timestamp was not captured; this limit is retained rather than inventing one.
+D3 start commit: eabd67131696beb45dec612d9f8caf747d8dfe6e
+Branch: temp/work-in-progress
+Initial git status --short --untracked-files=all: empty (clean)
+Owned cluster/context/namespace: secops-lab / kind-secops-lab / secops-demo; ownership record check passed.
+Canonical Phase B integrity: 19 rows parsed dynamically from docs/evidence/phase-b/workload-revision.txt; all SHA-256 matches.
+Protected pre-existing task1/hardened/** at start commit:
+task1/hardened/demo-api.yaml
+task1/hardened/identity.yaml
+task1/hardened/images/demo-api.Dockerfile
+task1/hardened/scripts/build-f1.sh
+task1/hardened/scripts/deploy-f1.sh
+task1/hardened/scripts/deploy-f2.sh
+task1/hardened/scripts/smoke-f1.sh
+task1/hardened/scripts/smoke-f2.sh
+Accepted API: Pod demo-api-6d49d5c8bd-nmjr5 UID 67e10621-03de-45f3-a6f2-8bcc30f0d9d4, image secops-demo-api:phase-d1, imageID sha256:cb82d20063553272d86db019ed015e599633f616535c8ffbed98eae1b5224e25; Ready, restart 0; F1 controls effective.
+Accepted backend: Pod demo-backend-5d4449cb58-vzhs2 UID 65aa8380-cd09-4da0-85af-4ec762f68f37, image secops-demo-backend:phase-b, imageID sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41; Ready, restart 0; accepted local settings intact.
+Both ServiceAccounts automount=false; no projected credentials; exact F2 Role/RoleBinding absent; ConfigMap phase-c-fixture marker=baseline. F2 smoke checked exact GET/PATCH can-i=no.
+Initial NetworkPolicy count: 0.
+Pre-D3 make task1-check: FUNCTIONALITY = PASS at 2026-09-22T08:04Z.
+Pre-D3 smoke-f1.sh: F1 CANDIDATE RUNTIME SMOKE = PASS at 08:05:12Z.
+Pre-D3 smoke-f2.sh: F2 CANDIDATE RUNTIME SMOKE = PASS at 08:05:47Z.
+Reviewed D0, D1, D2, Phase C synthesis, baseline, C3 F3 inventory/reachability/fixture lifecycle, and D1/D2 runtime/noninterference evidence. C3 showed both selected TCP/8081 paths connected to healthy Services.
+Current network component: kindnet image docker.io/kindest/kindnetd:v20251212-v0.29.0-alpha-105-g20ccfc88, imageID sha256:4921d7a6dffa922dd679732ba4797085c4f39e9a53bee8b6fdb1d463e8571251; kube-proxy v1.34.3; CoreDNS v1.12.1.
+Resolver datapath: API resolv.conf nameserver 10.96.0.10; kube-dns Service 10.96.0.10 selects two ordinary CoreDNS Pods at 10.244.0.2/.3 in kube-system, label k8s-app=kube-dns; EndpointSlice confirms. Pod and namespace selectors are applicable. No node-local/host-network DNS resolver was observed.
+D0 revision necessary: no. Starting contradiction: none.

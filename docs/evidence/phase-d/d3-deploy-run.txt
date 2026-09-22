@@ -1,0 +1,36 @@
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+UTC: 2026-09-22T08:11:47Z
+
+demo-api effective identity:
+ServiceAccount=demo-api automount=false
+Deployment serviceAccount=demo-api Pod-template automount=unset; no true override
+Pod=demo-api-6d49d5c8bd-nmjr5 UID=67e10621-03de-45f3-a6f2-8bcc30f0d9d4 image=secops-demo-api:phase-d1 imageID=sha256:cb82d20063553272d86db019ed015e599633f616535c8ffbed98eae1b5224e25 Pod automount=unset projected kube-api-access volume=absent SA mount=absent volumes=[('api-tmp', ['emptyDir', 'name'])] mounts=[{'mountPath': '/tmp', 'name': 'api-tmp'}] securityContext={'allowPrivilegeEscalation': False, 'capabilities': {'drop': ['ALL']}, 'readOnlyRootFilesystem': True, 'runAsNonRoot': True}
+Application-context SA directory=absent token=absent CA=absent namespace bundle=absent; former workload credential prerequisite unavailable; credential contents collected=NO
+
+demo-backend effective identity:
+ServiceAccount=demo-backend automount=false
+Deployment serviceAccount=demo-backend Pod-template automount=unset; no true override
+Pod=demo-backend-5d4449cb58-vzhs2 UID=65aa8380-cd09-4da0-85af-4ec762f68f37 image=secops-demo-backend:phase-b imageID=sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41 Pod automount=unset projected kube-api-access volume=absent SA mount=absent volumes=[] mounts=[] securityContext={'readOnlyRootFilesystem': False}
+Application-context SA directory=absent token=absent CA=absent namespace bundle=absent; former workload credential prerequisite unavailable; credential contents collected=NO
+demo-api: new UID=67e10621-03de-45f3-a6f2-8bcc30f0d9d4; accepted D1 image/imageID preserved
+demo-backend: new UID=65aa8380-cd09-4da0-85af-4ec762f68f37; accepted D1 image/imageID preserved
+API D1 image and F1 deployment controls preserved
+Backend accepted D1 image and local-security configuration preserved
+
+Role=absent RoleBinding=absent
+Exact demo-api ServiceAccount get configmap/phase-c-fixture can-i=no
+Exact demo-api ServiceAccount patch configmap/phase-c-fixture can-i=no
+Fixture exists; marker=baseline; data unchanged
+Former workload-identity GET/PATCH path unavailable: credential absent and exact identity authorization NO.
+F2 CANDIDATE RUNTIME SMOKE = PASS
+Pre-apply NetworkPolicies: none
+D3 policy object scope: PASS
+networkpolicy.networking.k8s.io/demo-api-egress created
+networkpolicy.networking.k8s.io/demo-backend-ingress created
+NAME                   POD-SELECTOR       AGE
+demo-api-egress        app=demo-api       1s
+demo-backend-ingress   app=demo-backend   1s
+NAME                            READY   STATUS    RESTARTS   AGE   IP           NODE                       NOMINATED NODE   READINESS GATES   LABELS
+demo-api-6d49d5c8bd-nmjr5       1/1     Running   0          41m   10.244.0.9   secops-lab-control-plane   <none>           <none>            app=demo-api,pod-template-hash=6d49d5c8bd
+demo-backend-5d4449cb58-vzhs2   1/1     Running   0          41m   10.244.0.8   secops-lab-control-plane   <none>           <none>            app=demo-backend,pod-template-hash=5d4449cb58

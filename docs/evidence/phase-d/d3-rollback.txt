@@ -1,0 +1,10 @@
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+networkpolicy.networking.k8s.io "demo-api-egress" deleted from secops-demo namespace
+networkpolicy.networking.k8s.io "demo-backend-ingress" deleted from secops-demo namespace
+No resources found in secops-demo namespace.
+NAME                            READY   STATUS    RESTARTS   AGE   IP           NODE                       NOMINATED NODE   READINESS GATES
+demo-api-6d49d5c8bd-nmjr5       1/1     Running   0          49m   10.244.0.9   secops-lab-control-plane   <none>           <none>
+demo-backend-5d4449cb58-vzhs2   1/1     Running   0          49m   10.244.0.8   secops-lab-control-plane   <none>           <none>
+NAME           TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE   SELECTOR
+demo-api       ClusterIP   10.96.161.44   <none>        8080/TCP   15h   app=demo-api
+demo-backend   ClusterIP   10.96.32.207   <none>        8081/TCP   15h   app=demo-backend

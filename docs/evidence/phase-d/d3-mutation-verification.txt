@@ -1,0 +1,80 @@
+UTC: 2026-09-22, final local repository verification
+D3 start commit: eabd67131696beb45dec612d9f8caf747d8dfe6e
+Branch: temp/work-in-progress
+git status --short --untracked-files=all:
+?? docs/evidence/phase-d/d3-context.txt
+?? docs/evidence/phase-d/d3-deploy-run.txt
+?? docs/evidence/phase-d/d3-enforcement-diagnosis.txt
+?? docs/evidence/phase-d/d3-fixture-lifecycle.txt
+?? docs/evidence/phase-d/d3-health-window.txt
+?? docs/evidence/phase-d/d3-mutation-verification.txt
+?? docs/evidence/phase-d/d3-network-inventory.txt
+?? docs/evidence/phase-d/d3-noninterference.txt
+?? docs/evidence/phase-d/d3-policy-apply.txt
+?? docs/evidence/phase-d/d3-post-f1.txt
+?? docs/evidence/phase-d/d3-post-f2.txt
+?? docs/evidence/phase-d/d3-post-functional.txt
+?? docs/evidence/phase-d/d3-post-policy-reachability.txt
+?? docs/evidence/phase-d/d3-pre-policy-reachability.txt
+?? docs/evidence/phase-d/d3-rollback-verification.txt
+?? docs/evidence/phase-d/d3-rollback.txt
+?? docs/phase-d-d3-report.md
+?? task1/hardened/network-policy.yaml
+?? task1/hardened/scripts/deploy-f3.sh
+?? task1/hardened/scripts/smoke-f3.sh
+git diff --name-only:
+(none; new D3 files are untracked)
+git diff --stat:
+(none; new D3 files are untracked)
+Protected D1/D2 hardened artifact set, derived from start commit: 8
+PASS task1/hardened/demo-api.yaml
+PASS task1/hardened/identity.yaml
+PASS task1/hardened/images/demo-api.Dockerfile
+PASS task1/hardened/scripts/build-f1.sh
+PASS task1/hardened/scripts/deploy-f1.sh
+PASS task1/hardened/scripts/deploy-f2.sh
+PASS task1/hardened/scripts/smoke-f1.sh
+PASS task1/hardened/scripts/smoke-f2.sh
+Canonical Phase B integrity rows: 19
+PASS Makefile
+PASS task1/BASELINE.md
+PASS task1/app/demo-api/.dockerignore
+PASS task1/app/demo-api/Dockerfile
+PASS task1/app/demo-api/app.py
+PASS task1/app/demo-backend/.dockerignore
+PASS task1/app/demo-backend/Dockerfile
+PASS task1/app/demo-backend/app.py
+PASS task1/insecure/demo-api.yaml
+PASS task1/insecure/demo-backend.yaml
+PASS task1/insecure/namespace.yaml
+PASS task1/insecure/rbac.yaml
+PASS task1/kind.yaml
+PASS task1/scripts/build.sh
+PASS task1/scripts/check-functional.sh
+PASS task1/scripts/cleanup.sh
+PASS task1/scripts/cluster-up.sh
+PASS task1/scripts/common.sh
+PASS task1/scripts/deploy-insecure.sh
+ALLOW docs/evidence/phase-d/d3-context.txt
+ALLOW docs/evidence/phase-d/d3-deploy-run.txt
+ALLOW docs/evidence/phase-d/d3-enforcement-diagnosis.txt
+ALLOW docs/evidence/phase-d/d3-fixture-lifecycle.txt
+ALLOW docs/evidence/phase-d/d3-health-window.txt
+ALLOW docs/evidence/phase-d/d3-mutation-verification.txt
+ALLOW docs/evidence/phase-d/d3-network-inventory.txt
+ALLOW docs/evidence/phase-d/d3-noninterference.txt
+ALLOW docs/evidence/phase-d/d3-policy-apply.txt
+ALLOW docs/evidence/phase-d/d3-post-f1.txt
+ALLOW docs/evidence/phase-d/d3-post-f2.txt
+ALLOW docs/evidence/phase-d/d3-post-functional.txt
+ALLOW docs/evidence/phase-d/d3-post-policy-reachability.txt
+ALLOW docs/evidence/phase-d/d3-pre-policy-reachability.txt
+ALLOW docs/evidence/phase-d/d3-rollback-verification.txt
+ALLOW docs/evidence/phase-d/d3-rollback.txt
+ALLOW docs/phase-d-d3-report.md
+ALLOW task1/hardened/network-policy.yaml
+ALLOW task1/hardened/scripts/deploy-f3.sh
+ALLOW task1/hardened/scripts/smoke-f3.sh
+D3 mutation allowlist: PASS
+Protected pre-existing hardened artifacts: UNCHANGED
+Canonical Phase B integrity: PASS

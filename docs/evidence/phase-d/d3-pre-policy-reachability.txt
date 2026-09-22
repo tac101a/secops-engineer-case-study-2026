@@ -1,0 +1,34 @@
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+sha256:95dd04cfef5a6d31e10adf7b2371676f0a5ae11d94772790dbd8467ec627ff18
+sha256:8359a9eb05508d097f51680085662c793afef1355c49dfe2ab28fcb92179ff57
+D3 mode=pre-policy UTC=2026-09-22T08:10:06Z context=kind-secops-lab namespace=secops-demo run_id=bd9d584b81
+Fixture names: source=phase-d3-source-bd9d584b81 targetPod=phase-d3-target-bd9d584b81 targetService=phase-d3-target-bd9d584b81
+pod/phase-d3-source-bd9d584b81 created
+pod/phase-d3-target-bd9d584b81 created
+service/phase-d3-target-bd9d584b81 created
+pod/phase-d3-source-bd9d584b81 condition met
+pod/phase-d3-target-bd9d584b81 condition met
+Pod=demo-api-6d49d5c8bd-nmjr5 UID=67e10621-03de-45f3-a6f2-8bcc30f0d9d4 IP=10.244.0.9 labels={'app': 'demo-api', 'pod-template-hash': '6d49d5c8bd'} image=secops-demo-api:phase-d1 imageID=sha256:cb82d20063553272d86db019ed015e599633f616535c8ffbed98eae1b5224e25 ready=True automount=None
+Pod=demo-backend-5d4449cb58-vzhs2 UID=65aa8380-cd09-4da0-85af-4ec762f68f37 IP=10.244.0.8 labels={'app': 'demo-backend', 'pod-template-hash': '5d4449cb58'} image=secops-demo-backend:phase-b imageID=sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41 ready=True automount=None
+Pod=phase-d3-source-bd9d584b81 UID=ac585867-e125-43e4-86cb-ef52370bf252 IP=10.244.0.10 labels={'assessment.id': 'bd9d584b81', 'assessment.phase': 'd3', 'assessment.role': 'unrelated-source'} image=secops-demo-api:phase-b imageID=sha256:80e1fd9bd1afe996dfb03d6b2839c88d00fc3bca1269a74b10b13acf777a6e1f ready=True automount=False
+Pod=phase-d3-target-bd9d584b81 UID=a80bb0ae-8982-4f4a-ac43-4d33c97f4e08 IP=10.244.0.11 labels={'assessment.id': 'bd9d584b81', 'assessment.phase': 'd3', 'assessment.role': 'unrelated-target'} image=secops-demo-backend:phase-b imageID=sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41 ready=True automount=False
+Service=demo-backend IP=10.96.32.207 selector={'app': 'demo-backend'} ports=[{'name': 'http', 'port': 8081, 'protocol': 'TCP', 'targetPort': 'http'}]
+Service=phase-d3-target-bd9d584b81 IP=10.96.20.134 selector={'assessment.id': 'bd9d584b81', 'assessment.phase': 'd3', 'assessment.role': 'unrelated-target'} ports=[{'name': 'http', 'port': 8081, 'protocol': 'TCP', 'targetPort': 8081}]
+Target EndpointSlice=phase-d3-target-bd9d584b81-sbk45 endpoint=[{'addresses': ['10.244.0.11'], 'conditions': {'ready': True, 'serving': True, 'terminating': False}, 'nodeName': 'secops-lab-control-plane', 'targetRef': {'kind': 'Pod', 'name': 'phase-d3-target-bd9d584b81', 'namespace': 'secops-demo', 'uid': 'a80bb0ae-8982-4f4a-ac43-4d33c97f4e08'}}] ports=[{'name': 'http', 'port': 8081, 'protocol': 'TCP'}]
+Target Pod-local /healthz: HTTP 200
+API to backend source=demo-api-6d49d5c8bd-nmjr5 result={"dns": {"addresses": ["10.96.32.207"], "result": "RESOLVED"}, "host": "demo-backend.secops-demo.svc.cluster.local", "http": {"body": {"source": "demo-backend", "value": "representative-data"}, "status": 200}, "port": 8081, "tcp": {"peer": ["10.96.32.207", 8081], "result": "CONNECTED"}, "utc": "2026-09-22T08:10:11.187558+00:00"}
+Probe classification: ALLOW PASS
+Source to unrelated target source=phase-d3-source-bd9d584b81 result={"dns": {"addresses": ["10.96.20.134"], "result": "RESOLVED"}, "host": "phase-d3-target-bd9d584b81.secops-demo.svc.cluster.local", "http": {"body": {"source": "demo-backend", "value": "representative-data"}, "status": 200}, "port": 8081, "tcp": {"peer": ["10.96.20.134", 8081], "result": "CONNECTED"}, "utc": "2026-09-22T08:10:11.769257+00:00"}
+Probe classification: ALLOW PASS
+API to unrelated target source=demo-api-6d49d5c8bd-nmjr5 result={"dns": {"addresses": ["10.96.20.134"], "result": "RESOLVED"}, "host": "phase-d3-target-bd9d584b81.secops-demo.svc.cluster.local", "http": {"body": {"source": "demo-backend", "value": "representative-data"}, "status": 200}, "port": 8081, "tcp": {"peer": ["10.96.20.134", 8081], "result": "CONNECTED"}, "utc": "2026-09-22T08:10:12.797022+00:00"}
+Probe classification: ALLOW PASS
+Source to backend source=phase-d3-source-bd9d584b81 result={"dns": {"addresses": ["10.96.32.207"], "result": "RESOLVED"}, "host": "demo-backend.secops-demo.svc.cluster.local", "http": {"body": {"source": "demo-backend", "value": "representative-data"}, "status": 200}, "port": 8081, "tcp": {"peer": ["10.96.32.207", 8081], "result": "CONNECTED"}, "utc": "2026-09-22T08:10:13.542297+00:00"}
+Probe classification: ALLOW PASS
+API DNS UDP/53 server=10.96.0.10 name=demo-backend.secops-demo.svc.cluster.local rcode=0 answers=1 PASS
+API DNS TCP/53 server=10.96.0.10 name=demo-backend.secops-demo.svc.cluster.local rcode=0 answers=1 PASS
+F3 pre-policy SMOKE = PASS
+Cleanup UTC: 2026-09-22T08:10:14Z
+service "phase-d3-target-bd9d584b81" deleted from secops-demo namespace
+pod "phase-d3-source-bd9d584b81" deleted from secops-demo namespace
+pod "phase-d3-target-bd9d584b81" deleted from secops-demo namespace
+Fixture cleanup: PASS

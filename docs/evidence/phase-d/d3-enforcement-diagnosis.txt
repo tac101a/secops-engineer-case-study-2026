@@ -1,0 +1,27 @@
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+Diagnosis capture UTC=2026-09-22T08:19:52Z
+kindnet sync errors after D3 apply:
+I0922 08:11:53.743790       1 controller.go:711] "Syncing nftables rules"
+	conn.Receive: netlink receive: no such file or directory
+	netlink receive: no such file or directory
+	netlink receive: no such file or directory
+	netlink receive: no such file or directory
+	netlink receive: no such file or directory
+	netlink receive: no such file or directory
+	netlink receive: no such file or directory
+	netlink receive: no such file or directory
+	conn.Receive: netlink receive: no such file or directory
+	netlink receive: no such file or directory
+	netlink receive: no such file or directory
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+Node nft tables:
+table ip nat
+table ip mangle
+table ip filter
+table ip6 mangle
+table ip6 nat
+table ip6 filter
+Current CNI image and imageID:
+docker.io/kindest/kindnetd:v20251212-v0.29.0-alpha-105-g20ccfc88 sha256:4921d7a6dffa922dd679732ba4797085c4f39e9a53bee8b6fdb1d463e8571251
+
+Earlier read-only inspection at 2026-09-22T08:15:08Z, while both policies were still applied, showed the effective API-egress and backend-ingress NetworkPolicy YAML exactly matching task1/hardened/network-policy.yaml. The same command's kindnet logs from 08:11:54Z showed repeated "Syncing nftables rules" followed by "conn.Receive: netlink receive: no such file or directory", "Unhandled Error", and "Dropping out of the queue". At 08:15:29Z, still while the policies were applied, `docker exec secops-lab-control-plane nft list tables` showed only ip/ip6 nat, mangle and filter tables; `nft list table ip kindnet-network-policies` returned "No such file or directory". This is correlation with the observed failed denials, not a demonstrated kernel-level root cause.

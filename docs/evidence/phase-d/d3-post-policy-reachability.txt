@@ -1,0 +1,45 @@
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+sha256:95dd04cfef5a6d31e10adf7b2371676f0a5ae11d94772790dbd8467ec627ff18
+sha256:8359a9eb05508d097f51680085662c793afef1355c49dfe2ab28fcb92179ff57
+D3 mode=candidate UTC=2026-09-22T08:13:30Z context=kind-secops-lab namespace=secops-demo run_id=9bffb5b97e
+Fixture names: source=phase-d3-source-9bffb5b97e targetPod=phase-d3-target-9bffb5b97e targetService=phase-d3-target-9bffb5b97e
+pod/phase-d3-source-9bffb5b97e created
+pod/phase-d3-target-9bffb5b97e created
+service/phase-d3-target-9bffb5b97e created
+pod/phase-d3-source-9bffb5b97e condition met
+pod/phase-d3-target-9bffb5b97e condition met
+Pod=demo-api-6d49d5c8bd-nmjr5 UID=67e10621-03de-45f3-a6f2-8bcc30f0d9d4 IP=10.244.0.9 labels={'app': 'demo-api', 'pod-template-hash': '6d49d5c8bd'} image=secops-demo-api:phase-d1 imageID=sha256:cb82d20063553272d86db019ed015e599633f616535c8ffbed98eae1b5224e25 ready=True automount=None
+Pod=demo-backend-5d4449cb58-vzhs2 UID=65aa8380-cd09-4da0-85af-4ec762f68f37 IP=10.244.0.8 labels={'app': 'demo-backend', 'pod-template-hash': '5d4449cb58'} image=secops-demo-backend:phase-b imageID=sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41 ready=True automount=None
+Pod=phase-d3-source-9bffb5b97e UID=d7f09084-ec4b-4d69-88ac-a7c65e0b35b3 IP=10.244.0.14 labels={'assessment.id': '9bffb5b97e', 'assessment.phase': 'd3', 'assessment.role': 'unrelated-source'} image=secops-demo-api:phase-b imageID=sha256:80e1fd9bd1afe996dfb03d6b2839c88d00fc3bca1269a74b10b13acf777a6e1f ready=True automount=False
+Pod=phase-d3-target-9bffb5b97e UID=4cb4a249-e1e5-4b2c-9e9e-7100c94efd41 IP=10.244.0.15 labels={'assessment.id': '9bffb5b97e', 'assessment.phase': 'd3', 'assessment.role': 'unrelated-target'} image=secops-demo-backend:phase-b imageID=sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41 ready=True automount=False
+Service=demo-backend IP=10.96.32.207 selector={'app': 'demo-backend'} ports=[{'name': 'http', 'port': 8081, 'protocol': 'TCP', 'targetPort': 'http'}]
+Service=phase-d3-target-9bffb5b97e IP=10.96.65.55 selector={'assessment.id': '9bffb5b97e', 'assessment.phase': 'd3', 'assessment.role': 'unrelated-target'} ports=[{'name': 'http', 'port': 8081, 'protocol': 'TCP', 'targetPort': 8081}]
+Target EndpointSlice=phase-d3-target-9bffb5b97e-w8rqw endpoint=[{'addresses': ['10.244.0.15'], 'conditions': {'ready': True, 'serving': True, 'terminating': False}, 'nodeName': 'secops-lab-control-plane', 'targetRef': {'kind': 'Pod', 'name': 'phase-d3-target-9bffb5b97e', 'namespace': 'secops-demo', 'uid': '4cb4a249-e1e5-4b2c-9e9e-7100c94efd41'}}] ports=[{'name': 'http', 'port': 8081, 'protocol': 'TCP'}]
+Target Pod-local /healthz: HTTP 200
+API to backend source=demo-api-6d49d5c8bd-nmjr5 result={"dns": {"addresses": ["10.96.32.207"], "result": "RESOLVED"}, "host": "demo-backend.secops-demo.svc.cluster.local", "http": {"body": {"source": "demo-backend", "value": "representative-data"}, "status": 200}, "port": 8081, "tcp": {"peer": ["10.96.32.207", 8081], "result": "CONNECTED"}, "utc": "2026-09-22T08:13:35.417437+00:00"}
+Probe classification: ALLOW PASS
+Source to unrelated target source=phase-d3-source-9bffb5b97e result={"dns": {"addresses": ["10.96.65.55"], "result": "RESOLVED"}, "host": "phase-d3-target-9bffb5b97e.secops-demo.svc.cluster.local", "http": {"body": {"source": "demo-backend", "value": "representative-data"}, "status": 200}, "port": 8081, "tcp": {"peer": ["10.96.65.55", 8081], "result": "CONNECTED"}, "utc": "2026-09-22T08:13:36.093300+00:00"}
+Probe classification: ALLOW PASS
+API to unrelated target source=demo-api-6d49d5c8bd-nmjr5 result={"dns": {"addresses": ["10.96.65.55"], "result": "RESOLVED"}, "host": "phase-d3-target-9bffb5b97e.secops-demo.svc.cluster.local", "http": {"body": {"source": "demo-backend", "value": "representative-data"}, "status": 200}, "port": 8081, "tcp": {"peer": ["10.96.65.55", 8081], "result": "CONNECTED"}, "utc": "2026-09-22T08:13:37.191136+00:00"}
+Traceback (most recent call last):
+  File "<stdin>", line 7, in <module>
+AssertionError: {'dns': {'addresses': ['10.96.65.55'], 'result': 'RESOLVED'}, 'host': 'phase-d3-target-9bffb5b97e.secops-demo.svc.cluster.local', 'http': {'body': {'source': 'demo-backend', 'value': 'representative-data'}, 'status': 200}, 'port': 8081, 'tcp': {'peer': ['10.96.65.55', 8081], 'result': 'CONNECTED'}, 'utc': '2026-09-22T08:13:37.191136+00:00'}
+Source to backend source=phase-d3-source-9bffb5b97e result={"dns": {"addresses": ["10.96.32.207"], "result": "RESOLVED"}, "host": "demo-backend.secops-demo.svc.cluster.local", "http": {"body": {"source": "demo-backend", "value": "representative-data"}, "status": 200}, "port": 8081, "tcp": {"peer": ["10.96.32.207", 8081], "result": "CONNECTED"}, "utc": "2026-09-22T08:13:37.752413+00:00"}
+Traceback (most recent call last):
+  File "<stdin>", line 7, in <module>
+AssertionError: {'dns': {'addresses': ['10.96.32.207'], 'result': 'RESOLVED'}, 'host': 'demo-backend.secops-demo.svc.cluster.local', 'http': {'body': {'source': 'demo-backend', 'value': 'representative-data'}, 'status': 200}, 'port': 8081, 'tcp': {'peer': ['10.96.32.207', 8081], 'result': 'CONNECTED'}, 'utc': '2026-09-22T08:13:37.752413+00:00'}
+API DNS UDP/53 server=10.96.0.10 name=demo-backend.secops-demo.svc.cluster.local rcode=0 answers=1 PASS
+API DNS TCP/53 server=10.96.0.10 name=demo-backend.secops-demo.svc.cluster.local rcode=0 answers=1 PASS
+ERROR: F3 candidate smoke: 2 flow classification(s) failed.
+Cleanup UTC: 2026-09-22T08:13:38Z
+service "phase-d3-target-9bffb5b97e" deleted from secops-demo namespace
+pod "phase-d3-source-9bffb5b97e" deleted from secops-demo namespace
+pod "phase-d3-target-9bffb5b97e" deleted from secops-demo namespace
+Fixture cleanup: PASS
+
+Post-policy compatibility checks (separately recorded after the complete matrix):
+make task1-check: FUNCTIONALITY = PASS; see d3-post-functional.txt.
+Health observation 2026-09-22T08:18:27Z to 08:18:49Z: both original Pods Ready, restart count 0; see d3-health-window.txt. Window was 22 seconds, derived from admitted readiness period 2 seconds and liveness period 10 seconds.
+F1 smoke: PASS; see d3-post-f1.txt.
+F2 smoke: PASS; see d3-post-f2.txt.
+Candidate classification: FAIL because both required denied flows were CONNECTED and HTTP 200. DNS succeeded, target health and Service wiring succeeded, and source-to-target positive control succeeded. The observed success is not a timeout or an ambiguous network error.

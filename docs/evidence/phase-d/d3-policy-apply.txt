@@ -1,0 +1,12 @@
+Policy artifact: task1/hardened/network-policy.yaml. Reviewed before apply at 2026-09-22T08:11Z.
+Pre-apply NetworkPolicy count: 0; no unrelated or additive selecting policy.
+Object demo-api-egress: namespace secops-demo; podSelector app=demo-api; policyTypes=[Egress]. Rule 1 to same-namespace podSelector app=demo-backend TCP/8081. Rule 2 to ONE peer containing namespaceSelector kubernetes.io/metadata.name=kube-system AND podSelector k8s-app=kube-dns; ports UDP/53 and TCP/53. No ipBlock.
+Object demo-backend-ingress: namespace secops-demo; podSelector app=demo-backend; policyTypes=[Ingress]. Rule from same-namespace podSelector app=demo-api TCP/8081. No ipBlock.
+DNS basis: API nameserver 10.96.0.10 is Pod-backed kube-dns Service; EndpointSlice maps to two ready CoreDNS Pods with observed k8s-app=kube-dns label in kube-system. Namespace and Pod selectors are in the SAME peer, thus AND. Backend and API selectors use actual admitted app labels. D3 fixtures have only assessment.* labels, so neither matches application allow selectors.
+Selector trust: trusted deployment/platform path controls app labels. Assumed attacker has code execution inside API, without Kubernetes Pod creation or relabel authority.
+No API ingress, backend egress, namespace default deny, CNI or Service change in artifact.
+Apply UTC: 2026-09-22T08:11:53Z. `task1/hardened/scripts/deploy-f3.sh` rechecked D2 F2 smoke, required either zero or exactly the two named D3 policies, and passed server dry-run object scope. It then ran `kubectl --kubeconfig .local/kubeconfig --context kind-secops-lab --namespace secops-demo apply -f task1/hardened/network-policy.yaml` through the repository `k` wrapper. Both objects were created; no workload restart occurred.
+Post-apply count: 2, names demo-api-egress and demo-backend-ingress only. Effective YAML inspected 08:15Z and matched the reviewed rules, selectors, protocols and ports. No other selecting policy existed.
+Selected Pods: demo-api-6d49d5c8bd-nmjr5 app=demo-api and demo-backend-5d4449cb58-vzhs2 app=demo-backend, each Ready with restart count 0. Fixture Pods had assessment.* labels only.
+Policy admission is configuration evidence. Behavioral evidence in d3-post-policy-reachability.txt shows the required two denials did not occur.
+After the failed candidate, only these two policies were deleted at 08:19Z. Runtime policy count at exit is zero; see d3-rollback.txt.

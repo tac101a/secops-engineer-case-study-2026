@@ -1,0 +1,80 @@
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+Rollback verification UTC=2026-09-22T08:19:16Z
+./task1/scripts/check-functional.sh
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+deployment "demo-backend" successfully rolled out
+deployment "demo-api" successfully rolled out
+NAME                            READY   STATUS    RESTARTS   AGE   IP           NODE                       NOMINATED NODE   READINESS GATES
+demo-api-6d49d5c8bd-nmjr5       1/1     Running   0          49m   10.244.0.9   secops-lab-control-plane   <none>           <none>
+demo-backend-5d4449cb58-vzhs2   1/1     Running   0          49m   10.244.0.8   secops-lab-control-plane   <none>           <none>
+backend /healthz: HTTP 200, {"status": "ok"}
+backend /data: HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+api /healthz: HTTP 200, {"status": "ok"}
+api /data (first): HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+api /data (repeat): HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+/tmp/demo-cache.json: {"source": "demo-backend", "value": "representative-data"}
+Recent backend request logs:
+10.244.0.1 - - [22/Sep/2026 08:19:06] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [22/Sep/2026 08:19:06] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [22/Sep/2026 08:19:08] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [22/Sep/2026 08:19:10] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [22/Sep/2026 08:19:12] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [22/Sep/2026 08:19:14] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [22/Sep/2026 08:19:16] "GET /healthz HTTP/1.1" 200 -
+10.244.0.1 - - [22/Sep/2026 08:19:16] "GET /healthz HTTP/1.1" 200 -
+127.0.0.1 - - [22/Sep/2026 08:19:17] "GET /healthz HTTP/1.1" 200 -
+127.0.0.1 - - [22/Sep/2026 08:19:17] "GET /data HTTP/1.1" 200 -
+10.244.0.9 - - [22/Sep/2026 08:19:17] "GET /data HTTP/1.1" 200 -
+10.244.0.9 - - [22/Sep/2026 08:19:17] "GET /data HTTP/1.1" 200 -
+
+FUNCTIONALITY = PASS
+H1–H4 remain hypotheses; security assessment occurs in Phase C.
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+UTC: 2026-09-22T08:19:19Z
+Pod=demo-api-6d49d5c8bd-nmjr5 UID=67e10621-03de-45f3-a6f2-8bcc30f0d9d4 IP=10.244.0.9 image=secops-demo-api:phase-d1 imageID=sha256:cb82d20063553272d86db019ed015e599633f616535c8ffbed98eae1b5224e25
+PID 1 command: python app.py
+Uid: 65534	65534	65534	65534
+Gid: 65534	65534	65534	65534
+CapInh: 0000000000000000
+CapPrm: 0000000000000000
+CapEff: 0000000000000000
+CapBnd: 0000000000000000
+CapAmb: 0000000000000000
+NoNewPrivs: 1
+Probe process UID/GID: 65534 65534
+/: mountpoint=/ options=ro,relatime filesystem=overlay statvfs_readonly=True owner=0:0 mode=0o755
+/app: mountpoint=/ options=ro,relatime filesystem=overlay statvfs_readonly=True owner=0:0 mode=0o755
+/tmp: mountpoint=/tmp options=rw,relatime filesystem=ext4 statvfs_readonly=False owner=0:0 mode=0o777
+/app/app.py: 0 0 0o644
+Cache before repeat: owner=65534:65534 mtime_ns=1790065157928697753 content={"source": "demo-backend", "value": "representative-data"}
+Repeat GET /data: 200 {'source': 'demo-backend', 'value': 'representative-data'}
+Cache after repeat: mtime_ns=1790065160840677894 updated=True
+/app probe path: /app/phase-d1-f1-probe-eec5ebd8bb09499390f30efc0fe9e0ba
+/app write: DENIED errno=30 reason=Read-only file system
+F1 CANDIDATE RUNTIME SMOKE = PASS
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+UTC: 2026-09-22T08:19:21Z
+
+demo-api effective identity:
+ServiceAccount=demo-api automount=false
+Deployment serviceAccount=demo-api Pod-template automount=unset; no true override
+Pod=demo-api-6d49d5c8bd-nmjr5 UID=67e10621-03de-45f3-a6f2-8bcc30f0d9d4 image=secops-demo-api:phase-d1 imageID=sha256:cb82d20063553272d86db019ed015e599633f616535c8ffbed98eae1b5224e25 Pod automount=unset projected kube-api-access volume=absent SA mount=absent volumes=[('api-tmp', ['emptyDir', 'name'])] mounts=[{'mountPath': '/tmp', 'name': 'api-tmp'}] securityContext={'allowPrivilegeEscalation': False, 'capabilities': {'drop': ['ALL']}, 'readOnlyRootFilesystem': True, 'runAsNonRoot': True}
+Application-context SA directory=absent token=absent CA=absent namespace bundle=absent; former workload credential prerequisite unavailable; credential contents collected=NO
+
+demo-backend effective identity:
+ServiceAccount=demo-backend automount=false
+Deployment serviceAccount=demo-backend Pod-template automount=unset; no true override
+Pod=demo-backend-5d4449cb58-vzhs2 UID=65aa8380-cd09-4da0-85af-4ec762f68f37 image=secops-demo-backend:phase-b imageID=sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41 Pod automount=unset projected kube-api-access volume=absent SA mount=absent volumes=[] mounts=[] securityContext={'readOnlyRootFilesystem': False}
+Application-context SA directory=absent token=absent CA=absent namespace bundle=absent; former workload credential prerequisite unavailable; credential contents collected=NO
+demo-api: new UID=67e10621-03de-45f3-a6f2-8bcc30f0d9d4; accepted D1 image/imageID preserved
+demo-backend: new UID=65aa8380-cd09-4da0-85af-4ec762f68f37; accepted D1 image/imageID preserved
+API D1 image and F1 deployment controls preserved
+Backend accepted D1 image and local-security configuration preserved
+
+Role=absent RoleBinding=absent
+Exact demo-api ServiceAccount get configmap/phase-c-fixture can-i=no
+Exact demo-api ServiceAccount patch configmap/phase-c-fixture can-i=no
+Fixture exists; marker=baseline; data unchanged
+Former workload-identity GET/PATCH path unavailable: credential absent and exact identity authorization NO.
+F2 CANDIDATE RUNTIME SMOKE = PASS
+Rollback policies=0 D3 fixtures=absent
