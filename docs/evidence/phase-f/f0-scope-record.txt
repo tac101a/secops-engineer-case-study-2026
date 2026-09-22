@@ -1,0 +1,46 @@
+F0 SCOPE AND ACTIVITY RECORD — 2026-09-22
+
+Starting repository state:
+  branch: temp/work-in-progress
+  HEAD: ff495e0 wip: d3r-1b-exec-review
+  git status --short --untracked-files=all: empty
+  git diff --name-only: empty
+  git diff --cached --name-only: empty
+
+Read-only repository inspection:
+  rg --files and rg text searches for F0/CI/architecture paths
+  git status, branch, log, remote, ls-files and diff queries
+  cat/sed of D0, D1, D2, D3, D3R and EXEC review reports; Phase B contract,
+    Phase C synthesis, architecture, README and Makefile
+  cat of hardened/insecure YAML, Dockerfile, kind config, and selected deploy
+    and smoke script source; scripts were read, not invoked
+  Python 3 -B with already-installed PyYAML safe_load_all for nine selected
+    offline assertions; output recorded in f0-static-checks.txt
+  command -v availability queries for offline validation tools
+  official Kubernetes and GitHub documentation viewed through web search
+
+No repository script or Make target was executed. No command invoked kubectl,
+Docker, nftables, a live cluster, interrupted D3R diagnostic helper, or a
+runtime verification path. No network-dependent tool installation or live
+substitute validation was performed. F0 did not attempt to resolve the EXEC
+interruption's unknown live cluster state or possible residue.
+
+Allowed writes: exactly the F0 report and four support records under docs/.
+No application, manifest, policy, script, CI workflow, admission resource,
+prior report, or prior evidence file was edited. No commit or push was made.
+
+Final local verification:
+  artifact count: 5, all under docs/phase-f0-* or docs/evidence/phase-f/
+  local Markdown links in all five files: PASS
+  main report prose count excluding table rows and headings: 2,026 words
+  nine detection IDs each appear once with exactly one primary category
+  git status --short --untracked-files=all: exactly these five new files
+  git diff --check and git diff --cached --check: exit 0
+
+Evidence boundary:
+  checked-in YAML = desired configuration
+  D1/D2/D3/D3R reports = historical observations at recorded runs
+  current live cluster = UNKNOWN
+  possible diagnostic residue = UNKNOWN
+  CI/admission architecture = PROPOSED, not SELECTED or DEPLOYED
+  F3 acceptance = NOT READY

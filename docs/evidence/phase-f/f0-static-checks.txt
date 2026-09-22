@@ -1,0 +1,37 @@
+F0 OFFLINE STATIC CHECKS — 2026-09-22
+
+Method: read-only repository queries and an inline Python 3 `yaml.safe_load_all`
+program against checked-in YAML. The interpreter was invoked with `-B`.
+No repository script, Make target, kubectl, Docker, deploy, smoke, or runtime
+verification command was executed. No tool was installed.
+
+Tool discovery:
+  /usr/bin/python3
+  PyYAML 6.0.1
+  yq, kubeconform, trivy, hadolint, shellcheck, pdftotext: not found by command -v
+
+Manifest assertion output (exit 0):
+PASS | F1 API nonroot + no escalation + drop ALL + readonly root
+PASS | F1 explicit writable ephemeral /tmp mount
+PASS | F1 distinct image identity
+PASS | F2 hardened identities disable automount
+PASS | F2 no Role/RoleBinding in hardened YAML
+PASS | F2 insecure fixture grant retained
+PASS | F3 two expected policy objects
+PASS | F3 API egress selected
+PASS | F3 backend ingress selected
+DETAIL | API egress: [{'to': [{'podSelector': {'matchLabels': {'app': 'demo-backend'}}}], 'ports': [{'protocol': 'TCP', 'port': 8081}]}, {'to': [{'namespaceSelector': {'matchLabels': {'kubernetes.io/metadata.name': 'kube-system'}}, 'podSelector': {'matchLabels': {'k8s-app': 'kube-dns'}}}], 'ports': [{'protocol': 'UDP', 'port': 53}, {'protocol': 'TCP', 'port': 53}]}]
+DETAIL | backend ingress: [{'from': [{'podSelector': {'matchLabels': {'app': 'demo-api'}}}], 'ports': [{'protocol': 'TCP', 'port': 8081}]}]
+SUMMARY | 9/9 static assertions passed; no runtime or dataplane test performed
+
+Tracked CI path query: `git ls-files` filtered for .github, .gitlab,
+.circleci, .buildkite, .tekton, Jenkinsfile and azure-pipelines: zero matches.
+Repository remote read: origin is
+https://github.com/tac101a/secops-engineer-case-study-2026.git.
+This is no proof of remote branch protection or CI settings.
+
+Limits: these assertions compare selected desired-state fields and names.
+They do not validate the entire Kubernetes schema, effective RBAC from all
+sources, actual admission, image contents, Pod process state, current cluster
+state, or NetworkPolicy dataplane behavior. No offline schema validator was
+available; no network-dependent substitute was used.
