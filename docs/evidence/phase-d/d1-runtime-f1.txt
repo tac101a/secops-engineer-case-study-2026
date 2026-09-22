@@ -1,0 +1,24 @@
+D1 actual runtime F1 observation
+Command: ./task1/hardened/scripts/smoke-f1.sh (kubectl exec is assessor transport; probe runs with candidate container security context)
+Exit code: 0
+UTC: 2026-09-22T04:18:15Z
+Pod=demo-api-79fb54f895-xwdfz UID=e84b6903-2da2-4b39-a22a-ea3c2d6cd3cc IP=10.244.0.7 image=secops-demo-api:phase-d1 imageID=sha256:cb82d20063553272d86db019ed015e599633f616535c8ffbed98eae1b5224e25
+PID 1 command: python app.py
+Uid: 65534 65534 65534 65534
+Gid: 65534 65534 65534 65534
+CapInh: 0000000000000000
+CapPrm: 0000000000000000
+CapEff: 0000000000000000
+CapBnd: 0000000000000000
+CapAmb: 0000000000000000
+NoNewPrivs: 1
+Probe process UID/GID: 65534 65534
+/: mountpoint=/ options=ro,relatime filesystem=overlay statvfs_readonly=True owner=0:0 mode=0755
+/app: mountpoint=/ options=ro,relatime filesystem=overlay statvfs_readonly=True owner=0:0 mode=0755
+/app/app.py: owner=0:0 mode=0644
+/tmp: mountpoint=/tmp options=rw,relatime filesystem=ext4 statvfs_readonly=False owner=0:0 mode=0777
+Cache after normal functional requests: /tmp/demo-cache.json owner=65534:65534; content={"source":"demo-backend","value":"representative-data"}; mtime_ns=1790050686255783005.
+Repeat GET /data inside actual Pod: HTTP 200, expected synthetic payload; cache mtime_ns=1790050697285771178, increased=True; content still expected.
+/app probe path: /app/phase-d1-f1-probe-aeb61f4289784511b8d2f50979209659
+/app write: DENIED errno=30 reason=Read-only file system; path absent after probe.
+F1 CANDIDATE RUNTIME SMOKE = PASS

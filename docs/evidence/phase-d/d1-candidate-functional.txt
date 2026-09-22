@@ -1,0 +1,18 @@
+Candidate functional control
+Candidate Pod after rollout: demo-api-79fb54f895-xwdfz; UID e84b6903-2da2-4b39-a22a-ea3c2d6cd3cc; IP 10.244.0.7; image secops-demo-api:phase-d1; imageID sha256:cb82d20063553272d86db019ed015e599633f616535c8ffbed98eae1b5224e25.
+UTC before first normal /data request: 2026-09-22T04:17:57Z.
+Assessor read-only observation in new Pod: /tmp/demo-cache.json exists = False. No assessor/root/init process pre-created it.
+Command: make task1-check
+Exit code: 0
+deployment "demo-backend" successfully rolled out
+deployment "demo-api" successfully rolled out
+demo-api-79fb54f895-xwdfz 1/1 Running 0 restarts; demo-backend-549b8f665f-npfsp 1/1 Running.
+backend /healthz: HTTP 200, {"status": "ok"}
+backend /data: HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+api /healthz: HTTP 200, {"status": "ok"}
+api /data (first): HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+api /data (repeat): HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+/tmp/demo-cache.json: {"source": "demo-backend", "value": "representative-data"}
+Backend logs recorded two GET /data requests from candidate API Pod IP 10.244.0.7 at 04:18:06Z.
+FUNCTIONALITY = PASS
+The script's historical H1-H4 footer is Phase B text, not the current security state.

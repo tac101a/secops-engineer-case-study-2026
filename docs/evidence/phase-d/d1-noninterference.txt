@@ -1,0 +1,21 @@
+D1 F2/F3 non-interference comparison
+UTC: 2026-09-22T04:18:53Z
+Source baseline: task1/insecure/demo-api.yaml and task1/insecure/rbac.yaml; starting live objects and Phase C inventory. Candidate: task1/hardened/demo-api.yaml and live D1 Pod/objects.
+
+F2 field/object | Baseline | D1 candidate/effective | Equivalent
+serviceAccountName | demo-api | Deployment and Pod demo-api | YES
+Pod automountServiceAccountToken | unset | unset | YES
+ServiceAccount automountServiceAccountToken | true | true | YES
+Effective projected token | baseline token projected/readable (Phase C) | kube-api-access-4drx6 volume present; token path process-readable (test exit 0; content not read) | YES
+Role demo-api-fixture-access | configmaps/phase-c-fixture get, patch | same named Role and rules present | YES
+RoleBinding demo-api-fixture-access | RoleRef demo-api-fixture-access; subject ServiceAccount demo-api in secops-demo | same RoleRef and subject present | YES
+No workload-token GET/PATCH was performed in D1. F2 was not remediated in D1.
+
+F3 property | Baseline | D1 candidate/effective | Equivalent
+NetworkPolicy count in secops-demo | 0 | 0 (kubectl returned empty items list) | YES
+demo-api Service | ClusterIP 10.96.161.44, selector app=demo-api, TCP/8080 | same | YES
+demo-backend Service | ClusterIP 10.96.32.207, selector app=demo-backend, TCP/8081 | same | YES
+Backend dependency | Pod demo-backend-549b8f665f-npfsp UID 71156c57-8a45-46aa-a365-7566292e6d61, imageID sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41 | same | YES
+CNI | kindnet image docker.io/kindest/kindnetd:v20251212-v0.29.0-alpha-105-g20ccfc88, imageID sha256:4921d7a6dffa922dd679732ba4797085c4f39e9a53bee8b6fdb1d463e8571251 (Phase C inventory) | same image and imageID | YES
+API to backend | required Phase B path passed before candidate | make task1-check passed after candidate; backend logged API IP 10.244.0.7 | YES
+No NetworkPolicy was applied and no NetworkPolicy enforcement test was performed in D1. F3 was not remediated in D1.

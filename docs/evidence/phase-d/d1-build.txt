@@ -1,0 +1,16 @@
+D1 separate image build and load
+Command: ./task1/hardened/scripts/build-f1.sh
+Build command in script: docker build -f task1/hardened/images/demo-api.Dockerfile -t secops-demo-api:phase-d1 task1/app/demo-api
+Dockerfile: task1/hardened/images/demo-api.Dockerfile
+Build context: task1/app/demo-api (application source unchanged)
+Candidate tag: secops-demo-api:phase-d1
+Pinned base: python:3.12.12-slim-bookworm@sha256:593bd06efe90efa80dc4eee3948be7c0fde4134606dd40d8dd8dbcade98e669c
+Build decisions: root owns /app and app.py; modes 0755/0644; numeric Config.User=65534:65534; Python bytecode disabled. No application source duplicate or change.
+Result: Successfully built 9837f584c9cd and tagged secops-demo-api:phase-d1.
+Local candidate image ID: sha256:9837f584c9cdaf2c6ac3d5e1b4188908f25ae5a33ea8dceb4d822020b270eb3a
+Image Config.User: 65534:65534
+Load command in script: kind load docker-image --name secops-lab secops-demo-api:phase-d1
+Load result: image ID sha256:9837f584c9cdaf2c6ac3d5e1b4188908f25ae5a33ea8dceb4d822020b270eb3a loaded to secops-lab-control-plane; exit 0.
+Local phase-b API image ID before and after: sha256:95dd04cfef5a6d31e10adf7b2371676f0a5ae11d94772790dbd8467ec627ff18; unchanged.
+Docker reported missing buildx plugin and used its legacy builder. The build and kind load both succeeded.
+Deployed Kubernetes candidate imageID (observed after rollout): sha256:cb82d20063553272d86db019ed015e599633f616535c8ffbed98eae1b5224e25.

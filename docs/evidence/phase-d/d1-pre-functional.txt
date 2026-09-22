@@ -1,0 +1,19 @@
+Pre-candidate functional control
+UTC window: 2026-09-22T04:11:57Z to 2026-09-22T04:12:09Z (timestamps in backend request log).
+D1 start commit: b03c132e7ce37883f44f7cf54423c1e0ad7e1858
+Owned cluster/context/namespace: secops-lab / kind-secops-lab / secops-demo; ownership check PASS.
+Baseline integrity: all SHA-256 rows in docs/evidence/phase-b/workload-revision.txt returned OK.
+Pods before candidate: demo-api-b8dcfccdf-gnv9c, UID d5601ad2-6919-4d58-bedf-5b984f0be056, image secops-demo-api:phase-b, imageID sha256:80e1fd9bd1afe996dfb03d6b2839c88d00fc3bca1269a74b10b13acf777a6e1f; demo-backend-549b8f665f-npfsp, UID 71156c57-8a45-46aa-a365-7566292e6d61, image secops-demo-backend:phase-b, imageID sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41.
+Command: make task1-check
+Exit code: 0
+deployment "demo-backend" successfully rolled out
+deployment "demo-api" successfully rolled out
+backend /healthz: HTTP 200, {"status": "ok"}
+backend /data: HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+api /healthz: HTTP 200, {"status": "ok"}
+api /data (first): HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+api /data (repeat): HTTP 200, {"source": "demo-backend", "value": "representative-data"}
+/tmp/demo-cache.json: {"source": "demo-backend", "value": "representative-data"}
+Backend logs recorded two GET /data requests from the baseline API Pod IP 10.244.0.5 at 04:12:08Z.
+FUNCTIONALITY = PASS
+The script's historical H1-H4 footer is Phase B text and is not an assessment of current security state.

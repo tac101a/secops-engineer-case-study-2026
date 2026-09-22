@@ -1,0 +1,20 @@
+D1 context
+UTC start marker: 2026-09-22T04:11:57Z (earliest timed line in the pre-candidate functional run; initial Git and source checks preceded it).
+D1 start commit (git rev-parse HEAD): b03c132e7ce37883f44f7cf54423c1e0ad7e1858
+Branch (git branch --show-current): temp/work-in-progress
+Initial git status --short --untracked-files=all: clean (no output)
+
+Owned environment: kind cluster secops-lab; context kind-secops-lab; namespace secops-demo; node secops-lab-control-plane Ready, Kubernetes v1.34.3. task1/scripts/common.sh require_cluster passed: Docker node ID matched this checkout's .local/secops-lab.owner; kubeconfig was .local/kubeconfig.
+Baseline integrity record: docs/evidence/phase-b/workload-revision.txt. Its recorded SHA-256 rows (not a hard-coded artifact count) were passed to sha256sum -c; every row returned OK. The record is unchanged in Git. Its descriptive header was excluded from the verifier; direct sha256sum -c also returned success with a three-header-line format warning.
+Unexpected baseline contradiction: NO.
+
+Starting demo-api Pod: demo-api-b8dcfccdf-gnv9c; UID d5601ad2-6919-4d58-bedf-5b984f0be056; IP 10.244.0.5; image secops-demo-api:phase-b; imageID sha256:80e1fd9bd1afe996dfb03d6b2839c88d00fc3bca1269a74b10b13acf777a6e1f.
+Starting demo-backend Pod: demo-backend-549b8f665f-npfsp; UID 71156c57-8a45-46aa-a365-7566292e6d61; IP 10.244.0.6; image secops-demo-backend:phase-b; imageID sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41.
+Local phase-b API image ID: sha256:95dd04cfef5a6d31e10adf7b2371676f0a5ae11d94772790dbd8467ec627ff18; Config.User=0.
+Local phase-b backend image ID: sha256:8359a9eb05508d097f51680085662c793afef1355c49dfe2ab28fcb92179ff57; Config.User=0.
+Starting services: demo-api ClusterIP 10.96.161.44 TCP/8080; demo-backend ClusterIP 10.96.32.207 TCP/8081. No NetworkPolicy in secops-demo. The named F2 fixture Role and RoleBinding were present.
+
+Reviewed in full: docs/phase-d-control-plan.md, docs/phase-c-report.md, task1/BASELINE.md, docs/evidence/phase-d/d0-design-context.txt, docs/evidence/phase-c/h1-container-privilege.txt, docs/evidence/phase-c/h4-filesystem.txt. Inspected both application directories, task1/insecure/*.yaml, task1/scripts/*.sh, task1/kind.yaml, and the Phase B integrity record. D0's official-assignment review is recorded in its design context; pdftotext was unavailable in this environment.
+Selected candidate image tag: secops-demo-api:phase-d1.
+Selected runtime identity: numeric 65534:65534, the pinned base image's existing nobody:nogroup entry. /app and app.py are root-owned 0755/0644; baseline /tmp was root-owned 1777. D1 tests the actual emptyDir permissions before accepting the choice.
+D0 revision necessary: NO.
