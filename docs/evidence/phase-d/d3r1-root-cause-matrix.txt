@@ -1,0 +1,36 @@
+D3R-1 read-only root-cause matrix. Historical and current evidence are separated; no numerical scores.
+
+Hypothesis / layer: A — candidate policy selector, peer, direction or additive-policy defect.
+Evidence for: No concrete defect identified. Configuration errors can in general explain an unenforced policy.
+Evidence against: HISTORICAL D3 admitted both policies, selected the intended Pods, had no other selecting policy, used actual TCP/8081 and CoreDNS labels, and observed both forbidden fresh flows HTTP 200. Current static review matches those selectors and ports.
+Missing evidence: Behavioral enforcement with the candidate is intentionally not repeated in D3R-1; the already captured D3 matrix is sufficient to establish failure, not to formally prove all possible policy semantics.
+Evidence type: DIRECT for admission/selection/HTTP outcomes; SUPPORTING for static Kubernetes semantic review.
+Current status: WEAKENED.
+
+Hypothesis / layer: B — kindnet controller/runtime cannot complete NetworkPolicy reconciliation in this owned cluster.
+Evidence for: HISTORICAL D3 kindnet `Syncing nftables rules` at 08:11:53Z, repeated `conn.Receive: netlink receive: no such file or directory`, `Unhandled Error`, queue drops and absent intended table while policies were still applied. Current Pod/DaemonSet shows a live Ready controller with the expected image, NET_ADMIN, hostNetwork, and no D3-time restart. Source-path correlation places the emitted error at an nftables Flush boundary.
+Evidence against: The error returned through netlink may originate in kernel handling, userspace request construction, transaction ordering, or another dependency; current configuration does not identify which. The exact binary source revision and failing message are not known.
+Missing evidence: Per-operation extended ACK/trace or exact binary source plus a narrow isolated reproduction, which is outside this read-only run.
+Evidence type: DIRECT for log/error and runtime state; SUPPORTING for upstream current-source correlation.
+Current status: SUPPORTED as failure boundary, UNRESOLVED as root-cause attribution/repair scope.
+
+Hypothesis / layer: nftables/netlink userspace transaction mismatch or invalid request.
+Evidence for: HISTORICAL error family explicitly names `conn.Receive` and netlink ENOENT during kindnet's nftables sync. Upstream source queues multiple object operations in one Flush; repeated ENOENT messages could arise from a composite transaction.
+Evidence against: CURRENT `nft list tables`, `nft list ruleset`, `iptables-save` and `ip6tables-save` all exit 0 and existing ip/ip6 tables are readable. This only demonstrates read operations and other extant netfilter behavior, not the failing write primitive.
+Missing evidence: Exact failed netlink message/extended ACK, exact library/build provenance, and narrow mutating comparison.
+Evidence type: DIRECT for historical error and current list-command results; SUPPORTING for upstream path; INFERENCE for transaction interpretation.
+Current status: UNRESOLVED.
+
+Hypothesis / layer: C — host/WSL kernel lacks or mishandles required nftables/netlink primitive.
+Evidence for: CURRENT host and node report the same 5.15.167.4-microsoft-standard-WSL2 kernel, so kind-node networking ultimately uses that kernel. The HISTORICAL controller received ENOENT from netlink.
+Evidence against: CURRENT `/proc/config.gz` directly reports CONFIG_NETFILTER=y, CONFIG_NETFILTER_NETLINK=y, CONFIG_NETFILTER_NETLINK_QUEUE=y, CONFIG_NF_TABLES=y, CONFIG_NF_TABLES_INET=y, CONFIG_NFT_CT=y; node nft list operations succeed. These observations weaken a broad missing-netfilter claim but cannot validate the exact controller transaction. Empty relevant `/proc/modules` search and lack of some `/sys/module` entries do not prove absence because features can be built in.
+Missing evidence: Direct test or traced error tying a particular required primitive's failure to host/kernel behavior. No such mutation or invasive tracing is allowed now.
+Evidence type: DIRECT for kernel identity/config/list behavior; CORRELATED for WSL context; INFERENCE for possible compatibility issue.
+Current status: UNRESOLVED.
+
+Hypothesis / layer: D — deeper cause and repair scope remain unresolved across B, userspace/netlink and C.
+Evidence for: The historical policy table and denials failed while the controller logged a composite nftables/netlink transaction error, but current read-only inspection cannot attribute the ENOENT to a particular message or software/kernel layer. Runtime imageID exists without exact source provenance. The policy has already been removed.
+Evidence against: The failure boundary is localized to kindnet's sync path; not every layer is equally plausible. A gross policy-selector defect and a broad absence of nftables are weakened.
+Missing evidence: An exact per-message failure observation or one bounded future diagnostic transaction with safe cleanup, after provenance is improved if possible.
+Evidence type: DIRECT for the observed uncertainty boundary and historical outcomes; SUPPORTING for source correlation.
+Current status: SUPPORTED as primary classification at this read-only boundary.

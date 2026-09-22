@@ -1,0 +1,147 @@
+Current read-only host and owned kind-node context; missing module/config data is UNKNOWN, not proof of disabled functionality.
+
+COMMAND: date -u +%FT%TZ
+2026-09-22T08:57:12Z
+EXIT: 0
+
+Follow-up targeted read-only kernel configuration inspection:
+COMMAND: docker exec secops-lab-control-plane sh -c 'zcat /proc/config.gz | grep -E "^(CONFIG_NF_TABLES|CONFIG_NFT_|CONFIG_NFNETLINK|CONFIG_NETFILTER|CONFIG_BRIDGE_NETFILTER|CONFIG_IP_NF_|CONFIG_NF_CONNTRACK)" | head -100'
+EXIT: 0
+Relevant directly observed entries include CONFIG_NETFILTER=y, CONFIG_NETFILTER_NETLINK=y, CONFIG_NETFILTER_NETLINK_QUEUE=y, CONFIG_NF_CONNTRACK=y, CONFIG_NF_TABLES=y, CONFIG_NF_TABLES_INET=y, CONFIG_NF_TABLES_IPV4=y, CONFIG_NF_TABLES_IPV6=y, CONFIG_NFT_CT=y, CONFIG_NFT_COUNTER=y, CONFIG_NFT_COMPAT=y, CONFIG_BRIDGE_NETFILTER=y, CONFIG_IP_NF_IPTABLES=y. One targeted output entry was CONFIG_NETFILTER_XT_TARGET_CT=m. These entries document configured features but do not prove that every nftables/netlink transaction used by kindnet succeeds.
+
+COMMAND: uname -a
+Linux LAPTOP-92J1MGF7 5.15.167.4-microsoft-standard-WSL2 #1 SMP Tue Nov 5 00:21:55 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
+EXIT: 0
+
+COMMAND: cat /proc/version
+Linux version 5.15.167.4-microsoft-standard-WSL2 (root@f9c826d3017f) (gcc (GCC) 11.2.0, GNU ld (GNU Binutils) 2.37) #1 SMP Tue Nov 5 00:21:55 UTC 2024
+EXIT: 0
+
+COMMAND: cat /etc/os-release
+PRETTY_NAME="Ubuntu 24.04.3 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.3 LTS (Noble Numbat)"
+VERSION_CODENAME=noble
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=noble
+LOGO=ubuntu-logo
+EXIT: 0
+
+COMMAND: cat /proc/1/cgroup
+15:name=systemd:/init.scope
+14:misc:/
+13:rdma:/
+12:pids:/init.scope
+11:hugetlb:/
+10:net_prio:/
+9:perf_event:/
+8:net_cls:/
+7:freezer:/
+6:devices:/init.scope
+5:memory:/init.scope
+4:blkio:/
+3:cpuacct:/
+2:cpu:/init.scope
+1:cpuset:/
+0::/init.scope
+EXIT: 0
+
+COMMAND: docker version --format Client=\{\{.Client.Version\}\}\ Server=\{\{.Server.Version\}\}
+Client=29.3.0 Server=29.3.0
+EXIT: 0
+
+COMMAND: docker inspect secops-lab-control-plane --format ID=\{\{.Id\}\}\ Image=\{\{.Image\}\}\ Privileged=\{\{.HostConfig.Privileged\}\}\ NetworkMode=\{\{.HostConfig.NetworkMode\}\}\ PidMode=\{\{.HostConfig.PidMode\}\}\ CapAdd=\{\{.HostConfig.CapAdd\}\}\ SecurityOpt=\{\{.HostConfig.SecurityOpt\}\}
+ID=bc50067e947d7a31d30cbff68a79c2f2fd933d06cae1882c42ecc65fa1476de1 Image=sha256:08497ee19eace7b4b5348db5c6a1591d7752b164530a36f855cb0f2bdcbadd48 Privileged=true NetworkMode=kind PidMode= CapAdd=<no value> SecurityOpt=[seccomp=unconfined apparmor=unconfined label=disable]
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane uname -a
+Linux secops-lab-control-plane 5.15.167.4-microsoft-standard-WSL2 #1 SMP Tue Nov 5 00:21:55 UTC 2024 x86_64 GNU/Linux
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane cat /etc/os-release
+PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+NAME="Debian GNU/Linux"
+VERSION_ID="12"
+VERSION="12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane containerd --version
+containerd github.com/containerd/containerd/v2 v2.2.0 1c4457e00facac03ce1d75f7b6777a7a851e5c41
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane sh -c test\ -r\ /proc/config.gz\ \&\&\ echo\ /proc/config.gz=readable\ \|\|\ echo\ /proc/config.gz=unavailable\;\ test\ -r\ /boot/config-\$\(uname\ -r\)\ \&\&\ echo\ boot_config=readable\ \|\|\ echo\ boot_config=unavailable
+/proc/config.gz=readable
+boot_config=unavailable
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane sh -c grep\ -E\ \"\^\(nf_\|nft\|ip_tables\|ip6_tables\|br_netfilter\|bridge\)\"\ /proc/modules\ \|\|\ true
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane sh -c ls\ -d\ /sys/module/nf\*\ /sys/module/nft\*\ /sys/module/br_netfilter\ 2\>/dev/null\ \|\|\ true
+/sys/module/nf_conntrack
+/sys/module/nf_conntrack_amanda
+/sys/module/nf_conntrack_ftp
+/sys/module/nf_conntrack_h323
+/sys/module/nf_conntrack_irc
+/sys/module/nf_conntrack_netbios_ns
+/sys/module/nf_conntrack_sane
+/sys/module/nf_conntrack_sip
+/sys/module/nf_conntrack_tftp
+/sys/module/nfit
+/sys/module/nfs
+/sys/module/nfs_layout_flexfiles
+/sys/module/nfs_layout_nfsv41_files
+/sys/module/nfsd
+/sys/module/nfsv4
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane sysctl net.bridge.bridge-nf-call-iptables net.bridge.bridge-nf-call-ip6tables net.ipv4.ip_forward net.netfilter.nf_conntrack_max
+net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward = 1
+net.netfilter.nf_conntrack_max = 262144
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane ip rule show
+0:	from all lookup local
+32766:	from all lookup main
+32767:	from all lookup default
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane ip route show
+default via 172.18.0.1 dev eth0 
+10.244.0.2 dev veth876bdf32 scope host 
+10.244.0.3 dev veth2cb34e67 scope host 
+10.244.0.4 dev veth3c1457b4 scope host 
+10.244.0.8 dev vethf07223fa scope host 
+10.244.0.9 dev veth8c94b9a2 scope host 
+172.18.0.0/16 dev eth0 proto kernel scope link src 172.18.0.2 
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane ip link show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0@if5: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default 
+    link/ether d6:5e:69:96:cf:1e brd ff:ff:ff:ff:ff:ff link-netnsid 0
+3: veth876bdf32@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default 
+    link/ether 0a:89:35:01:c5:bd brd ff:ff:ff:ff:ff:ff link-netns cni-05b72dd7-8086-4875-1444-380a8207108c
+4: veth2cb34e67@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default 
+    link/ether f2:77:92:88:1c:ac brd ff:ff:ff:ff:ff:ff link-netns cni-8d5e577f-32b6-897c-a731-bcb109bf07b0
+5: veth3c1457b4@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default 
+    link/ether aa:6b:65:cd:47:4c brd ff:ff:ff:ff:ff:ff link-netns cni-0741e410-a704-1599-acb1-73edd57e3f2e
+9: vethf07223fa@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default 
+    link/ether 26:2e:61:42:ab:33 brd ff:ff:ff:ff:ff:ff link-netns cni-e8fd1caf-5e16-55df-4f08-d2d10a7279f7
+10: veth8c94b9a2@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default 
+    link/ether ea:b0:b1:b9:fb:ff brd ff:ff:ff:ff:ff:ff link-netns cni-963ef045-701a-98a0-ef3c-c00c8240979a
+EXIT: 0

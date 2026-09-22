@@ -1,0 +1,18 @@
+D3R-0 context and blocker-freeze boundary
+UTC: 2026-09-22T08:54:43Z (last pre-freeze clock observation)
+D3R start commit: c62577f1e8e6d50c131676a5e5d219feb467d3e4
+Branch: temp/work-in-progress
+Initial `git status --short --untracked-files=all`: empty (clean)
+Initial `git diff --name-only`: empty
+Failed D3 report: docs/phase-d-d3-report.md; last line is exactly `D3 NOT READY`.
+Failed D3 report commit: c62577f1e8e6d50c131676a5e5d219feb467d3e4 (`wip: d3`); recorded D3 start commit: eabd67131696beb45dec612d9f8caf747d8dfe6e.
+
+Official assignment reviewed directly: docs/case-study-secops-engineer-2026.pdf, pages 1-3. Page 1 introduces mandatory Task 1 and the practical repository/PDF deliverables; page 2 sets the Kubernetes workload/platform assumption, security assessment, risk priority, safer manifest, post-remediation functionality, CI/CD detection/prevention and admission, and low-outage production rollout; page 3 lists Task 1 code, before/after manifests, run instructions, and report content. This run remains scoped to D3 enforcement diagnosis.
+
+Sources reviewed before freeze: docs/phase-d-d3-report.md; docs/evidence/phase-d/d3-context.txt, d3-network-inventory.txt, d3-policy-apply.txt, d3-post-policy-reachability.txt, d3-enforcement-diagnosis.txt, d3-health-window.txt, d3-noninterference.txt, d3-rollback.txt, d3-rollback-verification.txt, d3-mutation-verification.txt; task1/hardened/network-policy.yaml; docs/phase-d-control-plan.md; docs/phase-d-d2-report.md; docs/phase-d-d1-report.md; docs/phase-c-report.md; task1/BASELINE.md; task1/scripts/common.sh.
+
+Read-only ownership/context check: repository common.sh `require_cluster` passed against `secops-lab`; kubeconfig current context `kind-secops-lab`; namespace `secops-demo`. The first sandbox attempt could not access /var/run/docker.sock; the read-only check succeeded with approved escalation. No cluster state was changed.
+Read-only `kubectl get networkpolicies,pods,services,serviceaccounts,roles,rolebindings,configmaps -o wide`: only two workload Pods, two workload Services, three ServiceAccounts, and two ConfigMaps appeared; no NetworkPolicy, Role or RoleBinding. Thus current NetworkPolicy count = 0 and D3 temporary Pods/Services = absent.
+Read-only aggregate JSON inspection: API Pod demo-api-6d49d5c8bd-nmjr5 UID 67e10621-03de-45f3-a6f2-8bcc30f0d9d4, image secops-demo-api:phase-d1, imageID sha256:cb82d20063553272d86db019ed015e599633f616535c8ffbed98eae1b5224e25, Ready, restarts 0. Backend Pod demo-backend-5d4449cb58-vzhs2 UID 65aa8380-cd09-4da0-85af-4ec762f68f37, image secops-demo-backend:phase-b, imageID sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41, Ready, restarts 0. Both Pod automount fields unset; demo-api and demo-backend ServiceAccounts automount=false. API volumes=[api-tmp], backend volumes=[]; no projected credential bundle. Exact F2 Role/RoleBinding absent. phase-c-fixture exists with marker=baseline.
+Historical rollback evidence: d3-rollback.txt and d3-rollback-verification.txt record zero policies, no fixtures, same Pod UIDs/imageIDs, functionality PASS, F1 PASS, and F2 PASS after policy deletion.
+No runtime mutation occurred during D3R-0. Repository changes at this point are limited to this context file and the blocker-freeze report.

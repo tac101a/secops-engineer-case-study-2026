@@ -1,0 +1,538 @@
+Current read-only kind node nft/netfilter inventory. The D3 policies were already removed before this capture; current absence does not recreate the historical failure.
+
+COMMAND: docker exec secops-lab-control-plane uname -a
+Linux secops-lab-control-plane 5.15.167.4-microsoft-standard-WSL2 #1 SMP Tue Nov 5 00:21:55 UTC 2024 x86_64 GNU/Linux
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane nft --version
+nftables v1.0.6 (Lester Gooch #5)
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane nft list tables
+table ip nat
+table ip mangle
+table ip filter
+table ip6 mangle
+table ip6 nat
+table ip6 filter
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane nft list ruleset
+# Warning: table ip nat is managed by iptables-nft, do not touch!
+table ip nat {
+	chain PREROUTING {
+		type nat hook prerouting priority dstnat; policy accept;
+		 counter packets 535 bytes 35016 jump KUBE-SERVICES
+		ip daddr 172.18.0.1 counter packets 2 bytes 170 jump DOCKER_OUTPUT
+	}
+
+	chain INPUT {
+		type nat hook input priority 100; policy accept;
+	}
+
+	chain OUTPUT {
+		type nat hook output priority -100; policy accept;
+		 counter packets 95896 bytes 5753760 jump KUBE-SERVICES
+		ip daddr 172.18.0.1 counter packets 0 bytes 0 jump DOCKER_OUTPUT
+	}
+
+	chain POSTROUTING {
+		type nat hook postrouting priority srcnat; policy accept;
+		 counter packets 95995 bytes 5762566 jump KUBE-POSTROUTING
+		ip daddr 172.18.0.1 counter packets 0 bytes 0 jump DOCKER_POSTROUTING
+		fib daddr type != local  counter packets 30648 bytes 1841746 jump KIND-MASQ-AGENT
+	}
+
+	chain DOCKER_OUTPUT {
+		ip daddr 172.18.0.1 tcp dport 53 counter packets 0 bytes 0 dnat to 127.0.0.11:35657
+		ip daddr 172.18.0.1 udp dport 53 counter packets 2 bytes 170 dnat to 127.0.0.11:46636
+	}
+
+	chain DOCKER_POSTROUTING {
+		ip saddr 127.0.0.11 tcp sport 35657 counter packets 0 bytes 0 snat to 172.18.0.1:53
+		ip saddr 127.0.0.11 udp sport 46636 counter packets 0 bytes 0 snat to 172.18.0.1:53
+	}
+
+	chain KUBE-KUBELET-CANARY {
+	}
+
+	chain KUBE-PROXY-CANARY {
+	}
+
+	chain KUBE-SERVICES {
+		meta l4proto tcp ip daddr 10.96.0.1  tcp dport 443 counter packets 0 bytes 0 jump KUBE-SVC-NPX46M4PTMTKRN6Y
+		meta l4proto udp ip daddr 10.96.0.10  udp dport 53 counter packets 6 bytes 528 jump KUBE-SVC-TCOU7JCQXEZGVUNU
+		meta l4proto tcp ip daddr 10.96.0.10  tcp dport 53 counter packets 0 bytes 0 jump KUBE-SVC-ERIFXISQEP7F7OF4
+		meta l4proto tcp ip daddr 10.96.0.10  tcp dport 9153 counter packets 0 bytes 0 jump KUBE-SVC-JD5MR3NA4I4DYORP
+		meta l4proto tcp ip daddr 10.96.161.44  tcp dport 8080 counter packets 0 bytes 0 jump KUBE-SVC-ZYQXZMABSFVPIZCW
+		meta l4proto tcp ip daddr 10.96.32.207  tcp dport 8081 counter packets 6 bytes 360 jump KUBE-SVC-W3TLCVT3SY3RVRGD
+		 fib daddr type local counter packets 9184 bytes 551040 jump KUBE-NODEPORTS
+	}
+
+	chain KUBE-POSTROUTING {
+		meta mark & 0x00004000 != 0x00004000 counter packets 13355 bytes 801468 return
+		counter packets 0 bytes 0 meta mark set mark xor 0x4000
+		 counter packets 0 bytes 0 masquerade fully-random
+	}
+
+	chain KUBE-NODEPORTS {
+	}
+
+	chain KUBE-MARK-MASQ {
+		counter packets 0 bytes 0 meta mark set mark or 0x4000
+	}
+
+	chain KUBE-SVC-ZYQXZMABSFVPIZCW {
+		meta l4proto tcp ip saddr != 10.244.0.0/16 ip daddr 10.96.161.44  tcp dport 8080 counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		 counter packets 0 bytes 0 jump KUBE-SEP-O2ONS4FRAJG46KL3
+	}
+
+	chain KUBE-SVC-W3TLCVT3SY3RVRGD {
+		meta l4proto tcp ip saddr != 10.244.0.0/16 ip daddr 10.96.32.207  tcp dport 8081 counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		 counter packets 17 bytes 1020 jump KUBE-SEP-44S3ELUCG4GWG6ZD
+	}
+
+	chain KUBE-SVC-NPX46M4PTMTKRN6Y {
+		meta l4proto tcp ip saddr != 10.244.0.0/16 ip daddr 10.96.0.1  tcp dport 443 counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		 counter packets 0 bytes 0 jump KUBE-SEP-V2PECCYPB6X2GSCW
+	}
+
+	chain KUBE-SEP-V2PECCYPB6X2GSCW {
+		ip saddr 172.18.0.2  counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		meta l4proto tcp   counter packets 0 bytes 0 dnat to 172.18.0.2:6443
+	}
+
+	chain KIND-MASQ-AGENT {
+		ip daddr 10.244.0.0/16  counter packets 30648 bytes 1841746 return
+		 counter packets 0 bytes 0 masquerade
+	}
+
+	chain KUBE-SVC-TCOU7JCQXEZGVUNU {
+		meta l4proto udp ip saddr != 10.244.0.0/16 ip daddr 10.96.0.10  udp dport 53 counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		 meta random & 2147483647 < 1073741824 counter packets 27 bytes 2794 jump KUBE-SEP-YIL6JZP7A3QYXJU2
+		 counter packets 34 bytes 3592 jump KUBE-SEP-6E7XQMQ4RAYOWTTM
+	}
+
+	chain KUBE-SEP-6E7XQMQ4RAYOWTTM {
+		ip saddr 10.244.0.3  counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		meta l4proto udp   counter packets 34 bytes 3592 dnat to 10.244.0.3:53
+	}
+
+	chain KUBE-SVC-ERIFXISQEP7F7OF4 {
+		meta l4proto tcp ip saddr != 10.244.0.0/16 ip daddr 10.96.0.10  tcp dport 53 counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		 meta random & 2147483647 < 1073741824 counter packets 1 bytes 60 jump KUBE-SEP-IT2ZTR26TO4XFPTO
+		 counter packets 1 bytes 60 jump KUBE-SEP-ZXMNUKOKXUTL2MK2
+	}
+
+	chain KUBE-SEP-ZXMNUKOKXUTL2MK2 {
+		ip saddr 10.244.0.3  counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		meta l4proto tcp   counter packets 1 bytes 60 dnat to 10.244.0.3:53
+	}
+
+	chain KUBE-SVC-JD5MR3NA4I4DYORP {
+		meta l4proto tcp ip saddr != 10.244.0.0/16 ip daddr 10.96.0.10  tcp dport 9153 counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		 meta random & 2147483647 < 1073741824 counter packets 0 bytes 0 jump KUBE-SEP-N4G2XR5TDX7PQE7P
+		 counter packets 0 bytes 0 jump KUBE-SEP-ZP3FB6NMPNCO4VBJ
+	}
+
+	chain KUBE-SEP-ZP3FB6NMPNCO4VBJ {
+		ip saddr 10.244.0.3  counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		meta l4proto tcp   counter packets 0 bytes 0 dnat to 10.244.0.3:9153
+	}
+
+	chain KUBE-SEP-YIL6JZP7A3QYXJU2 {
+		ip saddr 10.244.0.2  counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		meta l4proto udp   counter packets 27 bytes 2794 dnat to 10.244.0.2:53
+	}
+
+	chain KUBE-SEP-IT2ZTR26TO4XFPTO {
+		ip saddr 10.244.0.2  counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		meta l4proto tcp   counter packets 1 bytes 60 dnat to 10.244.0.2:53
+	}
+
+	chain KUBE-SEP-N4G2XR5TDX7PQE7P {
+		ip saddr 10.244.0.2  counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		meta l4proto tcp   counter packets 0 bytes 0 dnat to 10.244.0.2:9153
+	}
+
+	chain KUBE-SEP-44S3ELUCG4GWG6ZD {
+		ip saddr 10.244.0.8  counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		meta l4proto tcp   counter packets 17 bytes 1020 dnat to 10.244.0.8:8081
+	}
+
+	chain KUBE-SEP-O2ONS4FRAJG46KL3 {
+		ip saddr 10.244.0.9  counter packets 0 bytes 0 jump KUBE-MARK-MASQ
+		meta l4proto tcp   counter packets 0 bytes 0 dnat to 10.244.0.9:8080
+	}
+}
+table ip mangle {
+	chain KUBE-IPTABLES-HINT {
+	}
+
+	chain KUBE-KUBELET-CANARY {
+	}
+
+	chain KUBE-PROXY-CANARY {
+	}
+}
+table ip filter {
+	chain KUBE-FIREWALL {
+		ip saddr != 127.0.0.0/8 ip daddr 127.0.0.0/8  # Warning: table ip filter is managed by iptables-nft, do not touch!
+ct status dnat counter packets 0 bytes 0 drop
+	}
+
+	chain OUTPUT {
+		type filter hook output priority filter; policy accept;
+		ct state new  counter packets 95896 bytes 5753760 jump KUBE-PROXY-FIREWALL
+		ct state new  counter packets 95896 bytes 5753760 jump KUBE-SERVICES
+		counter packets 3567335 bytes 634751370 jump KUBE-FIREWALL
+	}
+
+	chain INPUT {
+		type filter hook input priority filter; policy accept;
+		ct state new  counter packets 65781 bytes 3946910 jump KUBE-PROXY-FIREWALL
+		 counter packets 3558515 bytes 629789125 jump KUBE-NODEPORTS
+		ct state new  counter packets 65781 bytes 3946910 jump KUBE-EXTERNAL-SERVICES
+		counter packets 3565093 bytes 632613697 jump KUBE-FIREWALL
+	}
+
+	chain KUBE-KUBELET-CANARY {
+	}
+
+	chain KUBE-PROXY-CANARY {
+	}
+
+	chain KUBE-EXTERNAL-SERVICES {
+	}
+
+	chain FORWARD {
+		type filter hook forward priority filter; policy accept;
+		ct state new  counter packets 191 bytes 17136 jump KUBE-PROXY-FIREWALL
+		 counter packets 680 bytes 70743 jump KUBE-FORWARD
+		ct state new  counter packets 191 bytes 17136 jump KUBE-SERVICES
+		ct state new  counter packets 191 bytes 17136 jump KUBE-EXTERNAL-SERVICES
+	}
+
+	chain KUBE-NODEPORTS {
+	}
+
+	chain KUBE-SERVICES {
+	}
+
+	chain KUBE-FORWARD {
+		ct state invalid counter packets 0 bytes 0 drop
+		 meta mark & 0x00004000 == 0x00004000 counter packets 0 bytes 0 accept
+		 ct state related,established counter packets 78 bytes 7398 accept
+	}
+
+	chain KUBE-PROXY-FIREWALL {
+	}
+}
+table ip6 mangle {
+	chain KUBE-IPTABLES-HINT {
+	}
+
+	chain KUBE-KUBELET-CANARY {
+	}
+
+	chain KUBE-PROXY-CANARY {
+	}
+}
+table ip6 nat {
+	chain KUBE-KUBELET-CANARY {
+	}
+
+	chain KUBE-PROXY-CANARY {
+	}
+
+	chain KUBE-SERVICES {
+		ip6 daddr != # Warning: table ip6 nat is managed by iptables-nft, do not touch!
+::1  fib daddr type local counter packets 0 bytes 0 jump KUBE-NODEPORTS
+	}
+
+	chain OUTPUT {
+		type nat hook output priority -100; policy accept;
+		 counter packets 1 bytes 4199 jump KUBE-SERVICES
+	}
+
+	chain PREROUTING {
+		type nat hook prerouting priority dstnat; policy accept;
+		 counter packets 0 bytes 0 jump KUBE-SERVICES
+	}
+
+	chain KUBE-POSTROUTING {
+		meta mark & 0x00004000 != 0x00004000 counter packets 0 bytes 0 return
+		counter packets 0 bytes 0 meta mark set mark xor 0x4000
+		 counter packets 0 bytes 0 XT target MASQUERADE not found
+# Warning: table ip6 filter is managed by iptables-nft, do not touch!
+
+	}
+
+	chain POSTROUTING {
+		type nat hook postrouting priority srcnat; policy accept;
+		 counter packets 1 bytes 4199 jump KUBE-POSTROUTING
+	}
+
+	chain KUBE-NODEPORTS {
+	}
+
+	chain KUBE-MARK-MASQ {
+		counter packets 0 bytes 0 meta mark set mark or 0x4000
+	}
+}
+table ip6 filter {
+	chain KUBE-KUBELET-CANARY {
+	}
+
+	chain KUBE-PROXY-CANARY {
+	}
+
+	chain KUBE-EXTERNAL-SERVICES {
+	}
+
+	chain INPUT {
+		type filter hook input priority filter; policy accept;
+		counter packets 70927 bytes 14278330 jump KUBE-FIREWALL
+		ct state new  counter packets 2 bytes 6186 jump KUBE-PROXY-FIREWALL
+		 counter packets 70927 bytes 14278330 jump KUBE-NODEPORTS
+		ct state new  counter packets 2 bytes 6186 jump KUBE-EXTERNAL-SERVICES
+	}
+
+	chain FORWARD {
+		type filter hook forward priority filter; policy accept;
+		ct state new  counter packets 0 bytes 0 jump KUBE-PROXY-FIREWALL
+		 counter packets 0 bytes 0 jump KUBE-FORWARD
+		ct state new  counter packets 0 bytes 0 jump KUBE-SERVICES
+		ct state new  counter packets 0 bytes 0 jump KUBE-EXTERNAL-SERVICES
+	}
+
+	chain KUBE-NODEPORTS {
+	}
+
+	chain KUBE-SERVICES {
+	}
+
+	chain OUTPUT {
+		type filter hook output priority filter; policy accept;
+		counter packets 70992 bytes 14282994 jump KUBE-FIREWALL
+		ct state new  counter packets 2 bytes 6186 jump KUBE-PROXY-FIREWALL
+		ct state new  counter packets 2 bytes 6186 jump KUBE-SERVICES
+	}
+
+	chain KUBE-FORWARD {
+		ct state invalid counter packets 0 bytes 0 drop
+		 meta mark & 0x00004000 == 0x00004000 counter packets 0 bytes 0 accept
+		 ct state related,established counter packets 0 bytes 0 accept
+	}
+
+	chain KUBE-PROXY-FIREWALL {
+	}
+
+	chain KUBE-FIREWALL {
+	}
+}
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane iptables --version
+iptables v1.8.9 (nf_tables)
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane iptables-save
+# Generated by iptables-save v1.8.9 (nf_tables) on Tue Sep 22 08:56:44 2026
+*mangle
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+:KUBE-IPTABLES-HINT - [0:0]
+:KUBE-KUBELET-CANARY - [0:0]
+:KUBE-PROXY-CANARY - [0:0]
+COMMIT
+# Completed on Tue Sep 22 08:56:44 2026
+# Generated by iptables-save v1.8.9 (nf_tables) on Tue Sep 22 08:56:44 2026
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:KUBE-EXTERNAL-SERVICES - [0:0]
+:KUBE-FIREWALL - [0:0]
+:KUBE-FORWARD - [0:0]
+:KUBE-KUBELET-CANARY - [0:0]
+:KUBE-NODEPORTS - [0:0]
+:KUBE-PROXY-CANARY - [0:0]
+:KUBE-PROXY-FIREWALL - [0:0]
+:KUBE-SERVICES - [0:0]
+-A INPUT -m conntrack --ctstate NEW -m comment --comment "kubernetes load balancer firewall" -j KUBE-PROXY-FIREWALL
+-A INPUT -m comment --comment "kubernetes health check service ports" -j KUBE-NODEPORTS
+-A INPUT -m conntrack --ctstate NEW -m comment --comment "kubernetes externally-visible service portals" -j KUBE-EXTERNAL-SERVICES
+-A INPUT -j KUBE-FIREWALL
+-A FORWARD -m conntrack --ctstate NEW -m comment --comment "kubernetes load balancer firewall" -j KUBE-PROXY-FIREWALL
+-A FORWARD -m comment --comment "kubernetes forwarding rules" -j KUBE-FORWARD
+-A FORWARD -m conntrack --ctstate NEW -m comment --comment "kubernetes service portals" -j KUBE-SERVICES
+-A FORWARD -m conntrack --ctstate NEW -m comment --comment "kubernetes externally-visible service portals" -j KUBE-EXTERNAL-SERVICES
+-A OUTPUT -m conntrack --ctstate NEW -m comment --comment "kubernetes load balancer firewall" -j KUBE-PROXY-FIREWALL
+-A OUTPUT -m conntrack --ctstate NEW -m comment --comment "kubernetes service portals" -j KUBE-SERVICES
+-A OUTPUT -j KUBE-FIREWALL
+-A KUBE-FIREWALL ! -s 127.0.0.0/8 -d 127.0.0.0/8 -m comment --comment "block incoming localnet connections" -m conntrack ! --ctstate RELATED,ESTABLISHED,DNAT -j DROP
+-A KUBE-FORWARD -m conntrack --ctstate INVALID -j DROP
+-A KUBE-FORWARD -m comment --comment "kubernetes forwarding rules" -m mark --mark 0x4000/0x4000 -j ACCEPT
+-A KUBE-FORWARD -m comment --comment "kubernetes forwarding conntrack rule" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+COMMIT
+# Completed on Tue Sep 22 08:56:44 2026
+# Generated by iptables-save v1.8.9 (nf_tables) on Tue Sep 22 08:56:44 2026
+*nat
+:PREROUTING ACCEPT [438:26280]
+:INPUT ACCEPT [436:26210]
+:OUTPUT ACCEPT [96064:5763840]
+:POSTROUTING ACCEPT [96170:5773066]
+:DOCKER_OUTPUT - [0:0]
+:DOCKER_POSTROUTING - [0:0]
+:KIND-MASQ-AGENT - [0:0]
+:KUBE-KUBELET-CANARY - [0:0]
+:KUBE-MARK-MASQ - [0:0]
+:KUBE-NODEPORTS - [0:0]
+:KUBE-POSTROUTING - [0:0]
+:KUBE-PROXY-CANARY - [0:0]
+:KUBE-SEP-44S3ELUCG4GWG6ZD - [0:0]
+:KUBE-SEP-6E7XQMQ4RAYOWTTM - [0:0]
+:KUBE-SEP-IT2ZTR26TO4XFPTO - [0:0]
+:KUBE-SEP-N4G2XR5TDX7PQE7P - [0:0]
+:KUBE-SEP-O2ONS4FRAJG46KL3 - [0:0]
+:KUBE-SEP-V2PECCYPB6X2GSCW - [0:0]
+:KUBE-SEP-YIL6JZP7A3QYXJU2 - [0:0]
+:KUBE-SEP-ZP3FB6NMPNCO4VBJ - [0:0]
+:KUBE-SEP-ZXMNUKOKXUTL2MK2 - [0:0]
+:KUBE-SERVICES - [0:0]
+:KUBE-SVC-ERIFXISQEP7F7OF4 - [0:0]
+:KUBE-SVC-JD5MR3NA4I4DYORP - [0:0]
+:KUBE-SVC-NPX46M4PTMTKRN6Y - [0:0]
+:KUBE-SVC-TCOU7JCQXEZGVUNU - [0:0]
+:KUBE-SVC-W3TLCVT3SY3RVRGD - [0:0]
+:KUBE-SVC-ZYQXZMABSFVPIZCW - [0:0]
+-A PREROUTING -m comment --comment "kubernetes service portals" -j KUBE-SERVICES
+-A PREROUTING -d 172.18.0.1/32 -j DOCKER_OUTPUT
+-A OUTPUT -m comment --comment "kubernetes service portals" -j KUBE-SERVICES
+-A OUTPUT -d 172.18.0.1/32 -j DOCKER_OUTPUT
+-A POSTROUTING -m comment --comment "kubernetes postrouting rules" -j KUBE-POSTROUTING
+-A POSTROUTING -d 172.18.0.1/32 -j DOCKER_POSTROUTING
+-A POSTROUTING -m addrtype ! --dst-type LOCAL -m comment --comment "kind-masq-agent: ensure nat POSTROUTING directs all non-LOCAL destination traffic to our custom KIND-MASQ-AGENT chain" -j KIND-MASQ-AGENT
+-A DOCKER_OUTPUT -d 172.18.0.1/32 -p tcp -m tcp --dport 53 -j DNAT --to-destination 127.0.0.11:35657
+-A DOCKER_OUTPUT -d 172.18.0.1/32 -p udp -m udp --dport 53 -j DNAT --to-destination 127.0.0.11:46636
+-A DOCKER_POSTROUTING -s 127.0.0.11/32 -p tcp -m tcp --sport 35657 -j SNAT --to-source 172.18.0.1:53
+-A DOCKER_POSTROUTING -s 127.0.0.11/32 -p udp -m udp --sport 46636 -j SNAT --to-source 172.18.0.1:53
+-A KIND-MASQ-AGENT -d 10.244.0.0/16 -m comment --comment "kind-masq-agent: local traffic is not subject to MASQUERADE" -j RETURN
+-A KIND-MASQ-AGENT -m comment --comment "kind-masq-agent: outbound traffic is subject to MASQUERADE (must be last in chain)" -j MASQUERADE
+-A KUBE-MARK-MASQ -j MARK --set-xmark 0x4000/0x4000
+-A KUBE-POSTROUTING -m mark ! --mark 0x4000/0x4000 -j RETURN
+-A KUBE-POSTROUTING -j MARK --set-xmark 0x4000/0x0
+-A KUBE-POSTROUTING -m comment --comment "kubernetes service traffic requiring SNAT" -j MASQUERADE --random-fully
+-A KUBE-SEP-44S3ELUCG4GWG6ZD -s 10.244.0.8/32 -m comment --comment "secops-demo/demo-backend:http" -j KUBE-MARK-MASQ
+-A KUBE-SEP-44S3ELUCG4GWG6ZD -p tcp -m comment --comment "secops-demo/demo-backend:http" -m tcp -j DNAT --to-destination 10.244.0.8:8081
+-A KUBE-SEP-6E7XQMQ4RAYOWTTM -s 10.244.0.3/32 -m comment --comment "kube-system/kube-dns:dns" -j KUBE-MARK-MASQ
+-A KUBE-SEP-6E7XQMQ4RAYOWTTM -p udp -m comment --comment "kube-system/kube-dns:dns" -m udp -j DNAT --to-destination 10.244.0.3:53
+-A KUBE-SEP-IT2ZTR26TO4XFPTO -s 10.244.0.2/32 -m comment --comment "kube-system/kube-dns:dns-tcp" -j KUBE-MARK-MASQ
+-A KUBE-SEP-IT2ZTR26TO4XFPTO -p tcp -m comment --comment "kube-system/kube-dns:dns-tcp" -m tcp -j DNAT --to-destination 10.244.0.2:53
+-A KUBE-SEP-N4G2XR5TDX7PQE7P -s 10.244.0.2/32 -m comment --comment "kube-system/kube-dns:metrics" -j KUBE-MARK-MASQ
+-A KUBE-SEP-N4G2XR5TDX7PQE7P -p tcp -m comment --comment "kube-system/kube-dns:metrics" -m tcp -j DNAT --to-destination 10.244.0.2:9153
+-A KUBE-SEP-O2ONS4FRAJG46KL3 -s 10.244.0.9/32 -m comment --comment "secops-demo/demo-api:http" -j KUBE-MARK-MASQ
+-A KUBE-SEP-O2ONS4FRAJG46KL3 -p tcp -m comment --comment "secops-demo/demo-api:http" -m tcp -j DNAT --to-destination 10.244.0.9:8080
+-A KUBE-SEP-V2PECCYPB6X2GSCW -s 172.18.0.2/32 -m comment --comment "default/kubernetes:https" -j KUBE-MARK-MASQ
+-A KUBE-SEP-V2PECCYPB6X2GSCW -p tcp -m comment --comment "default/kubernetes:https" -m tcp -j DNAT --to-destination 172.18.0.2:6443
+-A KUBE-SEP-YIL6JZP7A3QYXJU2 -s 10.244.0.2/32 -m comment --comment "kube-system/kube-dns:dns" -j KUBE-MARK-MASQ
+-A KUBE-SEP-YIL6JZP7A3QYXJU2 -p udp -m comment --comment "kube-system/kube-dns:dns" -m udp -j DNAT --to-destination 10.244.0.2:53
+-A KUBE-SEP-ZP3FB6NMPNCO4VBJ -s 10.244.0.3/32 -m comment --comment "kube-system/kube-dns:metrics" -j KUBE-MARK-MASQ
+-A KUBE-SEP-ZP3FB6NMPNCO4VBJ -p tcp -m comment --comment "kube-system/kube-dns:metrics" -m tcp -j DNAT --to-destination 10.244.0.3:9153
+-A KUBE-SEP-ZXMNUKOKXUTL2MK2 -s 10.244.0.3/32 -m comment --comment "kube-system/kube-dns:dns-tcp" -j KUBE-MARK-MASQ
+-A KUBE-SEP-ZXMNUKOKXUTL2MK2 -p tcp -m comment --comment "kube-system/kube-dns:dns-tcp" -m tcp -j DNAT --to-destination 10.244.0.3:53
+-A KUBE-SERVICES -d 10.96.0.1/32 -p tcp -m comment --comment "default/kubernetes:https cluster IP" -m tcp --dport 443 -j KUBE-SVC-NPX46M4PTMTKRN6Y
+-A KUBE-SERVICES -d 10.96.0.10/32 -p udp -m comment --comment "kube-system/kube-dns:dns cluster IP" -m udp --dport 53 -j KUBE-SVC-TCOU7JCQXEZGVUNU
+-A KUBE-SERVICES -d 10.96.0.10/32 -p tcp -m comment --comment "kube-system/kube-dns:dns-tcp cluster IP" -m tcp --dport 53 -j KUBE-SVC-ERIFXISQEP7F7OF4
+-A KUBE-SERVICES -d 10.96.0.10/32 -p tcp -m comment --comment "kube-system/kube-dns:metrics cluster IP" -m tcp --dport 9153 -j KUBE-SVC-JD5MR3NA4I4DYORP
+-A KUBE-SERVICES -d 10.96.161.44/32 -p tcp -m comment --comment "secops-demo/demo-api:http cluster IP" -m tcp --dport 8080 -j KUBE-SVC-ZYQXZMABSFVPIZCW
+-A KUBE-SERVICES -d 10.96.32.207/32 -p tcp -m comment --comment "secops-demo/demo-backend:http cluster IP" -m tcp --dport 8081 -j KUBE-SVC-W3TLCVT3SY3RVRGD
+-A KUBE-SERVICES -m comment --comment "kubernetes service nodeports; NOTE: this must be the last rule in this chain" -m addrtype --dst-type LOCAL -j KUBE-NODEPORTS
+-A KUBE-SVC-ERIFXISQEP7F7OF4 ! -s 10.244.0.0/16 -d 10.96.0.10/32 -p tcp -m comment --comment "kube-system/kube-dns:dns-tcp cluster IP" -m tcp --dport 53 -j KUBE-MARK-MASQ
+-A KUBE-SVC-ERIFXISQEP7F7OF4 -m comment --comment "kube-system/kube-dns:dns-tcp -> 10.244.0.2:53" -m statistic --mode random --probability 0.50000000000 -j KUBE-SEP-IT2ZTR26TO4XFPTO
+-A KUBE-SVC-ERIFXISQEP7F7OF4 -m comment --comment "kube-system/kube-dns:dns-tcp -> 10.244.0.3:53" -j KUBE-SEP-ZXMNUKOKXUTL2MK2
+-A KUBE-SVC-JD5MR3NA4I4DYORP ! -s 10.244.0.0/16 -d 10.96.0.10/32 -p tcp -m comment --comment "kube-system/kube-dns:metrics cluster IP" -m tcp --dport 9153 -j KUBE-MARK-MASQ
+-A KUBE-SVC-JD5MR3NA4I4DYORP -m comment --comment "kube-system/kube-dns:metrics -> 10.244.0.2:9153" -m statistic --mode random --probability 0.50000000000 -j KUBE-SEP-N4G2XR5TDX7PQE7P
+-A KUBE-SVC-JD5MR3NA4I4DYORP -m comment --comment "kube-system/kube-dns:metrics -> 10.244.0.3:9153" -j KUBE-SEP-ZP3FB6NMPNCO4VBJ
+-A KUBE-SVC-NPX46M4PTMTKRN6Y ! -s 10.244.0.0/16 -d 10.96.0.1/32 -p tcp -m comment --comment "default/kubernetes:https cluster IP" -m tcp --dport 443 -j KUBE-MARK-MASQ
+-A KUBE-SVC-NPX46M4PTMTKRN6Y -m comment --comment "default/kubernetes:https -> 172.18.0.2:6443" -j KUBE-SEP-V2PECCYPB6X2GSCW
+-A KUBE-SVC-TCOU7JCQXEZGVUNU ! -s 10.244.0.0/16 -d 10.96.0.10/32 -p udp -m comment --comment "kube-system/kube-dns:dns cluster IP" -m udp --dport 53 -j KUBE-MARK-MASQ
+-A KUBE-SVC-TCOU7JCQXEZGVUNU -m comment --comment "kube-system/kube-dns:dns -> 10.244.0.2:53" -m statistic --mode random --probability 0.50000000000 -j KUBE-SEP-YIL6JZP7A3QYXJU2
+-A KUBE-SVC-TCOU7JCQXEZGVUNU -m comment --comment "kube-system/kube-dns:dns -> 10.244.0.3:53" -j KUBE-SEP-6E7XQMQ4RAYOWTTM
+-A KUBE-SVC-W3TLCVT3SY3RVRGD ! -s 10.244.0.0/16 -d 10.96.32.207/32 -p tcp -m comment --comment "secops-demo/demo-backend:http cluster IP" -m tcp --dport 8081 -j KUBE-MARK-MASQ
+-A KUBE-SVC-W3TLCVT3SY3RVRGD -m comment --comment "secops-demo/demo-backend:http -> 10.244.0.8:8081" -j KUBE-SEP-44S3ELUCG4GWG6ZD
+-A KUBE-SVC-ZYQXZMABSFVPIZCW ! -s 10.244.0.0/16 -d 10.96.161.44/32 -p tcp -m comment --comment "secops-demo/demo-api:http cluster IP" -m tcp --dport 8080 -j KUBE-MARK-MASQ
+-A KUBE-SVC-ZYQXZMABSFVPIZCW -m comment --comment "secops-demo/demo-api:http -> 10.244.0.9:8080" -j KUBE-SEP-O2ONS4FRAJG46KL3
+COMMIT
+# Completed on Tue Sep 22 08:56:44 2026
+EXIT: 0
+
+COMMAND: docker exec secops-lab-control-plane ip6tables-save
+# Generated by ip6tables-save v1.8.9 (nf_tables) on Tue Sep 22 08:56:44 2026
+*mangle
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+:KUBE-IPTABLES-HINT - [0:0]
+:KUBE-KUBELET-CANARY - [0:0]
+:KUBE-PROXY-CANARY - [0:0]
+COMMIT
+# Completed on Tue Sep 22 08:56:44 2026
+# Generated by ip6tables-save v1.8.9 (nf_tables) on Tue Sep 22 08:56:44 2026
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:KUBE-EXTERNAL-SERVICES - [0:0]
+:KUBE-FIREWALL - [0:0]
+:KUBE-FORWARD - [0:0]
+:KUBE-KUBELET-CANARY - [0:0]
+:KUBE-NODEPORTS - [0:0]
+:KUBE-PROXY-CANARY - [0:0]
+:KUBE-PROXY-FIREWALL - [0:0]
+:KUBE-SERVICES - [0:0]
+-A INPUT -j KUBE-FIREWALL
+-A INPUT -m conntrack --ctstate NEW -m comment --comment "kubernetes load balancer firewall" -j KUBE-PROXY-FIREWALL
+-A INPUT -m comment --comment "kubernetes health check service ports" -j KUBE-NODEPORTS
+-A INPUT -m conntrack --ctstate NEW -m comment --comment "kubernetes externally-visible service portals" -j KUBE-EXTERNAL-SERVICES
+-A FORWARD -m conntrack --ctstate NEW -m comment --comment "kubernetes load balancer firewall" -j KUBE-PROXY-FIREWALL
+-A FORWARD -m comment --comment "kubernetes forwarding rules" -j KUBE-FORWARD
+-A FORWARD -m conntrack --ctstate NEW -m comment --comment "kubernetes service portals" -j KUBE-SERVICES
+-A FORWARD -m conntrack --ctstate NEW -m comment --comment "kubernetes externally-visible service portals" -j KUBE-EXTERNAL-SERVICES
+-A OUTPUT -j KUBE-FIREWALL
+-A OUTPUT -m conntrack --ctstate NEW -m comment --comment "kubernetes load balancer firewall" -j KUBE-PROXY-FIREWALL
+-A OUTPUT -m conntrack --ctstate NEW -m comment --comment "kubernetes service portals" -j KUBE-SERVICES
+-A KUBE-FORWARD -m conntrack --ctstate INVALID -j DROP
+-A KUBE-FORWARD -m comment --comment "kubernetes forwarding rules" -m mark --mark 0x4000/0x4000 -j ACCEPT
+-A KUBE-FORWARD -m comment --comment "kubernetes forwarding conntrack rule" -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+COMMIT
+# Completed on Tue Sep 22 08:56:44 2026
+# Generated by ip6tables-save v1.8.9 (nf_tables) on Tue Sep 22 08:56:44 2026
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+:KUBE-KUBELET-CANARY - [0:0]
+:KUBE-MARK-MASQ - [0:0]
+:KUBE-NODEPORTS - [0:0]
+:KUBE-POSTROUTING - [0:0]
+:KUBE-PROXY-CANARY - [0:0]
+:KUBE-SERVICES - [0:0]
+-A PREROUTING -m comment --comment "kubernetes service portals" -j KUBE-SERVICES
+-A OUTPUT -m comment --comment "kubernetes service portals" -j KUBE-SERVICES
+-A POSTROUTING -m comment --comment "kubernetes postrouting rules" -j KUBE-POSTROUTING
+-A KUBE-MARK-MASQ -j MARK --set-xmark 0x4000/0x4000
+-A KUBE-POSTROUTING -m mark ! --mark 0x4000/0x4000 -j RETURN
+-A KUBE-POSTROUTING -j MARK --set-xmark 0x4000/0x0
+-A KUBE-POSTROUTING -m comment --comment "kubernetes service traffic requiring SNAT" -j MASQUERADE --random-fully
+-A KUBE-SERVICES ! -d ::1/128 -m comment --comment "kubernetes service nodeports; NOTE: this must be the last rule in this chain" -m addrtype --dst-type LOCAL -j KUBE-NODEPORTS
+COMMIT
+# Completed on Tue Sep 22 08:56:44 2026
+EXIT: 0

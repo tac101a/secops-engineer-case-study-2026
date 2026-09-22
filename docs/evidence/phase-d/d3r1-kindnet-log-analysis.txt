@@ -1,0 +1,114 @@
+Command: bash -c 'source task1/scripts/common.sh; require_cluster; k --namespace kube-system logs pod/kindnet-n2pj4 --timestamps --since-time=2026-09-22T08:11:45Z'
+Exit: 0
+Total captured log lines: 1175
+First sync event: 2026-09-22T08:11:53.744008334Z I0922 08:11:53.743790       1 controller.go:711] "Syncing nftables rules"
+First sync error: 2026-09-22T08:11:53.982931535Z I0922 08:11:53.982679       1 controller.go:925] "syncing nftables rules" error=<
+First queue drop: 2026-09-22T08:11:55.046661279Z I0922 08:11:55.046480       1 controller.go:704] "Dropping out of the queue" error=<
+Last queue drop: 2026-09-22T08:19:04.468268705Z I0922 08:19:04.468031       1 controller.go:704] "Dropping out of the queue" error=<
+Sync-start count: 24; sync-error count: 24; unhandled-error count: 4; queue-drop count: 4
+No log line in this window names a NetworkPolicy object; object admission time is from d3-policy-apply.txt.
+The last recorded kindnet container start at 03:41:12Z predates this 08:11-08:19 window; no restart during D3 is observed in current status.
+
+Selected verbatim log lines:
+using docker due to KIND_EXPERIMENTAL_PROVIDER
+2026-09-22T08:11:45.085138047Z I0922 08:11:45.084800       1 main.go:297] Handling node with IPs: map[172.18.0.2:{}]
+2026-09-22T08:11:45.085184369Z I0922 08:11:45.084855       1 main.go:301] handling current node
+2026-09-22T08:11:53.744008334Z I0922 08:11:53.743790       1 controller.go:711] "Syncing nftables rules"
+2026-09-22T08:11:53.982931535Z I0922 08:11:53.982679       1 controller.go:925] "syncing nftables rules" error=<
+2026-09-22T08:11:53.982978612Z 	conn.Receive: netlink receive: no such file or directory
+2026-09-22T08:11:53.982983822Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.982986779Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.982989767Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.982992581Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.982995345Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.982998098Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.983000902Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.983003675Z  >
+2026-09-22T08:11:53.984081275Z E0922 08:11:53.983850       1 controller.go:693] "syncing" err=<
+2026-09-22T08:11:53.984107307Z 	conn.Receive: netlink receive: no such file or directory
+2026-09-22T08:11:53.984111375Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.984114057Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.984116637Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.984119757Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.984122347Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.984124906Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.984127475Z 	netlink receive: no such file or directory
+2026-09-22T08:11:53.984130565Z  > key="dummy-key"
+2026-09-22T08:11:53.984770292Z I0922 08:11:53.984540       1 controller.go:711] "Syncing nftables rules"
+
+[first first drop with preceding error context]
+2026-09-22T08:11:55.042952227Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.042954766Z  >
+2026-09-22T08:11:55.045039641Z E0922 08:11:55.044811       1 controller.go:703] "Unhandled Error" err=<
+2026-09-22T08:11:55.045065143Z 	conn.Receive: netlink receive: no such file or directory
+2026-09-22T08:11:55.045068324Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.045071250Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.045073779Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.045090776Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.045093346Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.045095814Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.045098281Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.045101187Z  > logger="UnhandledError"
+2026-09-22T08:11:55.046661279Z I0922 08:11:55.046480       1 controller.go:704] "Dropping out of the queue" error=<
+2026-09-22T08:11:55.046681652Z 	conn.Receive: netlink receive: no such file or directory
+2026-09-22T08:11:55.046684915Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.046687444Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.046689921Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.046692419Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.046695070Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.046700464Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.046703065Z 	netlink receive: no such file or directory
+2026-09-22T08:11:55.046705920Z  > key="dummy-key"
+2026-09-22T08:11:55.046709091Z I0922 08:11:55.046518       1 controller.go:711] "Syncing nftables rules"
+2026-09-22T08:11:55.085213387Z I0922 08:11:55.085001       1 main.go:297] Handling node with IPs: map[172.18.0.2:{}]
+2026-09-22T08:11:55.085241856Z I0922 08:11:55.085044       1 main.go:301] handling current node
+2026-09-22T08:11:55.252914953Z I0922 08:11:55.252705       1 controller.go:925] "syncing nftables rules" error=<
+
+[first rollback-time sync context]
+2026-09-22T08:19:01.842160802Z I0922 08:19:01.841941       1 controller.go:711] "Syncing nftables rules"
+2026-09-22T08:19:02.046595487Z I0922 08:19:02.046404       1 controller.go:925] "syncing nftables rules" error=<
+2026-09-22T08:19:02.046626175Z 	conn.Receive: netlink receive: no such file or directory
+2026-09-22T08:19:02.046629467Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046632155Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046634780Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046637478Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046640073Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046642617Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046645273Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046647960Z  >
+2026-09-22T08:19:02.046650678Z E0922 08:19:02.046442       1 controller.go:693] "syncing" err=<
+2026-09-22T08:19:02.046653427Z 	conn.Receive: netlink receive: no such file or directory
+2026-09-22T08:19:02.046656104Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046658638Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046661181Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046677787Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046680433Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046682926Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046685408Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.046688270Z  > key="dummy-key"
+2026-09-22T08:19:02.046691665Z I0922 08:19:02.046476       1 controller.go:711] "Syncing nftables rules"
+2026-09-22T08:19:02.246734955Z I0922 08:19:02.246439       1 controller.go:925] "syncing nftables rules" error=<
+2026-09-22T08:19:02.246781808Z 	conn.Receive: netlink receive: no such file or directory
+2026-09-22T08:19:02.246791388Z 	netlink receive: no such file or directory
+2026-09-22T08:19:02.246797398Z 	netlink receive: no such file or directory
+
+[last rollback-time failure]
+2026-09-22T08:19:04.467061090Z E0922 08:19:04.466812       1 controller.go:703] "Unhandled Error" err=<
+2026-09-22T08:19:04.467076783Z 	conn.Receive: netlink receive: no such file or directory
+2026-09-22T08:19:04.467079409Z 	netlink receive: no such file or directory
+2026-09-22T08:19:04.467081953Z 	netlink receive: no such file or directory
+2026-09-22T08:19:04.467084466Z 	netlink receive: no such file or directory
+2026-09-22T08:19:04.467086958Z 	netlink receive: no such file or directory
+2026-09-22T08:19:04.467089471Z 	netlink receive: no such file or directory
+2026-09-22T08:19:04.467091963Z 	netlink receive: no such file or directory
+2026-09-22T08:19:04.467094476Z 	netlink receive: no such file or directory
+2026-09-22T08:19:04.467097184Z  > logger="UnhandledError"
+2026-09-22T08:19:04.468268705Z I0922 08:19:04.468031       1 controller.go:704] "Dropping out of the queue" error=<
+2026-09-22T08:19:04.468307260Z 	conn.Receive: netlink receive: no such file or directory
+2026-09-22T08:19:04.468311455Z 	netlink receive: no such file or directory
+2026-09-22T08:19:04.468314471Z 	netlink receive: no such file or directory
+
+Source-path correlation (external authoritative source; supporting, not runtime proof):
+- https://github.com/kubernetes-sigs/kind/blob/main/images/kindnetd/cmd/kindnetd/main.go creates a NetworkPolicy dataplane controller with an `NFTableName` of `kindnet-network-policies`; this is upstream main, not a verified exact source revision for the running binary.
+- https://github.com/kubernetes-sigs/kube-network-policies/blob/main/pkg/dataplane/controller.go has `syncNFTablesRules`: it queues an `inet` table add/delete/add sequence, sets, chains and rules, then submits them with `nft.Flush()`. The upstream `"syncing nftables rules"` error is logged on a failed Flush. This matches the log's filename/message family and approximate line location. It does not identify which netlink message in that composite transaction returned ENOENT.
+- Local CRI metadata provides imageID but no repoDigest or source/build labels; no exact build commit was established. Source mapping quality: approximate/current-upstream path; exact binary/source mapping: INSUFFICIENT. The error points to the nftables transaction boundary, with individual table/set/chain/rule message and host-versus-userspace attribution still UNKNOWN.

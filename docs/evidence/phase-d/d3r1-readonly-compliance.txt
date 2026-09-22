@@ -1,0 +1,34 @@
+D3R-1 current-run read-only compliance audit
+UTC: 2026-09-22T09:06Z final review period
+Start commit: c62577f1e8e6d50c131676a5e5d219feb467d3e4; branch temp/work-in-progress; initial git status empty.
+Scope: commands executed by THIS D3R run and generated D3R evidence. No unrelated shell history was inspected.
+
+Current-run command categories reviewed:
+- Git: status, rev-parse, branch, log, diff, hash-object; read-only repository inspection.
+- Repository/PDF: rg, cat, sed, file, strings, wc, Python read-only PDF stream extraction and JSON summarization; no source/report/evidence modification outside D3R allowlist.
+- Ownership/cluster: `source task1/scripts/common.sh; require_cluster` invokes Docker info/inspect and kind cluster listing, then read-only `kubectl config current-context` and `kubectl get`.
+- Kubernetes: `kubectl get` for current namespace and kube-system DaemonSet/Pod, `kubectl logs` for retained kindnet output. No Kubernetes create/update/delete API command was executed.
+- Host/node: uname, cat of version/OS/cgroup, docker version/inspect, docker exec of uname/cat/containerd version, targeted sysctl reads, `/proc/config.gz` zcat/grep, `/proc/modules` grep, `/sys/module` ls, ip rule/route/link show, nft version/list, iptables version/save and ip6tables-save, CRI image inspect. The first sandbox Docker check failed with socket permission denied; approved read-only escalation then succeeded.
+- External documentation: read-only official upstream kindnet, kube-network-policies and Kubernetes NetworkPolicy web pages; no external system modification.
+
+Runtime mutations observed: NONE
+Kubernetes mutations: NONE
+NetworkPolicy reapply: NO
+nftables mutations: NONE
+iptables mutations: NONE
+route/link/tc mutations: NONE
+sysctl mutations: NONE
+kernel module mutations: NONE
+network-component restarts: NONE
+Docker/WSL restarts: NONE
+CNI changes: NONE
+cluster recreation: NO
+prohibited current-run commands executed: NONE
+
+Final read-only Kubernetes observation: only the accepted demo-api and demo-backend Pods and Services are present in secops-demo; no NetworkPolicy, Role or RoleBinding appears. Both Pods 1/1 Ready with zero restarts. Both workload ServiceAccounts automount=false; phase-c-fixture marker=baseline. Kindnet Pod UID 6e4afac8-6fc5-491d-9a0d-f96b7007c540 remains Ready with restartCount=4 and container start 2026-09-22T03:41:12Z, predating this run. This supports no D3R-induced component restart.
+
+Repository mutations: D3R documentation/evidence allowlist only. The pre-compliance-file `git status --short --untracked-files=all` showed only d3r0-context.txt, d3r1-host-node-context.txt, d3r1-kindnet-log-analysis.txt, d3r1-kindnet-state.txt, d3r1-nft-runtime.txt, d3r1-root-cause-matrix.txt, phase-d-d3r0-blocker-freeze.md and phase-d-d3r1-diagnosis.md. `git diff --name-only` and `git diff --stat` were empty because these are new untracked files. `git diff --exit-code` against the start commit for task1/** and existing D0/D1/D2/D3 reports/evidence returned 0. The D3R-0 freeze originally hashed 290b771b7662ea185edeec46899ff4b0cad1a0ff; one clerical timestamp-label correction described in the D3R-1 report changed its hash to 0a01fe77a03e845ebf28eb329b4606de17f197b1. No blocker framing, uncertainty, open question or decision was changed after D3R-1 began.
+
+Final repository status must include this compliance file as the ninth untracked allowlisted artifact. No commit, push, branch switch, manifest apply, Policy creation, nft/iptables mutation, restart or cluster recreation occurred.
+
+compliance result: PASS
