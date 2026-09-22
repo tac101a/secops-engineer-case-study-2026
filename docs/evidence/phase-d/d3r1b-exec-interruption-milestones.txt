@@ -1,0 +1,27 @@
+D3R-1B-EXEC MILESTONE MATRIX. Classifications concern the INTERRUPTED RUN, not activities of this review. UTC means attributable historical event time; "—" means none established. NOT OBSERVED is scoped absence, never proof of nonoccurrence. The original EXEC workspace is contextually attributable by its unique path and birth times; no command transcript or ownership marker was found. Sources below are exact review evidence filenames under docs/evidence/phase-d/ unless otherwise specified.
+
+01 PREP handoff verified | NOT OBSERVED | context.txt; user-provided review specification | UTC — | Reported by user, no attributable EXEC verification transcript. Run source: user report only.
+02 EXEC workspace created | CONFIRMED | artifact-inventory.txt; original .local/d3r1b-exec.vY5yoFeN directory | UTC 2026-09-22T10:53:03.535514536Z birth | Path/timing support run attribution; creating command unavailable. Run source: original artifact.
+03 helper/go.mod created | CONFIRMED | source-preservation.txt; original .local/d3r1b-exec.vY5yoFeN/helper/go.mod | UTC 2026-09-22T10:55:10.239442334Z birth | Content creator/command unknown. Run source: original artifact.
+04 helper/main.go created | CONFIRMED | source-preservation.txt; original .local/d3r1b-exec.vY5yoFeN/helper/main.go | UTC 2026-09-22T10:55:11.103622942Z birth | Historical build linkage unknown. Run source: original artifact.
+05 Helper source statically reviewed during EXEC | NOT OBSERVED | artifact-inventory.txt; no review log in original workspace | UTC — | This review's static analysis is later and cannot confirm EXEC review. Run source: none.
+06 Helper build attempted | UNKNOWN | artifact-inventory.txt; original helper/go.sum | UTC — | go.sum born 10:55:27.203243027Z, but its producing command is ambiguous; no transcript. Run source: original artifact, ambiguous.
+07 Helper build succeeded | NOT OBSERVED | artifact-inventory.txt; no binary/build log in original workspace | UTC — | Present absence cannot prove no earlier success. Run source: no direct record.
+08 Helper binary created | NOT OBSERVED | artifact-inventory.txt; no binary in original workspace | UTC — | A historical binary could have been removed. Run source: no direct record.
+09 Helper copied into kind node | UNKNOWN | artifact-inventory.txt; runtime-state.txt | UTC — | No copy record; node access unavailable. Run source: none.
+10 Cleanup mechanism prepared | NOT OBSERVED | artifact-inventory.txt; no wrapper/transcript in original workspace | UTC — | It could have existed outside inspected workspace or in unavailable command text. Run source: no direct record.
+11 Unique diagnostic table name selected | NOT OBSERVED | artifact-inventory.txt; no name record; original main.go has only a name pattern | UTC — | Pattern is not an allocated name. Run source: no direct record.
+12 Exact table absence checked before execution | UNKNOWN | artifact-inventory.txt; runtime-state.txt | UTC — | No name/check transcript; live node unavailable. Run source: none.
+13 Diagnostic helper launched | UNKNOWN | artifact-inventory.txt; runtime-state.txt | UTC — | No attributable execution transcript; live node unavailable. Source file alone is not launch evidence. Run source: none.
+14 Actual helper execution context recorded | NOT OBSERVED | original main.go context() design; artifact-inventory.txt lacks output | UTC — | Source print statements do not establish runtime output. Run source: no direct record.
+15 nftables.New() succeeded | UNKNOWN | original main.go constructor call site; artifact-inventory.txt | UTC — | Runtime output/transcript unavailable. Run source: none.
+16 AddTable/DelTable/AddTable operations queued | UNKNOWN | original main.go call sites; artifact-inventory.txt | UTC — | Static order cannot establish runtime queueing. Run source: none.
+17 Primary Flush invoked | UNKNOWN | original main.go line 64 call site; artifact-inventory.txt | UTC — | No post-call output or attributable execution trace. Pre-call marker is not invocation proof. Run source: none.
+18 Primary Flush returned | UNKNOWN | original main.go line 64; artifact-inventory.txt | UTC — | No result transcript or trace. Run source: none.
+19 Primary result preserved | NOT OBSERVED | artifact-inventory.txt; no result log/evidence in inspected scope | UTC — | The missing transcript prevents a stronger negative claim. Run source: no direct record.
+20 Post-execution table inspection occurred | UNKNOWN | artifact-inventory.txt; runtime-state.txt | UTC — | No transcript; current node inaccessible. Run source: none.
+21 Cleanup attempted | UNKNOWN | artifact-inventory.txt; runtime-state.txt | UTC — | No cleanup transcript; current node inaccessible. Run source: none.
+22 Cleanup completed | UNKNOWN | artifact-inventory.txt; runtime-state.txt | UTC — | No completion proof; current residue cannot be assessed. Run source: none.
+23 Final runtime verification completed | UNKNOWN | artifact-inventory.txt; runtime-state.txt | UTC — | PREP's prior final check is a different run. No EXEC final check evidence. Run source: none.
+
+No classification above asserts NOT EXECUTED. Historical interrupted-run timeline supported directly: workspace birth 10:53:03.535514536Z; go.mod birth 10:55:10.239442334Z; main.go birth 10:55:11.103622942Z; go.sum birth 10:55:27.203243027Z (file presence confirmed, producing command unknown). The reported PREP verification and runtime observations have no independently attributable EXEC timestamp. Current review observations begin at 11:33:42Z and are not historical EXEC events.

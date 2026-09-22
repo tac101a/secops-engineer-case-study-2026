@@ -1,0 +1,9 @@
+CURRENT WORKSPACE OBSERVATION at 2026-09-22T11:35:07Z (filesystem metadata; not a complete historical command log).
+Root: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-exec.vY5yoFeN (directory, birth 2026-09-22T10:53:03.535514536Z, mtime 10:53:11.278377214Z).
+Directories: gocache/, gopath/, metadata/, tmp/, helper/; no files were found in the first four directories. Workspace inspection used a complete file walk, not Git status. .gitignore:36 ignores /.local/.
+helper/go.mod: regular file, 79 bytes, birth/mtime 2026-09-22T10:55:10.239442334Z, SHA-256 b610e0cecde2c05f692fbac09bc46bdbbd77f33ae890095dd9270a219737045f.
+helper/main.go: regular file, 1904 bytes, birth/mtime 2026-09-22T10:55:11.103622942Z, SHA-256 2da8e0122c6bc49afabee2a49c1dda5c45758f6af589bd3c3c102c9a05bf1c9a.
+helper/go.sum: regular file, 1555 bytes, birth/mtime 2026-09-22T10:55:27.203243027Z, SHA-256 bc011875bc6c3cab501c7e6aa7a3c5b3862b49e00ca530cb0c0e57f52e14b72a.
+Within this exact workspace, no helper binary, build log/metadata, helper hash record, node-copy record, cleanup wrapper/transcript, execution transcript, diagnostic table-name record or partial EXEC evidence file was found. Their present absence does not establish historical nonexistence. No attributable command transcript was available elsewhere in the supplied/relevant repository evidence.
+The go.sum timestamp follows main.go but does not identify whether a build, module operation or another command produced it.
+Collision guard before writes: the canonical report and all seven named review evidence files did not exist; no interruption-prefix evidence file existed. The two source-copy destinations also did not exist. Canonical evidence names were used; no run-suffixed alternative was needed.

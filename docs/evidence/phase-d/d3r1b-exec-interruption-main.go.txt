@@ -1,0 +1,71 @@
+package main
+
+import (
+	"errors"
+	"fmt"
+	"os"
+	"regexp"
+	"strings"
+	"syscall"
+
+	"github.com/google/nftables"
+)
+
+func fail(stage string, err error) {
+	fmt.Printf("failing_stage=%s\nerror_type=%T\nerror_text=%s\n", stage, err, err)
+	os.Exit(1)
+}
+
+func context() error {
+	fmt.Printf("uid=%d\ngid=%d\n", os.Getuid(), os.Getgid())
+	status, err := os.ReadFile("/proc/self/status")
+	if err != nil {
+		return err
+	}
+	for _, line := range strings.Split(string(status), "\n") {
+		for _, key := range []string{"CapPrm:", "CapEff:", "CapBnd:", "NoNewPrivs:", "Seccomp:", "Seccomp_filters:"} {
+			if strings.HasPrefix(line, key) {
+				fmt.Println(strings.TrimSpace(line))
+			}
+		}
+	}
+	for _, ns := range []string{"user", "net"} {
+		link, err := os.Readlink("/proc/self/ns/" + ns)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("namespace_%s=%s\n", ns, link)
+	}
+	return nil
+}
+
+func main() {
+	if err := context(); err != nil {
+		fail("context", err)
+	}
+	if len(os.Args) != 2 {
+		fail("argument", fmt.Errorf("expected exactly one table name"))
+	}
+	name := os.Args[1]
+	if !regexp.MustCompile(`^d3r1bx_[0-9a-f]{12}$`).MatchString(name) {
+		fail("argument", fmt.Errorf("invalid diagnostic table name %q", name))
+	}
+	fmt.Printf("table_family=inet\ntable_name=%s\n", name)
+	conn, err := nftables.New()
+	if err != nil {
+		fail("nftables.New", err)
+	}
+	fmt.Println("nftables_new=pass")
+	table := &nftables.Table{Name: name, Family: nftables.TableFamilyINet}
+	conn.AddTable(table)
+	conn.DelTable(table)
+	conn.AddTable(table)
+	fmt.Println("primary_flush_reached=true")
+	if err := conn.Flush(); err != nil {
+		fmt.Printf("failing_stage=Flush\nerror_type=%T\nerror_text=%s\n", err, err)
+		fmt.Printf("exact_enoent=%t\n", errors.Is(err, syscall.ENOENT))
+		fmt.Printf("text_family_match=%t\n", strings.Contains(strings.ToLower(err.Error()), "no such file or directory"))
+		os.Exit(1)
+	}
+	fmt.Println("primary_flush_result=pass")
+}

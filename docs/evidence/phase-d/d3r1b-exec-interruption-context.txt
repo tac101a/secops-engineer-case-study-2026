@@ -1,0 +1,16 @@
+D3R-1B-EXEC interruption review; observation date 2026-09-22 UTC.
+CHECKPOINT STARTING STATE, captured before any review file was created:
+  branch: temp/work-in-progress
+  HEAD: 9124b9bb74ede852467df11678c225d3ac4584f3
+  git status --short --untracked-files=all: empty
+  git diff --name-only / --stat: empty / empty
+  git diff --cached --name-only / --stat: empty / empty
+  staged changes: none; unstaged tracked changes: none; untracked files: none.
+  Ignored files are outside Git status; the EXEC workspace was separately inventoried.
+The initial commands returned before the first evidence copy (2026-09-22T11:34:05Z).
+Original resolved workspace: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-exec.vY5yoFeN
+It existed on this review. Directory birth: 2026-09-22T10:53:03.535514536Z. Exact run ID comes from the path found here, not the screenshot.
+The workspace path and timing, following PREP's documented 10:28:23Z final observation, support attribution to the interrupted EXEC attempt. No workspace ownership marker or attributable command transcript was found; the exact creating command is unavailable.
+Relevant earlier records: docs/phase-d-d3r1b-prep-report.md and docs/evidence/phase-d/d3r1b-prep-context.txt. These establish PREP readiness and its earlier D2 runtime observations, not EXEC chronology or current runtime state.
+USER-PROVIDED REPORT in the review specification: PREP hashes, Go 1.25.5, offline graph, D2 Pods, zero NetworkPolicies and original kindnet were verified during EXEC. No direct interrupted-run transcript was supplied to corroborate those reported checks.
+The interrupted agent's command transcript was unavailable within the attributable EXEC workspace and supplied material. Unrelated shell histories, agent sessions and personal workspaces were not inspected.

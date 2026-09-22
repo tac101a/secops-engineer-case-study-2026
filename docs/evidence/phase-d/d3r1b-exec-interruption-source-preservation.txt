@@ -1,0 +1,8 @@
+EXACT SOURCE PRESERVATION, review observation UTC 2026-09-22T11:35:07Z.
+Original go.mod: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-exec.vY5yoFeN/helper/go.mod; 79 bytes; birth/mtime 2026-09-22T10:55:10.239442334Z; SHA-256 b610e0cecde2c05f692fbac09bc46bdbbd77f33ae890095dd9270a219737045f.
+Evidence copy: docs/evidence/phase-d/d3r1b-exec-interruption-go.mod.txt; copy birth 2026-09-22T11:34:05.545721240Z; copied bytes without editing; SHA-256 b610e0cecde2c05f692fbac09bc46bdbbd77f33ae890095dd9270a219737045f. HASH MATCH.
+Original main.go: /home/tac/projects/secops-engineer-case-study-2026/.local/d3r1b-exec.vY5yoFeN/helper/main.go; 1904 bytes; birth/mtime 2026-09-22T10:55:11.103622942Z; SHA-256 2da8e0122c6bc49afabee2a49c1dda5c45758f6af589bd3c3c102c9a05bf1c9a.
+Evidence copy: docs/evidence/phase-d/d3r1b-exec-interruption-main.go.txt; copy birth 2026-09-22T11:34:08.476877609Z; copied bytes without editing; SHA-256 2da8e0122c6bc49afabee2a49c1dda5c45758f6af589bd3c3c102c9a05bf1c9a. HASH MATCH.
+Both copy commands completed and post-copy hash checks were observed by 2026-09-22T11:34:14Z; their exact command-return seconds were not separately recorded.
+Copy command used cp --no-clobber --preserve=mode,timestamps only after exact-path collision checks. SHA-256 comparisons passed after copying. Copy mtime reflects preserved original mtime, while copy birth records review creation.
+These hashes prove exact preservation at this review. They do not prove a historical binary existed or was built from these bytes; no binary, build transcript, source hash at build time or build metadata was found.
