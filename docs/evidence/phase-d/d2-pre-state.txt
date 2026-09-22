@@ -1,0 +1,29 @@
+D2 pre-state UTC: 2026-09-22T07:26:14Z
+D2 start commit: 10d54964152acf2859a5e1b313e8206b1743ec03
+Owned cluster/context/namespace: secops-lab/kind-secops-lab/secops-demo
+
+demo-api Deployment and Pod:
+deployment image=secops-demo-api:phase-d1 serviceAccount=demo-api pod automount=None command=None securityContext={'allowPrivilegeEscalation': False, 'capabilities': {'drop': ['ALL']}, 'readOnlyRootFilesystem': True, 'runAsNonRoot': True} resources={'limits': {'cpu': '250m', 'memory': '128Mi'}, 'requests': {'cpu': '25m', 'memory': '32Mi'}} volumes=[{'emptyDir': {}, 'name': 'api-tmp'}] mounts=[{'mountPath': '/tmp', 'name': 'api-tmp'}]
+pod=demo-api-79fb54f895-xwdfz UID=e84b6903-2da2-4b39-a22a-ea3c2d6cd3cc ready=Running image=secops-demo-api:phase-d1 imageID=sha256:cb82d20063553272d86db019ed015e599633f616535c8ffbed98eae1b5224e25 serviceAccount=demo-api pod automount=None securityContext={'allowPrivilegeEscalation': False, 'capabilities': {'drop': ['ALL']}, 'readOnlyRootFilesystem': True, 'runAsNonRoot': True} volumes=[('api-tmp', ['emptyDir', 'name']), ('kube-api-access-4drx6', ['name', 'projected'])] mounts=[{'mountPath': '/tmp', 'name': 'api-tmp'}, {'mountPath': '/var/run/secrets/kubernetes.io/serviceaccount', 'name': 'kube-api-access-4drx6', 'readOnly': True}]
+ServiceAccount=demo-api automount=True
+workload-process credential directory exists=True; token exists=True readable=True; CA exists=True; namespace exists=True; contents collected=NO
+
+demo-backend Deployment and Pod:
+deployment image=secops-demo-backend:phase-b serviceAccount=demo-backend pod automount=None command=None securityContext={'readOnlyRootFilesystem': False} resources={'limits': {'cpu': '250m', 'memory': '128Mi'}, 'requests': {'cpu': '25m', 'memory': '32Mi'}} volumes=None mounts=None
+pod=demo-backend-549b8f665f-npfsp UID=71156c57-8a45-46aa-a365-7566292e6d61 ready=Running image=secops-demo-backend:phase-b imageID=sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41 serviceAccount=demo-backend pod automount=None securityContext={'readOnlyRootFilesystem': False} volumes=[('kube-api-access-rwn96', ['name', 'projected'])] mounts=[{'mountPath': '/var/run/secrets/kubernetes.io/serviceaccount', 'name': 'kube-api-access-rwn96', 'readOnly': True}]
+ServiceAccount=demo-backend automount=True
+workload-process credential directory exists=True; token exists=True readable=True; CA exists=True; namespace exists=True; contents collected=NO
+
+F2 authorization objects:
+Role=demo-api-fixture-access rules=[{'apiGroups': [''], 'resourceNames': ['phase-c-fixture'], 'resources': ['configmaps'], 'verbs': ['get', 'patch']}]
+RoleBinding=demo-api-fixture-access roleRef={'apiGroup': 'rbac.authorization.k8s.io', 'kind': 'Role', 'name': 'demo-api-fixture-access'} subjects=[{'kind': 'ServiceAccount', 'name': 'demo-api', 'namespace': 'secops-demo'}]
+Fixture=phase-c-fixture marker=baseline
+Impersonated exact get configmap/phase-c-fixture: yes
+Impersonated exact patch configmap/phase-c-fixture: yes
+
+F3 and topology:
+NetworkPolicy count=0
+Service=demo-api ClusterIP=10.96.161.44 selector={'app': 'demo-api'} ports=[{'name': 'http', 'port': 8080, 'protocol': 'TCP', 'targetPort': 'http'}]
+Service=demo-backend ClusterIP=10.96.32.207 selector={'app': 'demo-backend'} ports=[{'name': 'http', 'port': 8081, 'protocol': 'TCP', 'targetPort': 'http'}]
+CNI image=docker.io/kindest/kindnetd:v20251212-v0.29.0-alpha-105-g20ccfc88
+CNI imageID=sha256:4921d7a6dffa922dd679732ba4797085c4f39e9a53bee8b6fdb1d463e8571251

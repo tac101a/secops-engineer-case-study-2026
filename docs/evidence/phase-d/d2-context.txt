@@ -1,0 +1,15 @@
+D2 context
+UTC pre-state capture: 2026-09-22T07:26:14Z
+D2 start commit: 10d54964152acf2859a5e1b313e8206b1743ec03
+Branch: temp/work-in-progress
+Initial git status --short --untracked-files=all: clean (no output)
+Owned cluster/context/namespace: secops-lab/kind-secops-lab/secops-demo; require_cluster ownership check passed.
+Canonical Phase B integrity: every SHA-256 row in docs/evidence/phase-b/workload-revision.txt verified with sha256sum -c before mutation; no hard-coded count.
+Accepted D1 API: Pod demo-api-79fb54f895-xwdfz, UID e84b6903-2da2-4b39-a22a-ea3c2d6cd3cc, image secops-demo-api:phase-d1, imageID sha256:cb82d20063553272d86db019ed015e599633f616535c8ffbed98eae1b5224e25; runAsNonRoot, ALL capability drop, allowPrivilegeEscalation=false, readOnlyRootFilesystem=true, emptyDir /tmp; pre-D2 F1 smoke passed.
+Accepted D1 backend: Pod demo-backend-549b8f665f-npfsp, UID 71156c57-8a45-46aa-a365-7566292e6d61, image secops-demo-backend:phase-b, imageID sha256:89a9dc8d230e5115be9a00823b47811002332014d46f09548b11d2931f876d41; command unset, readOnlyRootFilesystem=false, no application volumes, baseline resource settings. These values are observed and recorded in d2-pre-state.txt.
+F2 evidence reviewed: docs/evidence/phase-c/h2-credential-exposure.txt, h2-authorization-model.txt, h2-runtime-api.txt; relevant D1 context/runtime/noninterference evidence and canonical D0, D1, C4, Phase B contract reviewed. The protected Phase B hash set matched.
+Pre-D2 functional control: make task1-check returned exit 0 and FUNCTIONALITY = PASS. Existing F1 smoke returned PASS. See d2-pre-functional.txt.
+Precedence: Kubernetes documents that Pod .spec.automountServiceAccountToken takes precedence if both Pod and ServiceAccount specify a value. Both current Deployment templates and Pods have the Pod field unset, so ServiceAccount-level false will govern newly admitted Pods; no true override was found. Source: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+Selected control: ServiceAccount-level automountServiceAccountToken=false for the two dedicated zero-API-budget identities, represented by task1/hardened/identity.yaml. This covers future Pods on those dedicated identities unless explicitly overridden, keeps D1 workload manifests unchanged, and uses one control level. Existing Pods require recreation because admission already projected their tokens.
+Authorization implementation: explicitly delete only role/demo-api-fixture-access and rolebinding/demo-api-fixture-access after recording exact pre-state; retain phase-c-fixture.
+D0 revision necessary: NO. Starting-state contradiction: NO.
