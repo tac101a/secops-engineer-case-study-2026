@@ -1,0 +1,41 @@
+F1 SCOPE AND ACTIVITY RECORD — 2026-09-22
+
+Starting state:
+  branch: temp/work-in-progress
+  HEAD: e29c03976eb8bcbf76898da69873cf85652738b1
+  intervening commits after reviewed E1 snapshot: none
+  git status --short --untracked-files=all: empty
+
+Canonical inputs discovered through tracked Git inventory:
+  docs/phase-f0-detection-prevention-rollout.md
+  docs/evidence/phase-f/f0-source-inventory.md
+  docs/evidence/phase-f/f0-claim-traceability.md
+  docs/evidence/phase-f/f0-static-checks.txt
+  docs/evidence/phase-f/f0-scope-record.txt
+  docs/phase-e-e1-verification.md
+  docs/evidence/phase-e/e1-offline-tests.txt
+  task1/scripts/verify.sh
+  task1/scripts/test-verify-offline.sh
+
+Implementation inventory — exactly four F1 artifacts:
+  .github/workflows/task1-offline-security.yml
+  docs/phase-f1-offline-ci.md
+  docs/evidence/phase-f/f1-local-validation.txt
+  docs/evidence/phase-f/f1-scope-record.txt
+
+E1 files, F0 files, application code, Dockerfiles, and Kubernetes manifests
+were not modified. No deployment, runtime probe, kubectl, Docker, kind,
+nftables, diagnostic, or cleanup command was run. No actionlint installation,
+commit, push, pull request, branch-rule change, or hosted workflow run occurred.
+
+The workflow action release SHAs were checked against the official GitHub
+checkout v7.0.1 and setup-python v7.0.0 release pages. Local PyYAML 6.0.1
+was already installed. The hosted workflow declares its own pinned install.
+
+Evidence boundary:
+  LOCAL IMPLEMENTATION READY: yes, for the uncommitted working tree
+  HOSTED VERIFIED: no run URL or identified hosted result
+  REQUIRED MERGE GATE: no verified branch rule or pull-request enforcement
+  F3 enforcement: BLOCKED / NOT VERIFIED
+  current runtime security verification: NOT RUN
+  full integrated AFTER verification: BLOCKED / NOT VERIFIED

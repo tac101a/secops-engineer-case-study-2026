@@ -1,0 +1,67 @@
+name: Task 1 offline security
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-security:
+    name: Task 1 offline security
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install safe YAML parser
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.1
+
+      - name: Check Bash syntax
+        id: bash_syntax
+        run: bash -n task1/scripts/verify.sh task1/scripts/test-verify-offline.sh
+
+      - name: Verify hardened sources offline
+        id: hardened_verify
+        run: task1/scripts/verify.sh --offline hardened
+
+      - name: Run offline verifier self-tests
+        id: offline_self_tests
+        run: task1/scripts/test-verify-offline.sh
+
+      - name: Summarize security check outcomes
+        if: always()
+        env:
+          BASH_SYNTAX_OUTCOME: ${{ steps.bash_syntax.outcome || 'skipped' }}
+          HARDENED_VERIFY_OUTCOME: ${{ steps.hardened_verify.outcome || 'skipped' }}
+          OFFLINE_SELF_TESTS_OUTCOME: ${{ steps.offline_self_tests.outcome || 'skipped' }}
+        run: |
+          {
+            echo '## Task 1 security verification'
+            echo ''
+            echo '### OFFLINE STATIC VERIFICATION'
+            echo ''
+            echo '| Mandatory check | GitHub Actions step outcome |'
+            echo '| --- | --- |'
+            printf '| Bash syntax | %s |\n' "$BASH_SYNTAX_OUTCOME"
+            printf '| Hardened offline verifier | %s |\n' "$HARDENED_VERIFY_OUTCOME"
+            printf '| Offline self-tests | %s |\n' "$OFFLINE_SELF_TESTS_OUTCOME"
+            echo ''
+            echo '### CURRENT RUNTIME SECURITY VERIFICATION'
+            echo ''
+            echo 'NOT RUN. F3 enforcement: BLOCKED / NOT VERIFIED.'
+            echo 'Full integrated AFTER verification: BLOCKED / NOT VERIFIED.'
+          } >> "$GITHUB_STEP_SUMMARY"
