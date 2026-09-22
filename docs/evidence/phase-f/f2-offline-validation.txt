@@ -1,0 +1,236 @@
+TASK1-F2 OFFLINE VALIDATION RECORD
+
+VALIDATION UTC: 2026-09-22T18:06:25Z
+STARTING HEAD: ef69be68cd13ab282e2859ea516ce2558f5225af
+BRANCH: temp/work-in-progress
+STARTING WORKTREE: clean
+HOST TOOL TARGET: Linux x86_64
+
+BOUNDARY
+- No kubectl, kind, Docker, admission-controller installation, Kubernetes API,
+  or live-cluster command was invoked.
+- The current cluster version, installed CRDs, admission behavior, effective
+  RBAC, workload credentials, and existing Pods were not inspected.
+- Temporary tooling was isolated under /tmp/task1-f2-kyverno-8Ch57I and the
+  final re-verification directory /tmp/task1-f2-kyverno-660wKP. It was never
+  installed system-wide or added to Git.
+- Audit-mode offline policy evaluation is not an API-server admission denial.
+
+OFFICIAL SCHEMA / VERSION BASIS
+- https://kyverno.io/docs/policy-types/validating-policy/
+  documents policies.kyverno.io/v1 ValidatingPolicy, validationActions,
+  matchConstraints/resourceRules, matchConditions, CEL validations, and the
+  documented podControllers autogen field. This PoC does not depend on autogen.
+- https://kyverno.io/docs/subprojects/kyverno-cli/
+  documents cli.kyverno.io/v1alpha1 Test/Values resources,
+  isValidatingPolicy: true, declared pass/fail/skip outcomes, CREATE as the
+  default operation, and request.operation supplied by a Values object.
+- https://kyverno.io/docs/policy-types/overview/ and
+  https://kyverno.io/docs/guides/migration-to-cel/ document the v1.19
+  deprecation of legacy kyverno.io/v1 Policy and ClusterPolicy resources.
+- https://kyverno.io/docs/installation/releases/ documents Kyverno v1.19
+  support for Kubernetes v1.33-v1.35. Repository target v1.34.3 is therefore
+  within the documented range only; live compatibility was not tested.
+
+CLI DISCOVERY / BOUNDED DOWNLOAD
+command: command -v kyverno
+result: no installed Kyverno CLI found
+
+temporary-boundary precheck:
+  No /tmp/task1-f2-kyverno-* directory existed before mktemp.
+
+temporary directory:
+  /tmp/task1-f2-kyverno-8Ch57I
+final re-verification directory after UPDATE coverage expansion:
+  /tmp/task1-f2-kyverno-660wKP
+
+download source:
+  https://github.com/kyverno/kyverno/releases/download/v1.19.1/checksums.txt
+  https://github.com/kyverno/kyverno/releases/download/v1.19.1/kyverno-cli_v1.19.1_linux_x86_64.tar.gz
+
+official release-page SHA-256 for checksums.txt:
+  ef46faa1cbf507fcfd9326dfc595c1ecd67df5af0247c064fc20bc974b01acf1
+observed checksums.txt SHA-256:
+  ef46faa1cbf507fcfd9326dfc595c1ecd67df5af0247c064fc20bc974b01acf1
+result: MATCH
+
+artifact SHA-256 published inside verified checksums.txt:
+  b38228f367fc0fdc2b08f4c83ea50ac5f16c60ff8d62d76a66157c33c47b70ae
+observed archive SHA-256:
+  b38228f367fc0fdc2b08f4c83ea50ac5f16c60ff8d62d76a66157c33c47b70ae
+result: MATCH BEFORE EXTRACTION
+
+archive member inspection before extraction:
+  LICENSE
+  kyverno
+
+version command: /tmp/task1-f2-kyverno-8Ch57I/kyverno version
+version output:
+  Version: 1.19.1
+  Time: 2026-09-10T05:20:21Z
+  Git commit ID: 40ec788d48bb28d83dbf85538e962a59db9d45c6
+
+The final re-verification download repeated both SHA-256 checks before
+extraction and produced the same version and commit output.
+
+STRUCTURAL VALIDATION
+command: python3 -I -B -c '<safe PyYAML assertions over the eight F2 files>'
+exit: 0
+output:
+  STRUCTURAL_VALIDATION: PASS
+  POLICIES: 3 ValidatingPolicy resources; API policies.kyverno.io/v1; Audit actions
+  TEST RESULT ENTRIES: 23
+  RESOURCE ASSERTIONS: 24
+  UPDATE VALUE: UPDATE
+
+Legacy-syntax search:
+  rg -n 'apiVersion: kyverno\.io/|kind: (ClusterPolicy|Policy)$|validate:|pattern:|deny:' task1/policies
+result: no matches
+
+CREATE SELF-TEST
+command:
+  /tmp/task1-f2-kyverno-8Ch57I/kyverno test task1/policies/tests \
+    --file-name kyverno-test.yaml --detailed-results \
+    --warnings-as-errors --remove-color --require-tests
+exit: 0
+
+Observed assertion rows:
+  01 PASS expectation matched: f1 / Deployment api-deployment-secure / evaluation PASS
+  02 PASS expectation matched: f1 / Pod renamed-api-secure / evaluation PASS
+  03 FAIL expectation matched: f1 / Deployment api-deployment-prohibited /
+     violation identified: runAsNonRoot
+  04 FAIL expectation matched: f1 / Pod renamed-api-prohibited /
+     violation identified: runAsNonRoot
+  05 SKIP expectation matched: f1 / Deployment backend-deployment /
+     intentional demo-backend non-match
+  06 PASS expectation matched: f2 credentials / Deployment api-deployment-secure /
+     evaluation PASS
+  07 PASS expectation matched: f2 credentials / Deployment backend-deployment /
+     evaluation PASS
+  08 PASS expectation matched: f2 credentials / Pod renamed-api-secure /
+     evaluation PASS
+  09 PASS expectation matched: f2 credentials / ServiceAccount demo-backend /
+     evaluation PASS
+  10 FAIL expectation matched: f2 credentials / Deployment api-deployment-prohibited /
+     prohibited automount identified
+  11 FAIL expectation matched: f2 credentials / Pod renamed-api-prohibited /
+     prohibited automount identified despite changed name and label
+  12 FAIL expectation matched: f2 credentials / Pod renamed-api-explicit-token /
+     explicit token projection identified despite changed name and label
+  13 FAIL expectation matched: f2 credentials / ServiceAccount demo-api /
+     prohibited automount setting identified
+  14 PASS expectation matched: f2 direct RBAC / RoleBinding unrelated-direct-subject /
+     evaluation PASS
+  15 FAIL expectation matched: f2 direct RBAC / RoleBinding
+     differently-named-multi-subject-binding / protected subject among all
+     subjects identified
+  16 FAIL expectation matched: f2 direct RBAC / ClusterRoleBinding
+     direct-backend-cluster-grant / protected direct subject identified
+  17 PASS expectation matched: f2 direct RBAC / ClusterRoleBinding
+     protected-namespace-group-boundary / direct-subject rule boundary only;
+     NOT a security-compliance PASS
+
+actual CLI summary:
+  Test Summary: 17 tests passed and 0 tests failed
+
+UPDATE SELF-TEST
+command:
+  /tmp/task1-f2-kyverno-8Ch57I/kyverno test task1/policies/tests \
+    --file-name kyverno-test-update.yaml --detailed-results \
+    --warnings-as-errors --remove-color --require-tests
+exit: 0
+
+The first document of resources.yaml is the official Values object with
+globalValues.request.operation=UPDATE. The submitted new form of
+RoleBinding/existing-binding-updated-with-protected-subject adds the protected
+secops-demo/demo-api subject.
+
+Observed assertion rows:
+  01 FAIL expectation matched: f1 / UPDATE Deployment
+     api-deployment-prohibited / process-security violation identified
+  02 FAIL expectation matched: f1 / UPDATE Pod renamed-api-prohibited /
+     process-security violation identified despite changed name and label
+  03 FAIL expectation matched: f2 credentials / UPDATE Deployment
+     api-deployment-prohibited / prohibited automount identified
+  04 FAIL expectation matched: f2 credentials / UPDATE Pod
+     renamed-api-prohibited / prohibited automount identified
+  05 FAIL expectation matched: f2 credentials / UPDATE Pod
+     renamed-api-explicit-token / explicit token projection identified
+  06 FAIL expectation matched: f2 credentials / UPDATE ServiceAccount
+     demo-api / prohibited automount setting identified
+  07 FAIL expectation matched: f2 direct RBAC / UPDATE RoleBinding
+     existing-binding-updated-with-protected-subject / protected direct subject
+     identified
+
+actual CLI summary:
+  Test Summary: 7 tests passed and 0 tests failed
+
+OPERATION-MECHANISM CROSS-CHECK
+Temporary, uncommitted copies narrowed every policy's
+resourceRules.operations so the operation could not be inferred merely from
+evaluating the object:
+
+- CREATE-only copies + CREATE declaration: exit 0; 17 passed, 0 failed.
+- UPDATE-only copies + UPDATE declaration: exit 0; 7 passed, 0 failed.
+
+This demonstrates that CLI v1.19.1 honored the CREATE default and the supplied
+UPDATE value. The UPDATE test evaluates the submitted new object; it does not
+persist an old object, contact an API server, or prove live webhook behavior.
+
+OUTCOME ACCOUNTING
+- Policy-evaluation PASS assertions: 8.
+- Policy-evaluation FAIL assertions (intended violations detected): 15.
+- Intentional policy-evaluation SKIP assertions: 1.
+- Unexpected SKIP assertions: 0.
+- Overall CLI self-test assertions passed: 24.
+- Overall CLI self-test assertions failed: 0.
+
+For negative fixtures, the CLI table's RESULT=Pass means the declared FAIL
+expectation matched the actual policy violation. It does not relabel the
+resource as compliant and does not establish live admission blocking.
+
+EXISTING OFFLINE-HARNESS REGRESSION
+command: task1/scripts/verify.sh --offline hardened
+exit: 0
+selected output:
+  F1 STATIC: PASS
+  F2 STATIC: PASS
+  F3 STATIC: PASS
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+
+command: task1/scripts/test-verify-offline.sh
+exit: 0
+actual summary:
+  RUNTIME GUARD: PASS - no shimmed runtime tool was invoked
+  SELF-TEST SUMMARY: 24 passed, 0 failed
+
+FINAL OUTCOMES
+OFFLINE POLICY VIOLATION DETECTED: VERIFIED with Kyverno CLI v1.19.1.
+AUDIT-MODE ADMISSION BEHAVIOR: NOT LIVE VERIFIED.
+FUTURE DENY/ENFORCE BEHAVIOR: NOT LIVE VERIFIED.
+
+FINAL SCOPE / CLEANUP
+final check UTC: 2026-09-22T18:30:53Z
+branch: temp/work-in-progress (unchanged)
+HEAD: ef69be68cd13ab282e2859ea516ce2558f5225af (unchanged)
+tracked diff exit: 0 (no tracked file modified)
+git status entries: exactly 8, all newly authorized F2 artifacts
+
+  docs/evidence/phase-f/f2-offline-validation.txt
+  docs/phase-f2-admission-policy-poc.md
+  task1/policies/f1-demo-api-process-security.yaml
+  task1/policies/f2-direct-rbac-grants.yaml
+  task1/policies/f2-workload-credentials.yaml
+  task1/policies/tests/kyverno-test-update.yaml
+  task1/policies/tests/kyverno-test.yaml
+  task1/policies/tests/resources.yaml
+
+Both inspected task-owned temporary directories,
+/tmp/task1-f2-kyverno-8Ch57I and /tmp/task1-f2-kyverno-660wKP, were removed
+after testing; both absence checks returned 0. The archives, binaries, checksum
+files, and temporary operation-test copies were not retained. No ignored
+PREP/EXEC workspace was reused.
+
+TASK1-F2 OFFLINE VERIFIED

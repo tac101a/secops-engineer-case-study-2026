@@ -1,0 +1,119 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: task1-f2-validating-policies
+policies:
+  - ../f1-demo-api-process-security.yaml
+  - ../f2-workload-credentials.yaml
+  - ../f2-direct-rbac-grants.yaml
+resources:
+  - resources.yaml
+results:
+  # Policy-evaluation PASS: compliant Deployment and direct Pod forms.
+  - isValidatingPolicy: true
+    policy: f1-demo-api-process-security
+    kind: Deployment
+    resources:
+      - secops-demo/api-deployment-secure
+    result: pass
+  - isValidatingPolicy: true
+    policy: f1-demo-api-process-security
+    kind: Pod
+    resources:
+      - secops-demo/renamed-api-secure
+    result: pass
+
+  # Policy-evaluation FAIL means that the offline evaluator identified the
+  # prohibited configuration. These assertions do not claim admission denial.
+  - isValidatingPolicy: true
+    policy: f1-demo-api-process-security
+    kind: Deployment
+    resources:
+      - secops-demo/api-deployment-prohibited
+    result: fail
+  - isValidatingPolicy: true
+    policy: f1-demo-api-process-security
+    kind: Pod
+    resources:
+      - secops-demo/renamed-api-prohibited
+    result: fail
+
+  # Intentional policy-evaluation SKIP: F1 is tied to the demo-api identity and
+  # must not apply to demo-backend solely because it shares the namespace.
+  - isValidatingPolicy: true
+    policy: f1-demo-api-process-security
+    kind: Deployment
+    resources:
+      - secops-demo/backend-deployment
+    result: skip
+
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Deployment
+    resources:
+      - secops-demo/api-deployment-secure
+      - secops-demo/backend-deployment
+    result: pass
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Pod
+    resources:
+      - secops-demo/renamed-api-secure
+    result: pass
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: ServiceAccount
+    resources:
+      - secops-demo/demo-backend
+    result: pass
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Deployment
+    resources:
+      - secops-demo/api-deployment-prohibited
+    result: fail
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Pod
+    resources:
+      - secops-demo/renamed-api-prohibited
+    result: fail
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Pod
+    resources:
+      - secops-demo/renamed-api-explicit-token
+    result: fail
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: ServiceAccount
+    resources:
+      - secops-demo/demo-api
+    result: fail
+
+  - isValidatingPolicy: true
+    policy: f2-direct-rbac-grants
+    kind: RoleBinding
+    resources:
+      - secops-demo/unrelated-direct-subject
+    result: pass
+  - isValidatingPolicy: true
+    policy: f2-direct-rbac-grants
+    kind: RoleBinding
+    resources:
+      - secops-demo/differently-named-multi-subject-binding
+    result: fail
+  - isValidatingPolicy: true
+    policy: f2-direct-rbac-grants
+    kind: ClusterRoleBinding
+    resources:
+      - direct-backend-cluster-grant
+    result: fail
+  # Intentional policy-evaluation PASS at the direct-subject rule boundary;
+  # this group grant is explicitly not a security-compliance PASS.
+  - isValidatingPolicy: true
+    policy: f2-direct-rbac-grants
+    kind: ClusterRoleBinding
+    resources:
+      - protected-namespace-group-boundary
+    result: pass

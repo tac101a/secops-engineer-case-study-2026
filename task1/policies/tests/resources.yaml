@@ -1,0 +1,252 @@
+# The first document is the official CLI Values object consumed by the
+# UPDATE-specific test declaration. Keeping it with the fixture resources
+# preserves the authorized artifact boundary. The CREATE suite loads the same
+# multi-document file as resources; this metadata document matches no policy.
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Values
+metadata:
+  name: f2-update-operation
+globalValues:
+  request.operation: UPDATE
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment-secure
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: api-deployment-secure
+  template:
+    metadata:
+      labels:
+        app: api-deployment-secure
+    spec:
+      serviceAccountName: demo-api
+      containers:
+        - name: api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment-prohibited
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: api-deployment-prohibited
+  template:
+    metadata:
+      labels:
+        app: api-deployment-prohibited
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: true
+      containers:
+        - name: api
+          image: example.invalid/demo-api:test
+          securityContext:
+            readOnlyRootFilesystem: false
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: renamed-api-secure
+  namespace: secops-demo
+  labels:
+    component: deliberately-not-demo-api
+spec:
+  serviceAccountName: demo-api
+  automountServiceAccountToken: false
+  containers:
+    - name: renamed
+      image: example.invalid/demo-api:test
+      securityContext:
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: renamed-api-prohibited
+  namespace: secops-demo
+  labels:
+    component: changed-label
+spec:
+  serviceAccountName: demo-api
+  automountServiceAccountToken: true
+  containers:
+    - name: renamed
+      image: example.invalid/demo-api:test
+      securityContext:
+        readOnlyRootFilesystem: false
+      volumeMounts:
+        - name: explicit-api-token
+          mountPath: /var/run/explicit-token
+  volumes:
+    - name: explicit-api-token
+      projected:
+        sources:
+          - serviceAccountToken:
+              path: token
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: renamed-api-explicit-token
+  namespace: secops-demo
+  labels:
+    component: another-changed-label
+spec:
+  serviceAccountName: demo-api
+  automountServiceAccountToken: false
+  containers:
+    - name: renamed
+      image: example.invalid/demo-api:test
+      securityContext:
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+      volumeMounts:
+        - name: explicit-api-token
+          mountPath: /var/run/explicit-token
+  volumes:
+    - name: explicit-api-token
+      projected:
+        sources:
+          - serviceAccountToken:
+              path: token
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: backend-deployment
+  template:
+    metadata:
+      labels:
+        app: backend-deployment
+    spec:
+      serviceAccountName: demo-backend
+      automountServiceAccountToken: false
+      containers:
+        - name: backend
+          image: example.invalid/demo-backend:test
+          securityContext:
+            readOnlyRootFilesystem: false
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo-backend
+  namespace: secops-demo
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo-api
+  namespace: secops-demo
+automountServiceAccountToken: true
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: unrelated-direct-subject
+  namespace: secops-demo
+subjects:
+  - kind: ServiceAccount
+    name: unrelated
+    namespace: secops-demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: reader
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: differently-named-multi-subject-binding
+  namespace: secops-demo
+subjects:
+  - kind: User
+    name: example-user
+    apiGroup: rbac.authorization.k8s.io
+  - kind: ServiceAccount
+    name: unrelated
+    namespace: secops-demo
+  - kind: ServiceAccount
+    name: demo-api
+    namespace: secops-demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: reader
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: existing-binding-updated-with-protected-subject
+  namespace: secops-demo
+  annotations:
+    test.secops.example/prior-subject: ServiceAccount/secops-demo/unrelated
+subjects:
+  - kind: ServiceAccount
+    name: unrelated
+    namespace: secops-demo
+  - kind: ServiceAccount
+    name: demo-api
+    namespace: secops-demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: reader
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: direct-backend-cluster-grant
+subjects:
+  - kind: ServiceAccount
+    name: demo-backend
+    namespace: secops-demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+---
+# Coverage-boundary fixture: this indirect group path is intentionally outside
+# the narrow direct-ServiceAccount-subject rule. Its evaluation is not a
+# security-compliance pass.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: protected-namespace-group-boundary
+subjects:
+  - kind: Group
+    name: system:serviceaccounts:secops-demo
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view

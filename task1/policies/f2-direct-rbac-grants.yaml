@@ -1,0 +1,34 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: f2-direct-rbac-grants
+  annotations:
+    policies.kyverno.io/title: Protected workload direct RBAC grants
+    policies.kyverno.io/category: SecOps case study F2
+    policies.kyverno.io/description: >-
+      Reports a RoleBinding or ClusterRoleBinding containing a direct
+      ServiceAccount subject for secops-demo/demo-api or demo-backend.
+spec:
+  validationActions:
+    - Audit
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - rbac.authorization.k8s.io
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - rolebindings
+          - clusterrolebindings
+  validations:
+    - expression: >-
+        !object.?subjects.orValue([]).exists(subject,
+          subject.kind == 'ServiceAccount' &&
+          subject.?namespace.orValue('') == 'secops-demo' &&
+          subject.name in ['demo-api', 'demo-backend'])
+      message: >-
+        Policy evaluation identified a direct RBAC grant to a protected
+        secops-demo ServiceAccount.

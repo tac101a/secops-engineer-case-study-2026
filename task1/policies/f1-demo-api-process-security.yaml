@@ -1,0 +1,83 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: f1-demo-api-process-security
+  annotations:
+    policies.kyverno.io/title: Demo API process security
+    policies.kyverno.io/category: SecOps case study F1
+    policies.kyverno.io/description: >-
+      Reports a demo-api Pod or Deployment whose containers do not declare
+      the selected F1 process and root-filesystem restrictions.
+spec:
+  validationActions:
+    - Audit
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - pods
+      - apiGroups:
+          - apps
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - deployments
+  matchConditions:
+    - name: secops-demo-namespace
+      expression: object.metadata.namespace == 'secops-demo'
+    - name: demo-api-service-account
+      expression: >-
+        (object.kind == 'Pod' &&
+          object.spec.?serviceAccountName.orValue('default') == 'demo-api') ||
+        (object.kind == 'Deployment' &&
+          object.spec.template.spec.?serviceAccountName.orValue('default') == 'demo-api')
+  variables:
+    - name: workloadSpec
+      expression: >-
+        object.kind == 'Pod' ? object.spec : object.spec.template.spec
+    - name: allContainers
+      expression: >-
+        variables.workloadSpec.containers +
+        variables.workloadSpec.?initContainers.orValue([]) +
+        variables.workloadSpec.?ephemeralContainers.orValue([])
+  validations:
+    - expression: >-
+        variables.allContainers.all(c,
+          has(c.securityContext) &&
+          c.securityContext.?runAsNonRoot.orValue(false) == true)
+      message: >-
+        Policy evaluation identified a demo-api container without
+        securityContext.runAsNonRoot=true.
+    - expression: >-
+        variables.allContainers.all(c,
+          has(c.securityContext) &&
+          c.securityContext.?allowPrivilegeEscalation.orValue(true) == false)
+      message: >-
+        Policy evaluation identified a demo-api container without
+        securityContext.allowPrivilegeEscalation=false.
+    - expression: >-
+        variables.allContainers.all(c,
+          has(c.securityContext) &&
+          has(c.securityContext.capabilities) &&
+          c.securityContext.capabilities.?drop.orValue([]).exists(capability,
+            capability == 'ALL') &&
+          c.securityContext.capabilities.?add.orValue([]).size() == 0)
+      message: >-
+        Policy evaluation identified a demo-api container that does not drop
+        all Linux capabilities or that adds a capability back.
+    - expression: >-
+        variables.allContainers.all(c,
+          has(c.securityContext) &&
+          c.securityContext.?readOnlyRootFilesystem.orValue(false) == true)
+      message: >-
+        Policy evaluation identified a demo-api container without
+        securityContext.readOnlyRootFilesystem=true.

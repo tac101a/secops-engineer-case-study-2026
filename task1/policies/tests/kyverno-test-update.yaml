@@ -1,0 +1,64 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: task1-f2-validating-policy-update
+policies:
+  - ../f1-demo-api-process-security.yaml
+  - ../f2-workload-credentials.yaml
+  - ../f2-direct-rbac-grants.yaml
+resources:
+  - resources.yaml
+# resources.yaml begins with the official Values document which sets the
+# simulated admission operation to UPDATE for this separate test invocation.
+variables: resources.yaml
+results:
+  # UPDATE operation coverage for Deployment and direct Pod F1 behavior.
+  - isValidatingPolicy: true
+    policy: f1-demo-api-process-security
+    kind: Deployment
+    resources:
+      - secops-demo/api-deployment-prohibited
+    result: fail
+  - isValidatingPolicy: true
+    policy: f1-demo-api-process-security
+    kind: Pod
+    resources:
+      - secops-demo/renamed-api-prohibited
+    result: fail
+
+  # UPDATE operation coverage for the protected Deployment, direct Pod,
+  # explicit projection, and ServiceAccount credential paths.
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Deployment
+    resources:
+      - secops-demo/api-deployment-prohibited
+    result: fail
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Pod
+    resources:
+      - secops-demo/renamed-api-prohibited
+    result: fail
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Pod
+    resources:
+      - secops-demo/renamed-api-explicit-token
+    result: fail
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: ServiceAccount
+    resources:
+      - secops-demo/demo-api
+    result: fail
+
+  # The submitted new form of an existing RoleBinding introduces demo-api.
+  # Policy-evaluation FAIL is the intended detected violation; it does not
+  # establish live API-server blocking.
+  - isValidatingPolicy: true
+    policy: f2-direct-rbac-grants
+    kind: RoleBinding
+    resources:
+      - secops-demo/existing-binding-updated-with-protected-subject
+    result: fail
