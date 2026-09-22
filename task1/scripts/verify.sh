@@ -2,8 +2,36 @@
 # E1 offline verifier. Runtime probes are deliberately fail-closed until a later phase.
 set -u
 
+usage='Usage: task1/scripts/verify.sh [--help | --offline [insecure|hardened] | --historical-summary | --runtime | insecure | hardened]'
+case "${1-}" in
+  --help)
+    if (( $# != 1 )); then printf '%s\nARGUMENTS: INFRASTRUCTURE ERROR — invalid arguments\nMODE EXIT: 3\n' "$usage"; exit 3; fi
+    printf '%s\n' "$usage"
+    printf '%s\n' 'No arguments select --offline hardened. Offline results inspect source files only; they do not prove current runtime security.'
+    printf '%s\n' 'Bare profiles are compatibility modes: offline static checks plus explicit runtime blockers.'
+    exit 0
+    ;;
+  --runtime)
+    if (( $# != 1 )); then printf '%s\nARGUMENTS: INFRASTRUCTURE ERROR — invalid arguments\nMODE EXIT: 3\n' "$usage"; exit 3; fi
+    printf '%s\n' 'RUNTIME REQUEST: BLOCKED — no live probes are authorized in E1'
+    printf '%s\n' 'PREREQUISITES: resolve D3 policy enforcement; complete D3 candidate acceptance; resolve D3R-1B-EXEC paused execution state and possible residue; establish a known owned-cluster state; complete D4 integration; authorize a bounded full Phase E runtime run with healthy fixtures and same-oracle BEFORE/AFTER checks.'
+    printf '%s\n' 'CURRENT CLUSTER STATE: UNKNOWN' 'POSSIBLE DIAGNOSTIC RESIDUE: UNKNOWN' 'D3R-1B-EXEC: PAUSED — EXECUTION STATE UNKNOWN' 'D3: NOT READY' 'F3 ENFORCEMENT: BLOCKED / NOT VERIFIED' 'CURRENT RUNTIME VERIFICATION: NOT RUN' 'FULL AFTER RESULT: BLOCKED' 'MODE RESULT: BLOCKED' 'MODE EXIT: 2'
+    exit 2
+    ;;
+esac
+
+if (( $# == 0 )); then set -- --offline hardened; fi
+case "$1:$#" in
+  --offline:1|--offline:2|--historical-summary:1|insecure:1|hardened:1) ;;
+  *) printf '%s\nARGUMENTS: INFRASTRUCTURE ERROR — invalid arguments\nMODE EXIT: 3\n' "$usage"; exit 3 ;;
+esac
+if [[ "$1" == --offline && $# == 2 && "$2" != insecure && "$2" != hardened ]]; then
+  printf '%s\nARGUMENTS: INFRASTRUCTURE ERROR — invalid arguments\nMODE EXIT: 3\n' "$usage"
+  exit 3
+fi
+
 if ! command -v python3 >/dev/null 2>&1; then
-  printf 'PARSER UNAVAILABLE: BLOCKED (python3 is required for structured YAML inspection)\n'
+  printf 'YAML PARSER: BLOCKED — python3 is required for structured YAML inspection and historical mapping rendering\n'
   printf 'FULL AFTER RESULT: BLOCKED\nMODE EXIT: 2\n'
   exit 2
 fi
@@ -79,11 +107,16 @@ def historical_mapping():
         if not isinstance(claims, list) or not claims:
             raise ValueError("claims must be a nonempty array")
         expected = {
-            ("FUNC", "B/insecure"), ("F1", "C/insecure"),
-            ("F2", "C/insecure"), ("F3", "C/insecure"),
-            ("FUNC", "D1/hardened-candidate"), ("F1", "D1/hardened-candidate"),
-            ("FUNC", "D2/hardened-candidate"), ("F2", "D2/hardened-candidate"),
-            ("FUNC", "D3/hardened-candidate"), ("F3", "D3/hardened-candidate"),
+            ("FUNC", "B/insecure"): "FUNCTIONAL_PASS",
+            ("F1", "C/insecure"): "WEAKNESS_CONFIRMED",
+            ("F2", "C/insecure"): "WEAKNESS_CONFIRMED",
+            ("F3", "C/insecure"): "WEAKNESS_CONFIRMED",
+            ("FUNC", "D1/hardened-candidate"): "FUNCTIONAL_PASS",
+            ("F1", "D1/hardened-candidate"): "CANDIDATE_PASS",
+            ("FUNC", "D2/hardened-candidate"): "FUNCTIONAL_PASS",
+            ("F2", "D2/hardened-candidate"): "CANDIDATE_PASS",
+            ("FUNC", "D3/hardened-candidate"): "FUNCTIONAL_PASS",
+            ("F3", "D3/hardened-candidate"): "CANDIDATE_FAIL",
         }
         seen = set()
         docs = (ROOT / "docs").resolve()
@@ -97,12 +130,8 @@ def historical_mapping():
             if key not in expected or key in seen:
                 raise ValueError(f"unknown or duplicate historical claim: {key}")
             seen.add(key)
-            if claim_id == "FUNC" and status != "FUNCTIONAL_PASS":
-                raise ValueError(f"invalid functional status for {key}")
-            if phase == "C/insecure" and status != "WEAKNESS_CONFIRMED":
-                raise ValueError(f"invalid Phase C status for {key}")
-            if claim_id != "FUNC" and phase.startswith("D") and status not in {"CANDIDATE_PASS", "CANDIDATE_FAIL"}:
-                raise ValueError(f"invalid candidate status for {key}")
+            if status != expected[key]:
+                raise ValueError(f"status contradicts the reviewed historical outcome for {key}")
             sources = claim["sources"]
             if not isinstance(sources, list) or not sources or len(sources) != len(set(map(str, sources))):
                 raise ValueError(f"sources missing or duplicated for {key}")
@@ -112,8 +141,8 @@ def historical_mapping():
                 source_path = (ROOT / source).resolve()
                 if not source_path.is_relative_to(docs) or not source_path.is_file():
                     raise ValueError(f"canonical source unavailable or outside docs: {source}")
-        if seen != expected:
-            raise ValueError(f"missing curated claim(s): {sorted(expected - seen)}")
+        if seen != set(expected):
+            raise ValueError(f"missing curated claim(s): {sorted(set(expected) - seen)}")
         return claims
     except (OSError, UnicodeError, ValueError, TypeError) as exc:
         result("HISTORICAL MAPPING", "INFRASTRUCTURE ERROR", f"malformed or inconsistent mapping: {exc}")
@@ -124,7 +153,7 @@ def load_yaml(paths):
     try:
         import yaml
     except ImportError as exc:
-        result("YAML PARSER", "BLOCKED", f"PARSER UNAVAILABLE: safe structured YAML loader missing ({exc}); install nothing during E1")
+        result("YAML PARSER", "BLOCKED", f"safe structured YAML loader missing ({exc}); install nothing during E1")
         return None
 
     class StrictSafeLoader(yaml.SafeLoader):
@@ -190,6 +219,37 @@ def check(label, assertions):
     result(label, "FAIL" if failed else "PASS", "; ".join(failed) if failed else "selected source fields match reviewed profile")
 
 
+def credential_mount_free(template, expected_mounts):
+    volumes = template.get("volumes", [])
+    if not isinstance(volumes, list):
+        return False
+    actual_volumes = set()
+    for volume in volumes:
+        if not isinstance(volume, dict) or not isinstance(volume.get("name"), str):
+            return False
+        actual_volumes.add(volume.get("name"))
+        if "secret" in volume:
+            return False
+        projected = volume.get("projected")
+        if projected is not None:
+            sources = as_dict(projected).get("sources", [])
+            if not isinstance(sources, list) or any(not isinstance(source, dict) or "serviceAccountToken" in source or "secret" in source for source in sources):
+                return False
+    actual_mounts = set()
+    for field in ("containers", "initContainers", "ephemeralContainers"):
+        containers = template.get(field, [])
+        if not isinstance(containers, list):
+            return False
+        for container in containers:
+            mounts = as_dict(container).get("volumeMounts", [])
+            if not isinstance(mounts, list):
+                return False
+            if any(not isinstance(mount, dict) or not isinstance(mount.get("name"), str) or not isinstance(mount.get("mountPath"), str) or mount["mountPath"].startswith("/var/run/secrets") for mount in mounts):
+                return False
+            actual_mounts.update((mount.get("name"), mount.get("mountPath")) for mount in mounts)
+    return actual_volumes == {name for name, _ in expected_mounts} and actual_mounts == expected_mounts
+
+
 def static_checks(profile):
     insecure = [
         "task1/insecure/namespace.yaml", "task1/insecure/rbac.yaml",
@@ -220,7 +280,7 @@ def static_checks(profile):
             image_user = ""
         mounts = api_container.get("volumeMounts", [])
         volumes = api_template.get("volumes", [])
-        tmp_mount = any(isinstance(m, dict) and m.get("name") == "api-tmp" and m.get("mountPath") == "/tmp" for m in mounts) if isinstance(mounts, list) else False
+        tmp_mount = any(isinstance(m, dict) and m.get("name") == "api-tmp" and m.get("mountPath") == "/tmp" and m.get("readOnly") is not True for m in mounts) if isinstance(mounts, list) else False
         tmp_volume = any(isinstance(v, dict) and v.get("name") == "api-tmp" and isinstance(v.get("emptyDir"), dict) for v in volumes) if isinstance(volumes, list) else False
         check("F1 STATIC", [
             ("hardened image identity is distinct from phase-b", api_container.get("image") == "secops-demo-api:phase-d1"),
@@ -237,16 +297,23 @@ def static_checks(profile):
         check("F2 STATIC", [
             ("API ServiceAccount automount is false", api_sa.get("automountServiceAccountToken") is False),
             ("backend ServiceAccount automount is false", backend_sa.get("automountServiceAccountToken") is False),
+            ("API template uses dedicated ServiceAccount", api_template.get("serviceAccountName") == "demo-api"),
+            ("backend template uses dedicated ServiceAccount", backend_template.get("serviceAccountName") == "demo-backend"),
             ("API Pod does not override automount to true", api_template.get("automountServiceAccountToken") is not True),
             ("backend Pod does not override automount to true", backend_template.get("automountServiceAccountToken") is not True),
-            ("named fixture Role absent from hardened set", not any(k[0] == "Role" and k[2] == "demo-api-fixture-access" for k in candidate)),
-            ("named fixture RoleBinding absent from hardened set", not any(k[0] == "RoleBinding" and k[2] == "demo-api-fixture-access" for k in candidate)),
+            ("API template has no projected token or unintended credential mount", credential_mount_free(api_template, {("api-tmp", "/tmp")})),
+            ("backend template has no projected token or unintended credential mount", credential_mount_free(backend_template, set())),
+            ("fixture Role and any replacement Role absent from hardened set", not any(k[0] == "Role" for k in candidate)),
+            ("fixture RoleBinding and any replacement RoleBinding absent from hardened set", not any(k[0] == "RoleBinding" for k in candidate)),
+            ("original insecure fixture remains available", all(bool(obj(baseline, kind, name)) for kind, name in (("ConfigMap", "phase-c-fixture"), ("Role", "demo-api-fixture-access"), ("RoleBinding", "demo-api-fixture-access")))),
         ])
         egress = obj(objects, "NetworkPolicy", "demo-api-egress")
         ingress = obj(objects, "NetworkPolicy", "demo-backend-ingress")
         policy_keys = [key for key in objects if key[0] == "NetworkPolicy"]
         check("F3 STATIC", [
-            ("exactly two selected policies", set(policy_keys) == {("NetworkPolicy", "secops-demo", "demo-api-egress"), ("NetworkPolicy", "secops-demo", "demo-backend-ingress")}),
+            ("exactly two selected policies", set(policy_keys) == {("NetworkPolicy", "secops-demo", "demo-api-egress"), ("NetworkPolicy", "secops-demo", "demo-backend-ingress")} and len([key for key in candidate if key[0] == "NetworkPolicy"]) == 2),
+            ("API policy spec has no extra fields", set(as_dict(egress.get("spec"))) == {"podSelector", "policyTypes", "egress"}),
+            ("backend policy spec has no extra fields", set(as_dict(ingress.get("spec"))) == {"podSelector", "policyTypes", "ingress"}),
             ("API egress selects API and Egress", nested(egress, "spec", "podSelector", "matchLabels") == {"app": "demo-api"} and nested(egress, "spec", "policyTypes") == ["Egress"]),
             ("backend ingress selects backend and Ingress", nested(ingress, "spec", "podSelector", "matchLabels") == {"app": "demo-backend"} and nested(ingress, "spec", "policyTypes") == ["Ingress"]),
             ("API allows only backend TCP/8081 and DNS UDP/TCP 53", nested(egress, "spec", "egress") == [
@@ -255,6 +322,7 @@ def static_checks(profile):
             ]),
             ("backend allows only API TCP/8081", nested(ingress, "spec", "ingress") == [{"from": [{"podSelector": {"matchLabels": {"app": "demo-api"}}}], "ports": [{"protocol": "TCP", "port": 8081}]}]),
         ])
+        print("F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement")
     else:
         check("F1 STATIC", [
             ("insecure API uses phase-b image", api_container.get("image") == "secops-demo-api:phase-b"),
@@ -267,6 +335,8 @@ def static_checks(profile):
             ("insecure fixture RoleBinding exists", bool(obj(objects, "RoleBinding", "demo-api-fixture-access"))),
         ])
         check("F3 STATIC", [("insecure profile declares no NetworkPolicy", not any(key[0] == "NetworkPolicy" for key in objects))])
+        print("INSECURE PROFILE: baseline configuration identified; static PASS is not a hardened security PASS")
+        print("F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — historical reachability is not a current runtime probe")
 
 
 def runtime_blockers(profile):

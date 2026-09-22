@@ -1,0 +1,91 @@
+TASK1-E1 continuation scope record — 2026-09-22
+
+Starting checkpoint
+  Branch: temp/work-in-progress
+  HEAD: 1f8892d4d812d38a2f19b9709e70127bdc8d8097 (wip: verify)
+  Reviewed commit is HEAD and therefore in current history; no intervening commits.
+  Initial git status --short --untracked-files=all: empty.
+  The four requested destination paths were absent before creation.
+  No pre-existing staged, unstaged, or untracked Git changes were found.
+
+Files inspected before editing
+  Complete: task1/scripts/verify.sh
+  Complete: docs/evidence/phase-e/e1-historical-claims.md
+  Selected task1/insecure namespace, rbac, demo-api and demo-backend YAML.
+  Selected task1/hardened demo-api, identity and network-policy YAML.
+  task1/hardened/images/demo-api.Dockerfile.
+  Canonical Phase B/C/D1/D2/D3 reports and referenced evidence paths checked
+  through the curated mapping and scoped reads/searches.
+  docs/phase-d-d3r1b-exec-interruption-review.md.
+  docs/phase-f0-detection-prevention-rollout.md.
+  The new verifier and self-test contents, their invoked commands, temporary
+  paths and cleanup boundary were reviewed before executing them.
+
+Existing E1 artifacts
+  task1/scripts/verify.sh — corrected the three CLI defects; kept safe YAML
+  inspection and separate F1/F2/F3 checks; added explicit credential mount and
+  token-projection checks, exact selected policy-spec checks, and exact
+  historical-status validation. Runtime remains a fail-closed stub.
+  docs/evidence/phase-e/e1-historical-claims.md — unchanged. Its reviewed
+  ten-claim mapping and historical source references were preserved.
+
+New E1 artifacts
+  task1/scripts/test-verify-offline.sh
+  docs/phase-e-e1-verification.md
+  docs/evidence/phase-e/e1-offline-tests.txt
+  docs/evidence/phase-e/e1-scope.txt
+
+Commands actually executed within this continuation
+  Starting: git branch --show-current; git rev-parse HEAD;
+  git status --short --untracked-files=all; git log -5 --oneline;
+  git merge-base --is-ancestor <reviewed commit> HEAD; destination test -e.
+  Read-only repository/file inspection: pwd; rg --files; rg; cat; sed; tail;
+  Python 3/PyYAML local version import; git diff --check.
+  chmod +x task1/scripts/test-verify-offline.sh.
+  bash -n task1/scripts/verify.sh task1/scripts/test-verify-offline.sh.
+  task1/scripts/verify.sh --help; task1/scripts/verify.sh;
+  task1/scripts/verify.sh --offline;
+  task1/scripts/verify.sh --offline insecure;
+  task1/scripts/verify.sh --historical-summary.
+  task1/scripts/test-verify-offline.sh, including final run redirected to
+  docs/evidence/phase-e/e1-offline-tests.txt.
+  Final Git checks run after all E1 files existed:
+  git branch --show-current; git rev-parse HEAD;
+  git status --short --untracked-files=all; git diff --name-only;
+  git diff --stat; git diff --cached --name-only;
+  git diff --cached --stat; git diff --check.
+
+Checks and observed results
+  Python 3.12.3 and already-installed PyYAML 6.0.1 were available. No install.
+  Bash syntax check: exit 0.
+  Direct help/default/hardened offline/insecure offline/historical: exit 0.
+  Final self-test: 18 PASS, 0 FAIL, process exit 0; mandatory 01–13 PASS.
+  Negative F1/F2/F3/token fixtures: verifier exit 1.
+  Parser unavailable, blocked runtime, missing mapping: verifier exit 2.
+  Invalid arguments and malformed/inconsistent mapping: verifier exit 3.
+  Mixed F1 FAIL with F3 runtime BLOCKED: verifier exit 1, both visible.
+  Runtime guard: PASS, no Docker/kubectl/nft/node/kind/iptables shim call.
+  Historical mapping renders ten claims; D3 F3 remains CANDIDATE_FAIL.
+  FULL AFTER RESULT remains BLOCKED; current runtime was not tested.
+  An intermediate status-validation run failed 08 and 10 because of a
+  dict/set bug; it was corrected and the final 18-test run passed.
+
+Final Git mutation inventory
+  One modified tracked file: task1/scripts/verify.sh.
+  Four new untracked files: task1/scripts/test-verify-offline.sh,
+  docs/phase-e-e1-verification.md,
+  docs/evidence/phase-e/e1-offline-tests.txt,
+  docs/evidence/phase-e/e1-scope.txt.
+  The existing historical mapping remained tracked and unchanged.
+  No staged changes. No other tracked or untracked changes.
+  Final git diff --check: clean.
+
+Prohibited operations not performed
+  No live Kubernetes, Docker, nftables, or node command; no deploy, smoke,
+  cluster-up, cleanup, D3R diagnostic, or runtime recovery script.
+  No ignored PREP or EXEC workspace was accessed.
+  No original insecure/hardened manifest or application code was modified.
+  No D0/D1/D2/D3/D3R/F0 evidence or report was modified.
+  No workflow, policy, manifest, Make target, deployment script, or runtime
+  diagnostic was created. No commit, push, reset, stash, rebase, branch switch,
+  or worktree creation occurred.

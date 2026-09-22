@@ -1,0 +1,165 @@
+E1 final offline execution record — 2026-09-22
+
+Commands and observed exits on the final implementation:
+  bash -n task1/scripts/verify.sh task1/scripts/test-verify-offline.sh -> 0
+  task1/scripts/verify.sh --help -> 0
+  task1/scripts/verify.sh -> 0 (default hardened static PASS; full AFTER BLOCKED)
+  task1/scripts/verify.sh --offline -> 0 (F1/F2/F3 STATIC PASS; F3 enforcement BLOCKED)
+  task1/scripts/verify.sh --offline insecure -> 0 (insecure baseline identified; full AFTER BLOCKED)
+  task1/scripts/verify.sh --historical-summary -> 0 (ten curated claims; current runtime NOT RUN)
+  task1/scripts/test-verify-offline.sh > docs/evidence/phase-e/e1-offline-tests.txt -> 0
+
+The raw final self-test output follows. Tests 01–13 are mandatory; 14–18 add
+insecure-profile, token-projection, missing/malformed/inconsistent-mapping cases.
+Each line's exit code is the actual verifier invocation result; PASS is the
+self-test assertion result. The final self-test process returned 0.
+
+An intermediate run after tightening historical status validation returned 1:
+16 passed, 2 failed (08 and 10). A dict/set comparison bug caused valid
+historical rendering to return 3. The comparison was corrected, test 13 was
+tightened to require exit 0, and the final 18-test run below returned 0.
+
+Limitations: all manifest mutations and the misleading historical-source text
+were confined to isolated temporary copies. The parser-unavailable case used
+a temporary Python import shim. Runtime command shims fail and log attempts;
+the final guard log was empty. No cluster, container, node, or dataplane result
+was measured. Static PASS and historical rendering do not verify current
+runtime security or full integrated AFTER behavior.
+
+Final self-test stdout:
+01 help is offline — PASS (exit 0)
+02 no arguments use safe offline mode — PASS (exit 0)
+  F1 STATIC: PASS — selected source fields match reviewed profile
+  F2 STATIC: PASS — selected source fields match reviewed profile
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: PASS
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 0
+03 valid hardened static set — PASS (exit 0)
+  F1 STATIC: PASS — selected source fields match reviewed profile
+  F2 STATIC: PASS — selected source fields match reviewed profile
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: PASS
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 0
+04 weakened F1 — PASS (exit 1)
+  F1 STATIC: FAIL — runAsNonRoot is true
+  F2 STATIC: PASS — selected source fields match reviewed profile
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+05 weakened F2 — PASS (exit 1)
+  F1 STATIC: PASS — selected source fields match reviewed profile
+  F2 STATIC: FAIL — API ServiceAccount automount is false
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+06 broadened F3 policy — PASS (exit 1)
+  F1 STATIC: PASS — selected source fields match reviewed profile
+  F2 STATIC: PASS — selected source fields match reviewed profile
+  F3 STATIC: FAIL — API allows only backend TCP/8081 and DNS UDP/TCP 53
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+07 unavailable safe YAML parser — PASS (exit 2)
+  YAML PARSER: BLOCKED — safe structured YAML loader missing (simulated unavailable YAML parser); install nothing during E1
+  F1 STATIC: BLOCKED — selected YAML could not be inspected
+  F2 STATIC: BLOCKED — selected YAML could not be inspected
+  F3 STATIC: BLOCKED — selected YAML could not be inspected
+  MODE RESULT: BLOCKED
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 2
+08 curated historical summary — PASS (exit 0)
+  HISTORICAL MAPPING: PASS — rendered 10 reviewed historical claims
+  MODE RESULT: HISTORICAL SUMMARY RENDERED
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 0
+09 runtime fails closed — PASS (exit 2)
+  RUNTIME REQUEST: BLOCKED — no live probes are authorized in E1
+  CURRENT CLUSTER STATE: UNKNOWN
+  POSSIBLE DIAGNOSTIC RESIDUE: UNKNOWN
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE RESULT: BLOCKED
+  MODE EXIT: 2
+10 distinct PASS FAIL BLOCKED invalid exit codes — PASS (exit 3)
+  MODE EXIT: 3
+11 static F3 cannot become full PASS — PASS (exit 0)
+  F1 STATIC: PASS — selected source fields match reviewed profile
+  F2 STATIC: PASS — selected source fields match reviewed profile
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: PASS
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 0
+12 FAIL outranks BLOCKED and both remain visible — PASS (exit 1)
+  F1 STATIC: FAIL — runAsNonRoot is true
+  F2 STATIC: PASS — selected source fields match reviewed profile
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  F3 ENFORCEMENT: BLOCKED — fresh positive and negative Pod-to-Service traffic and DNS not run
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+13 historical mode is not current PASS — PASS (exit 0)
+  HISTORICAL MAPPING: PASS — rendered 10 reviewed historical claims
+  MODE RESULT: HISTORICAL SUMMARY RENDERED
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 0
+14 insecure profile correctly labeled — PASS (exit 0)
+  F1 STATIC: PASS — selected source fields match reviewed profile
+  F2 STATIC: PASS — selected source fields match reviewed profile
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  INSECURE PROFILE: baseline configuration identified; static PASS is not a hardened security PASS
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — historical reachability is not a current runtime probe
+  MODE RESULT: PASS
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 0
+15 explicit token projection rejected — PASS (exit 1)
+  F1 STATIC: PASS — selected source fields match reviewed profile
+  F2 STATIC: FAIL — API template has no projected token or unintended credential mount
+  F3 STATIC: PASS — selected source fields match reviewed profile
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED — static policy fields cannot prove dataplane enforcement
+  MODE RESULT: FAIL
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 1
+16 missing curated mapping blocks — PASS (exit 2)
+  HISTORICAL MAPPING: BLOCKED — required curated mapping missing: docs/evidence/phase-e/e1-historical-claims.md
+  MODE RESULT: BLOCKED
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 2
+17 malformed curated mapping errors — PASS (exit 3)
+  HISTORICAL MAPPING: INFRASTRUCTURE ERROR — malformed or inconsistent mapping: unsupported historical mapping schema
+  MODE RESULT: INFRASTRUCTURE ERROR
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 3
+18 historically inconsistent mapping errors — PASS (exit 3)
+  HISTORICAL MAPPING: INFRASTRUCTURE ERROR — malformed or inconsistent mapping: status contradicts the reviewed historical outcome for ('F3', 'D3/hardened-candidate')
+  MODE RESULT: INFRASTRUCTURE ERROR
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+  MODE EXIT: 3
+RUNTIME GUARD: PASS — no shimmed runtime tool was invoked
+SELF-TEST SUMMARY: 18 passed, 0 failed
