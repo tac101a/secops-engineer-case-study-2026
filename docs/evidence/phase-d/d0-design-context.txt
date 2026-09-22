@@ -1,0 +1,29 @@
+D0 design context
+UTC timestamp: 2026-09-21T19:14:42Z
+D0 start Git commit: 557e60d20ad4f81b7ba7e9666a313ea4a8c65af9
+Branch: temp/work-in-progress
+Initial git status --short --untracked-files=all: clean (no output)
+
+Official assignment reviewed: docs/case-study-secops-engineer-2026.pdf, all four pages; Task 1 scope and deliverables checked. Text was extracted read-only from the PDF's compressed content streams and ToUnicode maps because pdftotext was unavailable.
+Canonical Phase C synthesis reviewed completely: docs/phase-c-report.md.
+Phase A architecture reviewed completely: docs/architecture.md.
+Phase B legitimate baseline contract reviewed completely: task1/BASELINE.md.
+Phase B execution report reviewed completely: docs/phase-b-report.md.
+
+Final Phase C raw evidence reviewed:
+- docs/evidence/phase-c/h1-container-privilege.txt
+- docs/evidence/phase-c/h4-filesystem.txt
+- docs/evidence/phase-c/h2-credential-exposure.txt
+- docs/evidence/phase-c/h2-authorization-model.txt
+- docs/evidence/phase-c/h2-runtime-api.txt
+- docs/evidence/phase-c/h3-policy-network-inventory.txt
+- docs/evidence/phase-c/h3-network-reachability.txt
+- docs/evidence/phase-c/c3-fixture-lifecycle.txt
+Additional synthesis provenance reviewed: docs/evidence/phase-c/c4-synthesis-context.txt.
+
+Relevant source inspected: task1/app/demo-api/{Dockerfile,app.py,.dockerignore}; task1/app/demo-backend/{Dockerfile,app.py,.dockerignore}; all four task1/insecure/*.yaml files; all six task1/scripts/*.sh files; task1/kind.yaml. The functional check uses loopback kubectl port-forward to both Services.
+
+Phase B source integrity: PASS. All 19 SHA-256 entries in docs/evidence/phase-b/workload-revision.txt matched current files using sha256sum -c. git diff --name-only HEAD for docs/architecture.md, task1/, docs/phase-b-report.md, docs/phase-c-report.md, and docs/evidence/phase-c/ returned no paths before D0 authoring.
+Material factual contradiction found: NO.
+Runtime security test required for D0: NO.
+Runtime mutation or test performed in D0: NO.
