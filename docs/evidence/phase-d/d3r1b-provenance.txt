@@ -1,0 +1,14 @@
+D3R-1B provenance preflight — 2026-09-22 UTC; completed before any nftables mutation.
+Observed running tag: docker.io/kindest/kindnetd:v20251212-v0.29.0-alpha-105-g20ccfc88
+Observed imageID: sha256:4921d7a6dffa922dd679732ba4797085c4f39e9a53bee8b6fdb1d463e8571251
+Local CRI image metadata (D3R-1) has no repoDigest, build/source label or embedded commit proof.
+
+Authoritative upstream correlation:
+1. https://api.github.com/repos/kubernetes-sigs/kind/commits/20ccfc88 resolves the tag suffix to kind commit 20ccfc88055ce538b79b1685d6a497d35311d7d1, committed 2025-12-12T16:51:46Z. This is source correlation, not cryptographic proof of the running image build.
+2. https://raw.githubusercontent.com/kubernetes-sigs/kind/20ccfc88055ce538b79b1685d6a497d35311d7d1/images/kindnetd/cmd/kindnetd/main.go lines 212-243 constructs networkpolicy.Config (FailOpen=true, QueueID=101, NodeName, NetfilterBug1766Fix=true, NFTableName=kindnet-network-policies), calls networkpolicy.NewController, and runs it. This differs from newer main's dataplane package; the pinned source was used.
+3. https://raw.githubusercontent.com/kubernetes-sigs/kind/20ccfc88055ce538b79b1685d6a497d35311d7d1/images/kindnetd/go.mod declares Go 1.24.0 and pins sigs.k8s.io/kube-network-policies v0.8.0 and github.com/google/nftables v0.3.0 (indirect).
+4. https://api.github.com/repos/kubernetes-sigs/kube-network-policies/commits/v0.8.0 resolves the tag to d661fc1da10423068b97136e00e43fe819fe1e00. Its tagged go.mod at https://raw.githubusercontent.com/kubernetes-sigs/kube-network-policies/v0.8.0/go.mod declares Go 1.23.0 and directly requires github.com/google/nftables v0.3.0.
+5. Tagged controller https://raw.githubusercontent.com/kubernetes-sigs/kube-network-policies/v0.8.0/pkg/networkpolicy/controller.go lines 710-725 calls nftables.New(), creates Table{Name: c.config.NFTableName, Family: TableFamilyINet}, then queues AddTable, DelTable, AddTable. It queues later sets/chains/rules and calls nft.Flush() at line 924; the line-925 error log matches the historical filename/line/message. This verifies the selected first transaction sequence, not the identity of the historical failing netlink message.
+6. google/nftables v0.3.0 tagged source: https://raw.githubusercontent.com/google/nftables/v0.3.0/conn.go and https://raw.githubusercontent.com/google/nftables/v0.3.0/table.go.
+
+Provenance quality: VERSION-CORRELATED. The image tag and timestamp strongly align with the resolved source and dependencies, while the local imageID alone cannot prove an exact source build. No discrepancy in the expected dependency versions; pinned controller package/path differs from current main.

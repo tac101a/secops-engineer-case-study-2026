@@ -1,0 +1,4 @@
+Authorized runtime mutations: one isolated host build directory, temporary helper and optional wrapper, one unique diagnostic inet table transaction, and exact cleanup of those objects. Actual authorized runtime mutations: NONE; executability gate stopped the run first.
+Unexpected runtime mutations: NONE observed. Kubernetes mutations: NONE. NetworkPolicy reapply: NO. Existing nftables object modifications: NONE. Other network/runtime mutations: NONE. No restart, CNI change, sysctl/module/iptables/route/link/tc mutation, repair, or follow-on diagnostic.
+Repository mutation: new D3R-1B documentation/evidence only (`docs/phase-d-d3r1b-report.md` and `docs/evidence/phase-d/d3r1b-*`). No task1/** or existing D0/D1/D2/D3/D3R-0/D3R-1 artifact changed. No commit, push, or branch switch.
+Final mutation-scope result: PASS (for this non-executable preflight; no COMPLETE outcome is claimed).

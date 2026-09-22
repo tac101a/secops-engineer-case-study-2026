@@ -1,0 +1,6 @@
+Primary diagnostic execution: NOT EXECUTED.
+Stop reason: existing local Go toolchain unavailable (`go version` exit 127); the specification prohibits installation or automatic toolchain download.
+Helper invocation count: 0. Primary Flush count: 0. Command, helper SHA-256, helper stdout/stderr, helper exit status, and observed helper UID/GID/capability/namespace: N/A.
+Connection construction at runtime: N/A; preflight source semantics recorded separately.
+Diagnostic table: NOT CREATED. Flush: NOT EXECUTED. Go error type/text: N/A. errors.Is(..., syscall.ENOENT): N/A. Text-family check: N/A.
+Result classification: DIAGNOSTIC NOT EXECUTABLE. The authoritative diagnostic question remains unanswered; historical ENOENT was not reproduced or refuted.

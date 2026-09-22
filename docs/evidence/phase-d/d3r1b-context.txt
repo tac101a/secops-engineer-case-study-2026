@@ -1,0 +1,12 @@
+D3R-1B context — 2026-09-22T09:51:19Z
+Start commit: 7b9c7e933d24794db7503374a603ca94e5d6bb1f
+Branch: temp/work-in-progress
+Initial `git status --short --untracked-files=all`: empty (clean).
+Owned cluster/context/namespace: secops-lab / kind-secops-lab / secops-demo; ownership check passed.
+D3: NOT READY. D3R-1: D — Insufficient Evidence / Unresolved Cause, MEDIUM confidence; recovery decision ROOT CAUSE INSUFFICIENTLY ISOLATED. Its final line is exactly `D3R NOT READY — ROOT CAUSE INSUFFICIENTLY ISOLATED`.
+Accepted D2 runtime: only demo-api-6d49d5c8bd-nmjr5 and demo-backend-5d4449cb58-vzhs2 Pods, each Ready with zero restarts; only corresponding application Services; dedicated ServiceAccounts automount=false; no Role/RoleBinding; phase-c-fixture marker=baseline.
+NetworkPolicy count: 0 (empty `kubectl get networkpolicies -o name`). D3 temporary Pod/Service fixtures: absent.
+Kindnet: pod kindnet-n2pj4, UID 6e4afac8-6fc5-491d-9a0d-f96b7007c540, Ready on secops-lab-control-plane, restartCount=4, current container started 2026-09-22T03:41:12Z.
+Diagnostic question: Does an isolated, version-correlated inet AddTable/DelTable/AddTable/Flush transaction through github.com/google/nftables in the owned node namespace independently reproduce the historical netlink ENOENT family?
+Authorized nftables budget: one uniquely named disposable inet table, one queued AddTable/DelTable/AddTable, one primary Flush, exact-table cleanup only. No recovery technology has been selected.
+Actual gate outcome: no local Go toolchain; no primary mutation authorized after executability check.

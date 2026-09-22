@@ -1,0 +1,8 @@
+Architecture/build preflight — 2026-09-22 UTC.
+Host uname -m: x86_64. Kind node uname -m: x86_64. Explicit mapping: x86_64 -> GOARCH=amd64; intended GOOS=linux.
+Host `go version`: exit 127, `zsh:1: command not found: go`.
+Host `go env GOOS GOARCH`: exit 127, same error. Search for an executable named `go` under /usr, /opt, /home/tac, and common Go paths found none. Node `command -v go` also found none.
+GOTOOLCHAIN=local: required for any build, but no Go command could be invoked. GOWORK=off and isolated GOCACHE/GOMODCACHE/GOPATH were not created because no build began.
+Selected dependency from source: github.com/google/nftables v0.3.0. Dependency source: authoritative tagged upstream read-only inspection; no Go module source was downloaded into a build cache.
+Build command: NOT EXECUTED. Temporary go.mod/go.sum/module graph: N/A. Helper file metadata, `go version -m`, host/node SHA-256, and node copy: N/A. No compiler/toolchain was installed or downloaded; no global Go cache or repository go.mod/go.sum was changed.
+Gate: DIAGNOSTIC NOT EXECUTABLE. No nftables mutation followed.

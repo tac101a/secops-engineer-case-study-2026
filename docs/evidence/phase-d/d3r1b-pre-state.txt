@@ -1,0 +1,7 @@
+Read-only state before executability stop; no immediate pre-mutation safety check was applicable because no primary mutation occurred.
+UTC: 2026-09-22T09:49:26Z (host preflight observation; cluster observation in same D3R-1B run).
+Node: secops-lab-control-plane; kernel 5.15.167.4-microsoft-standard-WSL2; architecture x86_64; nftables v1.0.6.
+Kindnet: UID 6e4afac8-6fc5-491d-9a0d-f96b7007c540, Ready, restartCount=4, container started 2026-09-22T03:41:12Z.
+NetworkPolicy count: 0. D3 fixtures: absent.
+Full current table-name inventory (`nft list tables`): ip/nat; ip/mangle; ip/filter; ip6/mangle; ip6/nat; ip6/filter. No inet table appears.
+Diagnostic table name: N/A (not allocated). Exact-name absence query: N/A. No name was eligible for creation or cleanup. A future run must generate a fresh unique name and perform the exact absence check immediately before mutation.

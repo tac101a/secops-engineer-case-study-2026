@@ -1,0 +1,6 @@
+Cleanup verification for an executability-gated, non-mutating run.
+Cleanup mechanism/trap prepared before mutation: N/A; no mutation was permitted after the missing-toolchain gate. No wrapper or helper was created/copied.
+Diagnostic table name: N/A; no diagnostic table was created. `nft list tables` showed only ip/ip6 nat, mangle, filter. Exact-name query/deletion: N/A. No existing table was touched.
+Temporary node helper removed: N/A (never present). Temporary wrapper removed: N/A (never present). Host build tree removed: N/A (never created). No temporary runtime/build object remains from this run.
+Pre-existing table inventory: ip/nat; ip/mangle; ip/filter; ip6/mangle; ip6/nat; ip6/filter. Final read-only `nft list tables` returned exactly those six names, so the pre-existing table-name inventory was preserved. No nftables diagnostic mutation occurred.
+Final read-only Kubernetes observation: NetworkPolicy count 0; only the original API and backend Pods and Services; both Pods Ready with zero restarts; no Role/RoleBinding or D3 fixtures. Kindnet UID 6e4afac8-6fc5-491d-9a0d-f96b7007c540 remained Ready with restartCount=4 and container start 2026-09-22T03:41:12Z.
