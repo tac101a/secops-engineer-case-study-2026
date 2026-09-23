@@ -22,6 +22,13 @@ results:
     resources:
       - secops-demo/renamed-api-secure
     result: pass
+  # A read-only mount below /app is distinct from a prohibited writable mount.
+  - isValidatingPolicy: true
+    policy: f1-demo-api-process-security
+    kind: Deployment
+    resources:
+      - secops-demo/f1-read-only-app-mount-allowed
+    result: pass
 
   # Policy-evaluation FAIL means that the offline evaluator identified the
   # prohibited configuration. These assertions do not claim admission denial.
@@ -36,6 +43,32 @@ results:
     kind: Pod
     resources:
       - secops-demo/renamed-api-prohibited
+    result: fail
+
+  # Independent F1 negatives. Every Deployment retains all other selected
+  # process and filesystem fields so the named property is the policy reason.
+  - isValidatingPolicy: true
+    policy: f1-demo-api-process-security
+    kind: Deployment
+    resources:
+      - secops-demo/f1-run-as-non-root-false
+      - secops-demo/f1-privilege-escalation-true
+      - secops-demo/f1-missing-all-capability-drop
+      - secops-demo/f1-capability-added-back
+      - secops-demo/f1-writable-root-filesystem
+      - secops-demo/f1-missing-api-tmp-volume
+      - secops-demo/f1-api-tmp-wrong-volume-type
+      - secops-demo/f1-missing-tmp-mount
+      - secops-demo/f1-read-only-tmp-mount
+      - secops-demo/f1-writable-app-mount
+      - secops-demo/f1-init-container-process-violation
+      - secops-demo/f1-sidecar-process-violation
+    result: fail
+  - isValidatingPolicy: true
+    policy: f1-demo-api-process-security
+    kind: Pod
+    resources:
+      - secops-demo/f1-ephemeral-writable-app-mount
     result: fail
 
   # Intentional policy-evaluation SKIP: F1 is tied to the demo-api identity and
@@ -62,12 +95,6 @@ results:
     result: pass
   - isValidatingPolicy: true
     policy: f2-workload-credentials
-    kind: ServiceAccount
-    resources:
-      - secops-demo/demo-backend
-    result: pass
-  - isValidatingPolicy: true
-    policy: f2-workload-credentials
     kind: Deployment
     resources:
       - secops-demo/api-deployment-prohibited
@@ -86,10 +113,27 @@ results:
     result: fail
   - isValidatingPolicy: true
     policy: f2-workload-credentials
-    kind: ServiceAccount
+    kind: Deployment
     resources:
-      - secops-demo/demo-api
+      - secops-demo/f2-backend-secret-volume
+      - secops-demo/f2-backend-projected-secret
+      - secops-demo/f2-backend-token-path-mount
     result: fail
+
+  # Intentional F2 scope-boundary SKIPs. The second fixture documents the
+  # unavoidable simultaneous name/label/ServiceAccount identity change.
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Deployment
+    resources:
+      - secops-demo/unrelated-workload
+    result: skip
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Pod
+    resources:
+      - secops-demo/fully-renamed-identity-boundary
+    result: skip
 
   - isValidatingPolicy: true
     policy: f2-direct-rbac-grants
@@ -117,3 +161,49 @@ results:
     resources:
       - protected-namespace-group-boundary
     result: pass
+
+  # Traditional resources[] selection in CLI v1.19.1 keys by namespace/name.
+  # Version-supported resourceSpecs keeps same-named ServiceAccounts and
+  # canonical Deployments independent by their complete resource identity.
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: ServiceAccount
+    resources: []
+    resourceSpecs:
+      - version: v1
+        kind: ServiceAccount
+        namespace: secops-demo
+        name: demo-backend
+    result: pass
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: ServiceAccount
+    resources: []
+    resourceSpecs:
+      - version: v1
+        kind: ServiceAccount
+        namespace: secops-demo
+        name: demo-api
+    result: fail
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Deployment
+    resources: []
+    resourceSpecs:
+      - group: apps
+        version: v1
+        kind: Deployment
+        namespace: secops-demo
+        name: demo-api
+    result: fail
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Deployment
+    resources: []
+    resourceSpecs:
+      - group: apps
+        version: v1
+        kind: Deployment
+        namespace: secops-demo
+        name: demo-backend
+    result: fail

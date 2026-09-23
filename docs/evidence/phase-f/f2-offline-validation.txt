@@ -234,3 +234,259 @@ files, and temporary operation-test copies were not retained. No ignored
 PREP/EXEC workspace was reused.
 
 TASK1-F2 OFFLINE VERIFIED
+
+===============================================================================
+F2-PATCH OFFLINE VALIDATION RECORD
+
+FINAL VALIDATION UTC: 2026-09-23T04:01:54Z
+PATCH STARTING HEAD: 61e42a368dc4dbc6344dae066c76b6f1ab19cee6
+BRANCH: temp/work-in-progress
+STARTING WORKTREE: clean
+REVIEWED COMMIT IN HISTORY: yes; starting HEAD was the reviewed commit
+HOST TOOL TARGET: Linux x86_64
+
+CHRONOLOGY BOUNDARY
+- This section is appended to, and does not rewrite, the reviewed v1.19.1
+  execution above that reported 17 CREATE plus seven UPDATE assertions.
+- The previous 24/24 result is historical evidence only. The patched run below
+  has its own 38 CREATE and 12 UPDATE assertions.
+- No kubectl, Docker, kind, nftables, node command, Kubernetes API, Kyverno
+  installation, or live cluster operation was used.
+- Audit-mode offline evaluation is not API-server admission denial.
+
+PATCHED CONTROLS
+- F1 retains all five process/root-filesystem checks across regular, init, and
+  represented ephemeral containers.
+- F1 now requires the accepted regular container named demo-api, an api-tmp
+  emptyDir, and one direct writable api-tmp mount at /tmp without subPath or
+  subPathExpr.
+- F1 now reports writable mounts at /app or below it across regular, init, and
+  represented ephemeral containers while allowing read-only mounts there.
+- F2 now inspects every volume and every projected source for ordinary Secret,
+  projected Secret, and explicit serviceAccountToken sources.
+- F2 now inspects every represented regular, init, and ephemeral container for
+  mounts at or below /var/run/secrets/kubernetes.io/serviceaccount.
+- F2 retains protected-ServiceAccount selection for renamed/relabeled objects
+  and adds canonical secops-demo/demo-api and demo-backend Deployment matching
+  plus required ServiceAccountName validation.
+- The direct protected-subject RBAC rule was reviewed and left unchanged.
+
+CLI DISCOVERY, PROVENANCE, AND CHECKSUMS
+command: command -v kyverno
+result: no installed Kyverno CLI found
+
+task-owned temporary directory:
+  /tmp/task1-f2-patch-kyverno-ir5Siw
+
+download sources:
+  https://github.com/kyverno/kyverno/releases/download/v1.19.1/checksums.txt
+  https://github.com/kyverno/kyverno/releases/download/v1.19.1/kyverno-cli_v1.19.1_linux_x86_64.tar.gz
+
+official release-page SHA-256 for checksums.txt:
+  ef46faa1cbf507fcfd9326dfc595c1ecd67df5af0247c064fc20bc974b01acf1
+observed checksums.txt SHA-256:
+  ef46faa1cbf507fcfd9326dfc595c1ecd67df5af0247c064fc20bc974b01acf1
+result: MATCH
+
+artifact SHA-256 published inside verified checksums.txt:
+  b38228f367fc0fdc2b08f4c83ea50ac5f16c60ff8d62d76a66157c33c47b70ae
+observed archive SHA-256:
+  b38228f367fc0fdc2b08f4c83ea50ac5f16c60ff8d62d76a66157c33c47b70ae
+result: MATCH BEFORE EXTRACTION
+
+archive member inspection before extraction:
+  LICENSE
+  kyverno
+
+version output:
+  Version: 1.19.1
+  Time: 2026-09-10T05:20:21Z
+  Git commit ID: 40ec788d48bb28d83dbf85538e962a59db9d45c6
+
+The first sandboxed curl attempt failed with DNS resolution denied. The same
+bounded official downloads were retried with approved network access. A resume
+request confirmed the completed 53,334,121-byte archive. No binary was
+installed system-wide or added to Git.
+
+VERSION-SPECIFIC TEST SELECTOR FINDING
+- Traditional results[].resources selection in CLI v1.19.1 keys by
+  namespace/name and did not disambiguate canonical Deployments from the
+  same-named ServiceAccounts even when kind was declared.
+- Current online documentation described assertion-tree checks, but the pinned
+  v1.19.1 Test decoder rejected checks as an unknown field.
+- The v1.19.1 schema and tagged source provide resourceSpecs. Source inspection
+  showed that v1.19.1 processes resourceSpecs only when resources is non-nil.
+- The final declarations therefore use the supported complete
+  group/version/kind/namespace/name resourceSpecs identity with resources: []
+  for the four same-name CREATE assertions and three UPDATE assertions.
+- The tagged source archive and one raw tagged source file were inspection-only,
+  were never executed, and were removed with the temporary directory.
+
+FAILED INTERMEDIATE EXECUTIONS
+1. First expanded CREATE execution: exit 1; 40 assertions passed and two
+   failed. The policy evaluations were correct, but namespace/name result
+   selection associated canonical Deployments with same-named ServiceAccounts.
+2. Assertion-tree attempt: exit 1 before evaluation; the v1.19.1 decoder
+   reported unknown field "checks".
+3. First resourceSpecs attempt without resources: []: exit 1; 103 assertions
+   passed and 71 failed because the v1.19.1 implementation fell back to all
+   loaded resources when the exact selector was not activated.
+- These were test-declaration compatibility failures. They were corrected with
+  the pinned version's resourceSpecs behavior; none was omitted from the
+  chronology or presented as a successful security result.
+
+STRUCTURAL VALIDATION
+command: python3 -I -B -c '<duplicate-key rejecting PyYAML assertions>'
+exit: 0
+output:
+  STRUCTURAL_VALIDATION: PASS
+  RESOURCE_DOCUMENTS: 34
+  CREATE_ASSERTIONS: 38
+  UPDATE_ASSERTIONS: 12
+  POLICIES: 3 policies.kyverno.io/v1 ValidatingPolicy resources; Audit; CREATE/UPDATE
+
+FINAL CREATE SELF-TEST
+command:
+  /tmp/task1-f2-patch-kyverno-ir5Siw/kyverno test task1/policies/tests \
+    --file-name kyverno-test.yaml --detailed-results \
+    --warnings-as-errors --remove-color --require-tests
+exit: 0
+actual CLI summary:
+  Test Summary: 38 tests passed and 0 tests failed
+
+CREATE EXPECTATION ACCOUNTING
+- Expected policy-evaluation PASS: 9.
+- Expected policy-evaluation FAIL: 26.
+- Intentional policy-evaluation SKIP: 3.
+- Unexpected policy-evaluation SKIP: 0.
+- Overall CREATE assertions passed: 38.
+- Overall CREATE assertions failed: 0.
+
+CREATE NEGATIVE DETAIL
+- runAsNonRoot=false: intended non-root validation reported.
+- allowPrivilegeEscalation=true: intended privilege validation reported.
+- missing ALL drop and an added NET_RAW capability: capability validation
+  independently reported for each fixture.
+- readOnlyRootFilesystem=false: intended root-filesystem validation reported.
+- missing api-tmp and api-tmp backed by hostPath: emptyDir validation reported.
+- missing /tmp mount and read-only /tmp mount: direct writable-mount validation
+  independently reported.
+- writable /app/cache and an ephemeral-container /app/debug mount: writable
+  /app validation independently reported.
+- init-container runAsNonRoot and sidecar privilege escalation: the intended
+  process validation independently reported.
+- ordinary Secret in the second volume, Secret in the second projected source,
+  explicit serviceAccountToken projection, and init-container token-path mount:
+  the intended distinct F2 validation reported for each fixture.
+- canonical demo-api and demo-backend ServiceAccount substitution: the matching
+  canonical identity validation reported for each Deployment.
+- Existing direct-RBAC negative cases continued to report the selected direct
+  protected ServiceAccount subject.
+
+CREATE POSITIVE AND BOUNDARY DETAIL
+- Accepted API with api-tmp emptyDir, accepted backend, renamed/relabeled API
+  Pod, protected backend ServiceAccount, unrelated direct RBAC subject, and a
+  read-only /app/reference mount evaluated PASS as intended.
+- Intentional SKIP 1: F1 against backend-deployment.
+- Intentional SKIP 2: F2 against unrelated-workload.
+- Intentional SKIP 3: F2 against fully-renamed-identity-boundary, documenting
+  the simultaneous name/label/ServiceAccount boundary.
+- The group-subject ClusterRoleBinding evaluated PASS only at the narrow
+  direct-subject rule boundary. It is not evidence of effective zero API
+  authority.
+
+FINAL UPDATE SELF-TEST
+command:
+  /tmp/task1-f2-patch-kyverno-ir5Siw/kyverno test task1/policies/tests \
+    --file-name kyverno-test-update.yaml --detailed-results \
+    --warnings-as-errors --remove-color --require-tests
+exit: 0
+actual CLI summary:
+  Test Summary: 12 tests passed and 0 tests failed
+
+UPDATE EXPECTATION ACCOUNTING
+- Expected policy-evaluation PASS: 0.
+- Expected policy-evaluation FAIL: 12.
+- Intentional policy-evaluation SKIP: 0.
+- Unexpected policy-evaluation SKIP: 0.
+- Overall UPDATE assertions passed: 12.
+- Overall UPDATE assertions failed: 0.
+
+UPDATE COVERAGE
+- Existing broad Deployment and direct-Pod F1 violations remained detected.
+- A newly introduced writable /app mount was independently detected.
+- Existing automount, explicit token projection, and protected ServiceAccount
+  changes remained detected.
+- Ordinary Secret and projected Secret introduction were independently
+  detected.
+- Both canonical Deployment ServiceAccount substitutions were independently
+  detected.
+- An existing RoleBinding gaining the protected direct subject remained
+  detected.
+
+COMBINED FINAL ACCOUNTING
+- Expected policy-evaluation PASS: 9.
+- Expected policy-evaluation FAIL: 38.
+- Intentional policy-evaluation SKIP: 3.
+- Unexpected policy-evaluation SKIP: 0.
+- Overall CLI assertions passed: 50.
+- Overall CLI assertions failed: 0.
+
+For a negative fixture, CLI RESULT=Pass means the declared policy FAIL matched
+the actual validation message. It does not relabel the resource compliant and
+does not establish Audit-mode or Deny-mode API-server behavior.
+
+OPERATION-MECHANISM CROSS-CHECK
+- Temporary copies of all three policies were narrowed to UPDATE-only.
+- UPDATE-only copies plus the UPDATE declaration: exit 0; 12 passed, 0 failed.
+- UPDATE-only copies plus the CREATE declaration: exit 1; ValidatingPolicy rows
+  were Excluded under CREATE and the direct-RBAC CREATE expectations were not
+  found; CLI summary 34 passed, four failed.
+- This demonstrates that the Values-supplied UPDATE operation was honored. It
+  does not persist oldObject state, submit an API request, or prove webhook
+  matching.
+
+E1 OFFLINE REGRESSION
+command: bash -n task1/scripts/verify.sh
+exit: 0
+
+command: bash -n task1/scripts/test-verify-offline.sh
+exit: 0
+
+command: task1/scripts/verify.sh --offline hardened
+exit: 0
+selected output:
+  F1 STATIC: PASS
+  F2 STATIC: PASS
+  F3 STATIC: PASS
+  F3 ENFORCEMENT: BLOCKED / NOT VERIFIED
+  CURRENT RUNTIME VERIFICATION: NOT RUN
+  FULL AFTER RESULT: BLOCKED
+
+command: task1/scripts/test-verify-offline.sh
+exit: 0
+actual summary:
+  RUNTIME GUARD: PASS - no shimmed runtime tool was invoked
+  SELF-TEST SUMMARY: 24 passed, 0 failed
+
+SCOPE, CLEANUP, AND LIMITATIONS
+- The final mutation inventory is recorded in f2-scope-record.txt and is
+  contained in the approved nine-file inventory. The direct-RBAC policy was
+  unchanged.
+- Before cleanup, realpath resolved exactly to
+  /tmp/task1-f2-patch-kyverno-ir5Siw. Its top-level contents were LICENSE,
+  checksums.txt, kyverno, the verified CLI archive, tagged inspection source,
+  the operation-check directory, and the source-inspection directory. Total
+  size was 386 MiB.
+- The exact task-owned directory was removed. Its absence check returned 0.
+- No ignored PREP/EXEC workspace was read or reused.
+- Secret-backed environment variables, imagePullSecrets, CSI/external secret
+  delivery, group RBAC, existing grants, effective permissions, and already
+  admitted Pods remain outside the demonstrated coverage.
+- Submitted Pod objects with ephemeralContainers are inspected, but the
+  pods/ephemeralcontainers subresource is not matched and is not claimed.
+- Application /tmp behavior, /app denial, live token absence, actual admission
+  Audit/Deny behavior, effective zero API authority, and network dataplane
+  enforcement remain live unverified.
+
+TASK1-F2-PATCH OFFLINE VERIFIED — LIVE ADMISSION VERIFICATION PENDING

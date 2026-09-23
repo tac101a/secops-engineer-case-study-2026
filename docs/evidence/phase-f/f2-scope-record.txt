@@ -1,0 +1,60 @@
+TASK1-F2-PATCH SCOPE RECORD
+
+STARTING BRANCH: temp/work-in-progress
+STARTING HEAD: 61e42a368dc4dbc6344dae066c76b6f1ab19cee6
+STARTING WORKTREE: clean
+REVIEWED COMMIT IN HISTORY: yes; it was the starting HEAD
+
+ORIGINAL REVIEWED EIGHT-FILE F2 INVENTORY
+1. task1/policies/f1-demo-api-process-security.yaml
+2. task1/policies/f2-workload-credentials.yaml
+3. task1/policies/f2-direct-rbac-grants.yaml
+4. task1/policies/tests/resources.yaml
+5. task1/policies/tests/kyverno-test.yaml
+6. task1/policies/tests/kyverno-test-update.yaml
+7. docs/phase-f2-admission-policy-poc.md
+8. docs/evidence/phase-f/f2-offline-validation.txt
+
+WHY CREATE AND UPDATE REMAIN SEPARATE
+- The reviewed implementation deliberately uses separate CREATE and UPDATE
+  Test declarations while sharing one resource/Values bundle.
+- The CREATE declaration exercises the CLI default CREATE operation.
+- The UPDATE declaration consumes the Values document setting
+  globalValues.request.operation=UPDATE.
+- Keeping both declarations preserves the proven architecture, makes operation
+  evidence reviewable, and avoids replacing it with an untested framework.
+
+APPROVED CORRECTED NINE-FILE INVENTORY
+- The original eight files above remain in place.
+- The approved ninth artifact is this standalone scope record:
+  docs/evidence/phase-f/f2-scope-record.txt
+- No policy, workflow, framework, deployment script, Helm chart, or other
+  artifact was added.
+
+FINAL GIT MUTATION INVENTORY
+Modified:
+- docs/evidence/phase-f/f2-offline-validation.txt
+- docs/phase-f2-admission-policy-poc.md
+- task1/policies/f1-demo-api-process-security.yaml
+- task1/policies/f2-workload-credentials.yaml
+- task1/policies/tests/kyverno-test-update.yaml
+- task1/policies/tests/kyverno-test.yaml
+- task1/policies/tests/resources.yaml
+
+New:
+- docs/evidence/phase-f/f2-scope-record.txt
+
+Reviewed and intentionally unchanged:
+- task1/policies/f2-direct-rbac-grants.yaml
+
+The final mutation set is therefore eight files inside the authorized nine-file
+allowlist. F0, the F1 CI workflow and evidence, E1, D1/D2/D3 evidence,
+application source, Dockerfiles, and Kubernetes workload manifests remain
+unchanged. No branch, worktree, commit, stash, reset, rebase, merge, or push was
+created or performed.
+
+RUNTIME BOUNDARY
+- No kubectl, Docker, kind, nftables, node access, or live Kubernetes API was
+  used.
+- No Kyverno component or policy was installed in a cluster.
+- This scope record does not claim live Audit or Deny behavior.

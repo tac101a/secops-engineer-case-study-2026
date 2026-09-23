@@ -7,7 +7,8 @@ metadata:
     policies.kyverno.io/category: SecOps case study F1
     policies.kyverno.io/description: >-
       Reports a demo-api Pod or Deployment whose containers do not declare
-      the selected F1 process and root-filesystem restrictions.
+      the selected F1 process, root-filesystem, and writable-mount
+      restrictions.
 spec:
   validationActions:
     - Audit
@@ -49,6 +50,12 @@ spec:
         variables.workloadSpec.containers +
         variables.workloadSpec.?initContainers.orValue([]) +
         variables.workloadSpec.?ephemeralContainers.orValue([])
+    - name: applicationContainers
+      expression: >-
+        variables.workloadSpec.containers.filter(c, c.name == 'demo-api')
+    - name: workloadVolumes
+      expression: >-
+        variables.workloadSpec.?volumes.orValue([])
   validations:
     - expression: >-
         variables.allContainers.all(c,
@@ -81,3 +88,31 @@ spec:
       message: >-
         Policy evaluation identified a demo-api container without
         securityContext.readOnlyRootFilesystem=true.
+    - expression: >-
+        variables.workloadVolumes.exists(volume,
+          volume.name == 'api-tmp' && has(volume.emptyDir))
+      message: >-
+        Policy evaluation identified a demo-api workload without the required
+        api-tmp emptyDir volume.
+    - expression: >-
+        variables.applicationContainers.size() == 1 &&
+        variables.applicationContainers.all(container,
+          container.?volumeMounts.orValue([]).exists(mount,
+            mount.name == 'api-tmp' &&
+            mount.mountPath == '/tmp' &&
+            mount.?readOnly.orValue(false) == false &&
+            !has(mount.subPath) &&
+            !has(mount.subPathExpr)))
+      message: >-
+        Policy evaluation identified a demo-api application container without
+        one direct writable api-tmp mount at /tmp.
+    - expression: >-
+        variables.allContainers.all(container,
+          container.?volumeMounts.orValue([]).all(mount,
+            !(
+              (mount.mountPath == '/app' || mount.mountPath.startsWith('/app/')) &&
+              mount.?readOnly.orValue(false) == false
+            )))
+      message: >-
+        Policy evaluation identified a writable volume mount at /app or below
+        /app in a demo-api container.

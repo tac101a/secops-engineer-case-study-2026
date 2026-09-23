@@ -24,8 +24,9 @@ spec:
         app: api-deployment-secure
     spec:
       serviceAccountName: demo-api
+      automountServiceAccountToken: false
       containers:
-        - name: api
+        - name: demo-api
           image: example.invalid/demo-api:test
           securityContext:
             runAsNonRoot: true
@@ -34,6 +35,12 @@ spec:
               drop:
                 - ALL
             readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -68,7 +75,7 @@ spec:
   serviceAccountName: demo-api
   automountServiceAccountToken: false
   containers:
-    - name: renamed
+    - name: demo-api
       image: example.invalid/demo-api:test
       securityContext:
         runAsNonRoot: true
@@ -77,6 +84,12 @@ spec:
           drop:
             - ALL
         readOnlyRootFilesystem: true
+      volumeMounts:
+        - name: api-tmp
+          mountPath: /tmp
+  volumes:
+    - name: api-tmp
+      emptyDir: {}
 ---
 apiVersion: v1
 kind: Pod
@@ -100,6 +113,8 @@ spec:
     - name: explicit-api-token
       projected:
         sources:
+          - configMap:
+              name: harmless-first
           - serviceAccountToken:
               path: token
 ---
@@ -234,6 +249,685 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: view
+---
+# Independent F1 fixture: only runAsNonRoot is prohibited.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-run-as-non-root-false
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f1-run-as-non-root-false
+  template:
+    metadata:
+      labels:
+        app: f1-run-as-non-root-false
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: false
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
+---
+# Independent F1 fixture: only privilege escalation is enabled.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-privilege-escalation-true
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f1-privilege-escalation-true
+  template:
+    metadata:
+      labels:
+        app: f1-privilege-escalation-true
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: false
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: true
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
+---
+# Independent F1 fixture: the capability set does not drop ALL.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-missing-all-capability-drop
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f1-missing-all-capability-drop
+  template:
+    metadata:
+      labels:
+        app: f1-missing-all-capability-drop
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: false
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [NET_RAW]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
+---
+# Independent F1 fixture: ALL is dropped but NET_RAW is added back.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-capability-added-back
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f1-capability-added-back
+  template:
+    metadata:
+      labels:
+        app: f1-capability-added-back
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: false
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+              add: [NET_RAW]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
+---
+# Independent F1 fixture: only the root filesystem is writable.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-writable-root-filesystem
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f1-writable-root-filesystem
+  template:
+    metadata:
+      labels:
+        app: f1-writable-root-filesystem
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: false
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: false
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
+---
+# Independent CEL unit fixture: the mount declaration is otherwise correct,
+# but its required api-tmp volume declaration is absent.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-missing-api-tmp-volume
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f1-missing-api-tmp-volume
+  template:
+    metadata:
+      labels:
+        app: f1-missing-api-tmp-volume
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: false
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+---
+# Independent F1 fixture: api-tmp is a hostPath, not an emptyDir.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-api-tmp-wrong-volume-type
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f1-api-tmp-wrong-volume-type
+  template:
+    metadata:
+      labels:
+        app: f1-api-tmp-wrong-volume-type
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: false
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+      volumes:
+        - name: api-tmp
+          hostPath:
+            path: /tmp/f1-unit-source
+---
+# Independent F1 fixture: api-tmp exists but is not mounted by demo-api.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-missing-tmp-mount
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f1-missing-tmp-mount
+  template:
+    metadata:
+      labels:
+        app: f1-missing-tmp-mount
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: false
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
+---
+# Independent F1 fixture: the required /tmp mount is read-only.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-read-only-tmp-mount
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f1-read-only-tmp-mount
+  template:
+    metadata:
+      labels:
+        app: f1-read-only-tmp-mount
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: false
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+              readOnly: true
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
+---
+# Independent F1 fixture: a second writable volume covers /app/cache.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-writable-app-mount
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f1-writable-app-mount
+  template:
+    metadata:
+      labels:
+        app: f1-writable-app-mount
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: false
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+            - name: app-data
+              mountPath: /app/cache
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
+        - name: app-data
+          emptyDir: {}
+---
+# Positive F1 distinction: a read-only mount below /app is allowed.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-read-only-app-mount-allowed
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f1-read-only-app-mount-allowed
+  template:
+    metadata:
+      labels:
+        app: f1-read-only-app-mount-allowed
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: false
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+            - name: reference-data
+              mountPath: /app/reference
+              readOnly: true
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
+        - name: reference-data
+          configMap:
+            name: example-reference
+---
+# Independent F1 fixture: only an init container violates runAsNonRoot.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-init-container-process-violation
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f1-init-container-process-violation
+  template:
+    metadata:
+      labels:
+        app: f1-init-container-process-violation
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: false
+      initContainers:
+        - name: init-helper
+          image: example.invalid/helper:test
+          securityContext:
+            runAsNonRoot: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
+---
+# Independent F1 fixture: only a sidecar enables privilege escalation.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f1-sidecar-process-violation
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f1-sidecar-process-violation
+  template:
+    metadata:
+      labels:
+        app: f1-sidecar-process-violation
+    spec:
+      serviceAccountName: demo-api
+      automountServiceAccountToken: false
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+        - name: sidecar
+          image: example.invalid/helper:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: true
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
+---
+# Independent F1 fixture: a represented ephemeral container adds a writable
+# mount below /app. This tests submitted Pod-object inspection only.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: f1-ephemeral-writable-app-mount
+  namespace: secops-demo
+spec:
+  serviceAccountName: demo-api
+  automountServiceAccountToken: false
+  containers:
+    - name: demo-api
+      image: example.invalid/demo-api:test
+      securityContext:
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: [ALL]
+        readOnlyRootFilesystem: true
+      volumeMounts:
+        - name: api-tmp
+          mountPath: /tmp
+  ephemeralContainers:
+    - name: debugger
+      image: example.invalid/helper:test
+      securityContext:
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop: [ALL]
+        readOnlyRootFilesystem: true
+      volumeMounts:
+        - name: debug-data
+          mountPath: /app/debug
+  volumes:
+    - name: api-tmp
+      emptyDir: {}
+    - name: debug-data
+      emptyDir: {}
+---
+# Independent F2 fixture: the Secret volume is second in the volume list.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f2-backend-secret-volume
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f2-backend-secret-volume
+  template:
+    metadata:
+      labels:
+        app: f2-backend-secret-volume
+    spec:
+      serviceAccountName: demo-backend
+      automountServiceAccountToken: false
+      containers:
+        - name: backend
+          image: example.invalid/demo-backend:test
+      volumes:
+        - name: harmless-first
+          emptyDir: {}
+        - name: selected-secret
+          secret:
+            secretName: unexpected-credential
+---
+# Independent F2 fixture: the Secret source is second in a projected volume.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f2-backend-projected-secret
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f2-backend-projected-secret
+  template:
+    metadata:
+      labels:
+        app: f2-backend-projected-secret
+    spec:
+      serviceAccountName: demo-backend
+      automountServiceAccountToken: false
+      containers:
+        - name: backend
+          image: example.invalid/demo-backend:test
+      volumes:
+        - name: projected-credential
+          projected:
+            sources:
+              - configMap:
+                  name: harmless-first
+              - secret:
+                  name: unexpected-credential
+---
+# Independent F2 fixture: a harmless-looking emptyDir is mounted by an init
+# container under the standard Kubernetes ServiceAccount token path.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f2-backend-token-path-mount
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: f2-backend-token-path-mount
+  template:
+    metadata:
+      labels:
+        app: f2-backend-token-path-mount
+    spec:
+      serviceAccountName: demo-backend
+      automountServiceAccountToken: false
+      initContainers:
+        - name: init-helper
+          image: example.invalid/helper:test
+          volumeMounts:
+            - name: harmless-name
+              mountPath: /var/run/secrets/kubernetes.io/serviceaccount/custom
+      containers:
+        - name: backend
+          image: example.invalid/demo-backend:test
+      volumes:
+        - name: harmless-name
+          emptyDir: {}
+---
+# Canonical Deployment identity fixture: changing both labels and the
+# ServiceAccount must not make secops-demo/demo-api disappear from F2 scope.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-api
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: substituted-api-identity
+  template:
+    metadata:
+      labels:
+        app: substituted-api-identity
+    spec:
+      serviceAccountName: unrelated
+      automountServiceAccountToken: false
+      containers:
+        - name: demo-api
+          image: example.invalid/demo-api:test
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
+---
+# Canonical Deployment identity fixture for secops-demo/demo-backend.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-backend
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: substituted-backend-identity
+  template:
+    metadata:
+      labels:
+        app: substituted-backend-identity
+    spec:
+      serviceAccountName: unrelated
+      automountServiceAccountToken: false
+      containers:
+        - name: backend
+          image: example.invalid/demo-backend:test
+---
+# Scope boundary: an unrelated workload is intentionally outside F2.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unrelated-workload
+  namespace: secops-demo
+spec:
+  selector:
+    matchLabels:
+      app: unrelated-workload
+  template:
+    metadata:
+      labels:
+        app: unrelated-workload
+    spec:
+      serviceAccountName: unrelated
+      containers:
+        - name: unrelated
+          image: example.invalid/unrelated:test
+      volumes:
+        - name: unrelated-secret
+          secret:
+            secretName: unrelated-secret
+---
+# Explicit identity-scoping boundary: name, labels, and ServiceAccount all
+# differ, so this Pod is indistinguishable from an unrelated workload here.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fully-renamed-identity-boundary
+  namespace: secops-demo
+  labels:
+    component: unrelated
+spec:
+  serviceAccountName: unrelated
+  containers:
+    - name: unrelated
+      image: example.invalid/unrelated:test
+  volumes:
+    - name: renamed-secret
+      secret:
+        secretName: unexpected-credential
 ---
 # Coverage-boundary fixture: this indirect group path is intentionally outside
 # the narrow direct-ServiceAccount-subject rule. Its evaluation is not a

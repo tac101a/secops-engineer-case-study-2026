@@ -25,6 +25,12 @@ results:
     resources:
       - secops-demo/renamed-api-prohibited
     result: fail
+  - isValidatingPolicy: true
+    policy: f1-demo-api-process-security
+    kind: Deployment
+    resources:
+      - secops-demo/f1-writable-app-mount
+    result: fail
 
   # UPDATE operation coverage for the protected Deployment, direct Pod,
   # explicit projection, and ServiceAccount credential paths.
@@ -48,9 +54,10 @@ results:
     result: fail
   - isValidatingPolicy: true
     policy: f2-workload-credentials
-    kind: ServiceAccount
+    kind: Deployment
     resources:
-      - secops-demo/demo-api
+      - secops-demo/f2-backend-secret-volume
+      - secops-demo/f2-backend-projected-secret
     result: fail
 
   # The submitted new form of an existing RoleBinding introduces demo-api.
@@ -61,4 +68,39 @@ results:
     kind: RoleBinding
     resources:
       - secops-demo/existing-binding-updated-with-protected-subject
+    result: fail
+
+  # Disambiguate same-named canonical Deployments and ServiceAccounts by the
+  # complete version-supported resourceSpecs identity.
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: ServiceAccount
+    resources: []
+    resourceSpecs:
+      - version: v1
+        kind: ServiceAccount
+        namespace: secops-demo
+        name: demo-api
+    result: fail
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Deployment
+    resources: []
+    resourceSpecs:
+      - group: apps
+        version: v1
+        kind: Deployment
+        namespace: secops-demo
+        name: demo-api
+    result: fail
+  - isValidatingPolicy: true
+    policy: f2-workload-credentials
+    kind: Deployment
+    resources: []
+    resourceSpecs:
+      - group: apps
+        version: v1
+        kind: Deployment
+        namespace: secops-demo
+        name: demo-backend
     result: fail
