@@ -1,6 +1,14 @@
 TASK 2 P1 EXECUTION EVIDENCE
 =================================
 
+CURRENT STATUS POINTER
+----------------------
+
+The historical dispositions below are preserved as evidence of their own
+execution windows. The latest authoritative result is the final continuation
+headed "CONTINUATION — FINAL SINGLE-HOST RUNTIME AND P2 HANDOFF,
+2026-09-24" at the end of this file.
+
 FINAL DISPOSITION
 
 TASK2-P1 PARTIAL —
@@ -308,6 +316,470 @@ No branch/worktree, stage, commit, push, reset, rebase, merge, or stash
 operation occurred.
 No password, client secret, token, code, cookie, or private key is in this
 record.
+
+
+CONTINUATION — FINAL SINGLE-HOST RUNTIME AND P2 HANDOFF, 2026-09-24
+===================================================================
+
+LATEST DISPOSITION
+------------------
+
+TASK2-P1 SINGLE-HOST RUNTIME & KEYCLOAK VERIFIED
+
+CP1 ORIGINAL CONTRACT:
+INCOMPLETE — R8 INDEPENDENT LAN TEST DEFERRED
+
+CP1 SINGLE-HOST EXCEPTION GATE:
+PASS
+
+CP2:
+PASS
+
+P2:
+AUTHORIZED UNDER DOCUMENTED R8 EXCEPTION
+
+INDEPENDENT LAN ISOLATION:
+UNVERIFIED
+
+ACTUAL ops_roles TOKEN OUTPUT:
+UNVERIFIED — MANDATORY P2 ENTRY TEST
+
+OPENING GIT GATE AND SOURCE REVIEW
+----------------------------------
+
+The mandatory Git gate ran before runtime or tracked-file mutation.
+
+- actual branch: temp/work-in-progress
+- actual starting HEAD:
+  f7a52d63025dba62a1f7ca106e0329d6a5156971
+- commit subject: wip: task2-p1-patch
+- starting worktree: clean
+- reviewed checkpoint:
+  f7a52d63025dba62a1f7ca106e0329d6a5156971
+- merge-base ancestry result: exit 0
+- intervening commits: none; HEAD equaled the reviewed checkpoint
+
+All required current Task 2 source, P0 evidence, P1 evidence, and the latest
+five-file patch diff were read before runtime work. The P0 architecture and
+threat model remained authoritative. No P2 implementation was performed.
+
+SINGLE-HOST CAPABILITY ASSESSMENT
+---------------------------------
+
+First recorded current timestamp: 2026-09-23T17:45:25Z.
+
+- PowerShell interop: OBSERVED PASS, Windows PowerShell 5.1.19041.7725
+- Windows listener inspection: OBSERVED PASS
+- Windows DNS inspection: OBSERVED PASS
+- Windows interface inspection: OBSERVED PASS
+- Windows browser capability: OBSERVED PASS, Google Chrome 153.0.8010.53
+- Docker client/daemon: OBSERVED PASS, 29.3.0, linux/x86_64
+- Docker Compose: OBSERVED PASS, v5.1.0
+- WSL host: Linux 5.15.167.4-microsoft-standard-WSL2 x86_64
+- genuinely independent authorized LAN endpoint: unavailable, consistent with
+  the owner's stated single-host constraint
+
+R8 INDEPENDENT TEST CAPABILITY:
+UNAVAILABLE IN CURRENT SINGLE-HOST ENVIRONMENT
+
+R8:
+DEFERRED UNDER EXPLICIT OWNER AUTHORIZATION
+
+STATIC CONFIGURATION REVALIDATION
+---------------------------------
+
+Before Stage A restart:
+
+- realm JSON parse: exit 0
+- rendered Compose validation: exit 0
+- documented structured clientScopeMappings regression: PASS
+- complete secret-safe Compose assertions: STATIC CONFIGURATION PASS
+- complete secret-safe realm assertions: STATIC CONFIGURATION PASS
+
+The source mapping outer key was exactly ops-dashboard, the target property
+was clientScope, the target was ops-dashboard-roles, and roles were exactly
+viewer and admin. The dedicated scope existed and was a default only for
+ops-dashboard; neither disabled design-only client referenced it.
+
+INITIAL RESOURCE AND PERSISTENT-STATE RECONCILIATION
+----------------------------------------------------
+
+Only the five authorized Task 2 identities were inspected initially.
+
+- Stage A container: present, stopped, project task2-iam, service
+  keycloak-stage-a, exact image, expected network/volume/secret mounts
+- Stage B container: absent
+- diagnostic container: absent
+- task2-iam-oidc: present, project task2-iam, no active members
+- task2-iam-keycloak-data: present, project task2-iam
+
+The exact-volume reference query returned only the stopped Stage A container.
+Prior evidence established initial volume absence, the original Stage A
+creation, and realm ops HTTP 404 before shutdown. The current Stage A restart
+again returned HTTP 404 for realm ops, resolving current provenance as the
+documented pre-import state. No realm, volume, database, or resource was
+deleted or reset.
+
+IMAGE AND BOOTSTRAP CREDENTIAL
+------------------------------
+
+OBSERVED PASS — Keycloak image:
+
+- reference:
+  quay.io/keycloak/keycloak:26.7.4@sha256:3d911baa186f352563854039b95f21a7e2c01c76b527fdc64f24a0885b927bdf
+- image ID:
+  sha256:3d911baa186f352563854039b95f21a7e2c01c76b527fdc64f24a0885b927bdf
+- RepoDigest matched the same immutable digest
+- OS/architecture: linux/amd64
+- configured image user: 1000
+
+OBSERVED PASS — diagnostic image:
+
+- image ID and RepoDigest:
+  sha256:eafc1edb577d2e9b458664a15f23ea1c370214193226069eb22921169fc7e43f
+- OS/architecture: linux/amd64
+
+OBSERVED PASS — existing bootstrap credential, without reading its value:
+
+- runtime directory UID/GID/mode: 1000:1000 / 0700
+- file UID/GID/mode: 1000:1000 / 0600
+- file size: 65 bytes
+- ignored by task2/.gitignore
+- untracked
+- networkless, read-only, cap-dropped probe as UID 1000:
+  secret_readability=PASS
+- probe container auto-removed
+
+CURRENT STAGE A VERIFICATION
+----------------------------
+
+Stage A and diagnostic startup: OBSERVED PASS.
+
+R1 OBSERVED PASS:
+
+- project/service: task2-iam / keycloak-stage-a
+- exact immutable image ID and configured UID 1000
+- dedicated network and auth.localhost alias
+- named data volume
+- only 127.0.0.1:18082 published
+- no import mount and command start-dev only
+- no Docker socket, Task 1 attachment, privilege, or unintended host-facing
+  management port
+- diagnostic service was Task-2-owned, read-only, cap-dropped, unprivileged,
+  without host ports or mounts
+
+R2/R3 OBSERVED PASS: the exact Keycloak process started and used the reviewed
+linux/amd64 image ID.
+
+R4 OBSERVED PASS:
+
+- startup logs identified Keycloak 26.7.4
+- actual internal listener: http://0.0.0.0:18082
+- internal master discovery HTTP/1.1 200
+- WSL readiness master discovery HTTP 200
+- realm ops discovery before import HTTP 404
+
+R5 OBSERVED PASS: diagnostic DNS resolved auth.localhost to the active Stage A
+container and diagnostic HTTP returned 200.
+
+R6 OBSERVED PASS with explicit limitation: WSL curl --resolve returned HTTP
+200. Ordinary WSL getent still returned no address and was not reported as DNS
+success.
+
+R7 OBSERVED PASS: Windows Chrome 153.0.8010.53 requested
+http://auth.localhost:18082 and rendered the Keycloak Administration Console.
+Windows DNS returned ::1 and 127.0.0.1, and the active Windows listener was
+127.0.0.1:18082 only.
+
+R9 OBSERVED PASS: neither WSL nor Windows had a listener on 18083.
+
+R10 OBSERVED PASS: no separate management or administration port was
+published. Image-declared ports other than 18082 had no host binding.
+
+HOST-LOCAL EXPOSURE CHECKS AND R8
+---------------------------------
+
+The exact Docker binding and Windows listener were loopback-only. Bounded TCP
+checks to every current preferred Windows non-loopback IPv4 interface and HTTP
+checks to every current WSL global non-loopback interface did not reach port
+18082. No tested non-loopback listener or unexpected exposure was observed.
+Private interface addresses were not retained in this evidence.
+
+A same-host LAN-address request, Windows interface check, WSL interface check,
+container, or local VM is not an independent LAN vantage. Therefore:
+
+R8:
+DEFERRED — INDEPENDENT LAN VANTAGE UNAVAILABLE
+
+HOST-LOCAL EXPOSURE CHECKS:
+OBSERVED PASS
+
+INDEPENDENT LAN ISOLATION:
+UNVERIFIED
+
+CP1 ORIGINAL CONTRACT:
+INCOMPLETE — R8 DEFERRED
+
+CP1 SINGLE-HOST EXCEPTION GATE:
+PASS
+
+SECURE ADMIN CLI PREFLIGHT
+--------------------------
+
+The installed Keycloak 26.7.4 kcadm.sh credential help documented
+KC_CLI_PASSWORD. The verified procedure:
+
+- disabled shell tracing before secret handling;
+- applied umask 077;
+- created a unique /tmp/task2-p1-kcadm.XXXXXX directory;
+- used an explicit mode-0600 kcadm.config;
+- read the password only from the mounted secret inside the intended container;
+- exported it only as KC_CLI_PASSWORD inside that shell;
+- passed no literal password as a CLI argument or Docker exec environment;
+- unset it immediately after login;
+- completed authenticated status and read-only master-realm GET checks; and
+- used EXIT/HUP/INT/TERM handling that exited after removing only the exact
+  temporary config and directory.
+
+ADMIN CLI VERIFICATION:
+OBSERVED PASS
+
+All later Admin CLI inspections reused this pattern. Final audit found no
+matching temporary directory. Client-secret presence was tested without
+printing or retaining the secret.
+
+CONTROLLED STAGE A TO STAGE B TRANSITION
+----------------------------------------
+
+Transition began at 2026-09-23T18:00:17Z.
+
+- Stage A stopped and reported exited
+- WSL and Windows ports 18082/18083 were released
+- the dedicated network had no active Stage A alias owner
+- the persistent volume was preserved
+- only Stage B was created and started
+- Stage B used the same image, network, alias, loopback publish, credential,
+  and data volume
+- Stage A remained stopped throughout Stage B
+
+STAGE B IMPORT AND PROFILE-SCOPE DEFECT
+---------------------------------------
+
+Initial Stage B import: OBSERVED PASS for realm creation and the corrected
+clientScopeMappings representation.
+
+Sanitized logs reported:
+
+- full model import requested, IGNORE_EXISTING
+- Realm 'ops' imported
+- import finished successfully
+- Keycloak 26.7.4 listening on http://0.0.0.0:18082
+
+The same import also warned that referenced client scope profile did not exist
+and was ignored. Runtime inspection confirmed the standard profile scope was
+absent. A valid authorization request with scope=openid profile, exact callback,
+high-entropy state and nonce, and PKCE S256 returned a 302 error redirect with
+invalid_scope. This was a reproducible source/runtime defect and O7 initially
+failed.
+
+The minimum allowlisted source correction added Keycloak 26.7.4's exact
+standard profile scope representation, obtained read-only from the master
+realm. The known, successfully imported ops realm was then corrected once,
+without deletion or reset:
+
+- create the version-matched profile scope through Admin REST;
+- attach it to ops-dashboard through the dedicated default-client-scope REST
+  endpoint; and
+- verify master reference, tracked source, and live runtime representations
+  were semantically equal.
+
+The first attempted general client update did not persist the association and
+was not claimed as a pass. The dedicated endpoint succeeded. No import retry,
+realm deletion, volume reset, or replacement deployment occurred. Because the
+existing realm must be preserved and --import-realm uses IGNORE_EXISTING, the
+updated profile object was not tested through a destructive fresh-volume
+import. Current source/runtime parity and actual authorization behavior were
+verified; that fresh-import limitation remains explicit.
+
+CP2 O1 THROUGH O7
+-----------------
+
+O1 OBSERVED PASS:
+
+- diagnostic and WSL-override discovery documents were equivalent for checked
+  security metadata
+- issuer was exactly http://auth.localhost:18082/realms/ops
+
+O2 OBSERVED PASS:
+
+- authorization, token, JWKS, and end-session endpoints used the canonical
+  http://auth.localhost:18082/realms/ops base
+- no Docker-only hostname leaked
+- Docker token endpoint returned the expected HTTP 400 to an empty request,
+  proving reachability without attempting a grant
+- Windows browser, Docker diagnostic, and WSL override paths were evaluated
+  separately
+
+O3 OBSERVED PASS:
+
+- JWKS documents matched across Docker and host paths
+- two public keys were returned; one was a usable RS256 asymmetric signing key
+- key IDs were present and unique
+- no symmetric key, alg=none key, or private key member was returned
+- realm default signature algorithm was RS256 and ops-dashboard had no
+  symmetric signing override
+- discovery also advertised provider-wide HMAC algorithms; P2 must still
+  allow-list the intended asymmetric RS256 algorithm and never infer trust from
+  the broad provider capability list
+
+O4 OBSERVED PASS:
+
+- ops-dashboard existed and was enabled
+- confidential client-secret authentication and runtime credential present
+- public/bearer flags false
+- code flow enabled; PKCE S256 required
+- redirect exactly http://ops.localhost:18083/oidc/callback
+- implicit, direct access, service account, and authorization services disabled
+- Full Scope Allowed false
+- profile and ops-dashboard-roles attached by default
+- asset-inventory and runbook-portal existed and remained disabled
+
+O5 OBSERVED PASS / CONFIGURED:
+
+- six exact client roles
+- four exact groups
+- exact group-to-client-role mappings
+- unique profile and ops-dashboard-roles scopes, plus Keycloak's built-in
+  offline_access scope
+- standard profile scope contained 14 version-matched mappers
+- dedicated scope default only to ops-dashboard
+- one User Client Role mapper with Client ID ops-dashboard
+- claim ops_roles, String, multivalued
+- ID-token output true
+- access-token, lightweight-token, UserInfo, and introspection output false
+- Full Scope Allowed false
+- actual imported role-scope mapping exactly ops-dashboard:viewer and
+  ops-dashboard:admin
+
+The clientScopeMappings result above was inspected from actual Keycloak
+objects; it was not inferred from source JSON.
+
+O6 disposition:
+
+ACTUAL ops_roles TOKEN OUTPUT:
+UNVERIFIED — MANDATORY P2 ENTRY TEST
+
+No direct-access password grant was enabled, no test client was created, and no
+raw token was obtained or retained. P2 must prove viewer ["viewer"], admin
+exactly viewer and admin, multivalued-array shape, and unrelated-role exclusion
+before trusting the claim.
+
+O7 OBSERVED PASS after the profile correction: Windows Chrome
+153.0.8010.53 rendered title "Sign in to SecOps Operations" and the realm login
+form for a valid scope=openid profile authorization-code request with the exact
+redirect, 32-byte state, 32-byte nonce, and PKCE S256. The temporary profile
+was removed. No callback or application SSO was claimed.
+
+CP2:
+PASS
+
+OPTIONAL RESTART / IDEMPOTENCY
+------------------------------
+
+Restart began at 2026-09-23T18:46:44Z.
+
+- only Stage B stopped
+- WSL and Windows listeners were absent while stopped
+- the same Stage B container and volume restarted
+- import logs reported Realm 'ops' already exists. Import skipped
+- discovery and JWKS continued passing
+- clients, runtime credential presence, six roles, four groups, exact group
+  mappings, three unique scopes, 14 profile mappers, dedicated mapper, default
+  attachments, and exact viewer/admin role-scope mapping remained intact
+- no duplication or unexpected overwrite was observed
+
+RESTART/IDEMPOTENCY:
+PASS
+
+MANDATORY CLEANUP AND FINAL RUNTIME STATE
+-----------------------------------------
+
+- all Admin CLI temporary configurations: removed; final audit NONE
+- all Task-2 temporary Chrome profiles/processes: removed; final audit NONE
+- diagnostic container: stopped and removed
+- Stage A container: retained, stopped, correct project/service/image
+- Stage B container: retained, stopped, correct project/service/image
+- task2-iam-oidc: retained, correct project, no active members
+- task2-iam-keycloak-data: retained, correct project, provisioned ops state
+- bootstrap credential: retained, ignored, untracked, UID/GID 1000:1000,
+  mode 0600, 65 bytes
+- final WSL listeners on 18082/18083: absent
+- final Windows listeners on 18082/18083: absent
+
+The current volume is no longer a pre-import volume. It contains the imported
+and verified ops realm plus the documented profile-scope correction. It was
+not deleted, reset, or recreated. Stage B is intentionally stopped for the P2
+handoff and can be restarted with:
+
+docker compose --project-directory task2 --profile stage-b up -d
+keycloak-stage-b
+
+REMAINING RISKS AND P2 ENTRY CONDITIONS
+---------------------------------------
+
+- Independent LAN isolation remains UNVERIFIED; R8 is deferred, not passed.
+- Local HTTP, start-dev, and the embedded database remain POC-only limitations.
+- The corrected profile object has source/runtime parity but was not exercised
+  through a prohibited destructive fresh-volume re-import.
+- Actual emitted ops_roles content remains UNVERIFIED and is the first mandatory
+  P2 integration test.
+- P2 still owns Flask, callback processing, complete token validation,
+  sessions, RBAC, CSRF, logout, and integrated negative testing.
+
+P2 AUTHORIZATION DECISION
+-------------------------
+
+P2:
+AUTHORIZED UNDER DOCUMENTED R8 EXCEPTION
+
+This authorization depends on the single-host gate and CP2 results above. It
+does not claim that the original CP1 contract passed or that all LAN devices
+are unable to reach the service.
+
+BOUNDARY CONFIRMATION
+---------------------
+
+No P2 application was created. No Task 1 or Kubernetes command ran. No
+unrelated Docker resource was inventoried, stopped, attached, removed, or
+pruned. No firewall, Docker daemon, WSL network, DNS, hosts, nftables, or
+iptables setting changed. No branch/worktree, Git stage, commit, push, reset,
+merge, rebase, or stash operation occurred. No password, client secret, raw
+token, authorization code, cookie, private key, or unrestricted sensitive
+Admin CLI output was retained in this record.
+
+FINAL VALIDATION
+----------------
+
+Observed at 2026-09-23T19:06:46Z.
+
+- python3 -m json.tool task2/keycloak/ops-realm.json: exit 0
+- docker compose --project-directory task2 --profile '*' config --quiet:
+  exit 0
+- structured clientScopeMappings and profile-scope regression: PASS
+- complete Compose model assertions: STATIC CONFIGURATION PASS
+- complete realm model assertions: STATIC CONFIGURATION PASS
+- git diff --check: exit 0, no output
+- git diff --cached --name-only: empty
+- runtime credential: ignored and untracked
+- git status and git diff --name-only returned exactly the five allowlisted
+  tracked paths:
+  - docs/evidence/task2/t2-p1-execution.txt
+  - docs/evidence/task2/t2-p1-scope-record.txt
+  - task2/README.md
+  - task2/keycloak/ops-realm.json
+  - task2/test-plan.md
+
+Nothing was staged, committed, or pushed.
 
 
 CONTINUATION — SEMANTIC PATCH AND SAFE RUNTIME, 2026-09-23

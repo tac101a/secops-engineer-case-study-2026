@@ -1,11 +1,11 @@
 # Task 2 — IAM/SSO proof of concept
 
-Status: **P1 partial — independent LAN exposure gate pending.** The exact
-pinned image and corrected realm source passed static validation. Stage A then
-passed the automated runtime, Docker DNS/HTTP, WSL host-path, and Windows
-Chrome checks from a proven absent-volume baseline. No independent LAN vantage
-was available, so R8 is inconclusive; Stage B and CP2 were not run, and P2
-remains unauthorized.
+Status: **P1 provider verified; P2 authorized under the documented R8
+exception.** The original CP1 contract remains incomplete because no
+independent LAN vantage was available. All other CP1 checks passed, the
+owner-authorized single-host exception gate passed, and actual Stage B import
+plus CP2 O1–O7 passed. Independent LAN isolation and actual emitted
+`ops_roles` output remain unverified; the latter is a mandatory P2 entry test.
 
 This directory implements the Task 2 Option A foundation selected in the
 committed [architecture](architecture.md): Keycloak `26.7.4`, realm `ops`, and
@@ -75,11 +75,12 @@ non-secret username placeholder.
 
 ## Stage A — pre-realm runtime
 
-The exact pinned image and Stage A were observed successfully in the current
-continuation. The retained Stage A container is stopped and its named volume is
-a documented pre-import state: master exists and realm `ops` returned HTTP
-`404`. Before resuming CP1, revalidate the exact image, resource identities,
-volume disposition, and current host state:
+The exact pinned image and Stage A were observed successfully in both P1
+runtime continuations. In the latest continuation, realm `ops` still returned
+HTTP `404` before the controlled Stage A to Stage B transition. Both Keycloak
+containers are now stopped, and the retained named volume contains the
+verified provisioned `ops` realm. Before a later restart, revalidate the exact
+image, resource identities, volume disposition, and current host state:
 
 ```sh
 docker compose --profile '*' pull
@@ -149,6 +150,32 @@ While Stage A is actively running:
 A request from the Windows host to its own LAN address and a WSL `ss` result do
 not replace the independent exposure test.
 
+### Owner-authorized single-host R8 exception
+
+The original R8 test above is preserved and remains outstanding. For the
+2026-09-24 continuation only, the owner explicitly authorized proceeding when
+no genuinely independent endpoint was available, provided R1–R7, R9, R10, and
+all useful host-local exposure checks passed and no unintended exposure was
+observed. The resulting dispositions are intentionally different:
+
+```text
+CP1 ORIGINAL CONTRACT:
+INCOMPLETE — R8 INDEPENDENT LAN TEST DEFERRED
+
+CP1 SINGLE-HOST EXCEPTION GATE:
+PASS
+
+R8:
+DEFERRED UNDER EXPLICIT OWNER AUTHORIZATION
+```
+
+Windows listened only on `127.0.0.1:18082`; the Windows host's active
+non-loopback addresses and WSL non-loopback interfaces did not accept port
+`18082`. These are host-local observations, not proof that every LAN device is
+unable to reach the service. A future independent LAN test must still execute
+R8 without changing firewall, Docker, WSL, DNS, or host networking merely to
+obtain a result.
+
 If owner evidence is pending, remove the diagnostic container and stop only
 Stage A while preserving the volume:
 
@@ -163,8 +190,9 @@ external exposure. Historical results do not pass the resumed checkpoint.
 
 ## Stage A to Stage B
 
-Do not continue until every CP1 requirement passes. Then perform and record the
-actual narrow transition:
+Continue only after the original CP1 contract passes or the documented
+single-host exception gate passes. Then perform and record the actual narrow
+transition:
 
 ```sh
 docker compose --profile stage-a stop keycloak-stage-a
@@ -217,6 +245,47 @@ without printing credentials or client secrets:
 - Full Scope Allowed is false and the client scope maps only the two
   `ops-dashboard` roles.
 
+The verified Keycloak 26.7.4 procedure uses its documented `KC_CLI_PASSWORD`
+environment variable. Run the following shell body inside the intended active
+Keycloak container. The password is read from the mounted secret inside the
+container, never supplied as a command argument or Docker exec environment
+argument. The configuration contains tokens and must remain mode `0600` and be
+removed on success, failure, or interruption:
+
+```sh
+set +x
+set -euo pipefail
+umask 077
+cfg_dir="$(mktemp -d /tmp/task2-p1-kcadm.XXXXXX)"
+cfg_file="$cfg_dir/kcadm.config"
+cleanup() {
+  rc=$?
+  trap - EXIT HUP INT TERM
+  unset KC_CLI_PASSWORD
+  rm -f -- "$cfg_file"
+  rmdir -- "$cfg_dir"
+  exit "$rc"
+}
+trap cleanup EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+export KC_CLI_PASSWORD="$(< /run/secrets/keycloak_bootstrap_admin_password)"
+/opt/keycloak/bin/kcadm.sh config credentials \
+  --config "$cfg_file" \
+  --server http://auth.localhost:18082 \
+  --realm master \
+  --user "$KC_BOOTSTRAP_ADMIN_USERNAME"
+unset KC_CLI_PASSWORD
+test "$(stat -c %a "$cfg_file")" = 600
+/opt/keycloak/bin/kcadm.sh get realms/master \
+  --config "$cfg_file" >/dev/null
+```
+
+Use field-filtered Admin REST reads and never print the client-secret endpoint,
+raw CLI config, access token, or refresh token. The latest execution verified
+authentication, a read-only master-realm GET, and cleanup using this pattern.
+
 Reach the realm login page with a valid authorization-code request containing
 an exact redirect URI, high-entropy state and nonce, and an S256 code
 challenge. A successful Flask callback is not expected in P1.
@@ -253,25 +322,44 @@ or NOT VERIFIED.
 
 Observed in this execution:
 
-- the `clientScopeMappings` source defect was corrected and the structured
-  regression check plus complete Compose/realm static assertions passed;
-- both immutable images are locally inspectable as `linux/amd64`, and the
-  Keycloak image ID equals the reviewed platform digest;
-- Stage A started from an absent volume, listened internally on
-  `0.0.0.0:18082`, returned HTTP `200` through the container, diagnostic, WSL,
-  and Windows-browser paths, and returned HTTP `404` for absent realm `ops`;
-- Windows Chrome `153.0.8010.53` rendered the page titled `Sign in to Keycloak`,
-  and the Windows listener was only `127.0.0.1:18082`;
-- R8 is **INCONCLUSIVE** because no independent LAN vantage and connectivity
-  control were available; CP1 therefore remains incomplete;
-- the diagnostic container was removed, Stage A was stopped, and the documented
-  pre-import `task2-iam-keycloak-data` volume was preserved; and
-- Stage B, import, Admin CLI inspection, CP2, and actual emitted `ops_roles`
-  output were not run.
+- both immutable images were re-inspected as `linux/amd64`; the Keycloak image
+  ID equals the pinned platform digest and its configured user is UID `1000`;
+- Stage A passed current Docker, internal HTTP, diagnostic DNS/HTTP, WSL,
+  Windows Chrome, listener, port `18083`, and administration-boundary checks;
+- Windows Chrome `153.0.8010.53` rendered the Keycloak landing page, and all
+  tested Windows/WSL non-loopback host addresses rejected port `18082`;
+- independent R8 is **DEFERRED** under the explicit owner authorization, the
+  original CP1 contract remains **INCOMPLETE**, and the single-host exception
+  gate is **PASS**;
+- Stage B imported realm `ops`, and live inspection verified the confidential
+  client, runtime credential presence, PKCE S256, exact callback, disabled
+  grants, six roles, four groups, group mappings, mapper, and exact live
+  `ops-dashboard:viewer,admin` role-scope mapping;
+- the first import exposed a reproducible missing-`profile`-scope defect: the
+  import warned that `profile` did not exist and a valid `openid profile`
+  request returned `invalid_scope`. The allowlisted source now includes the
+  exact Keycloak 26.7.4 standard scope. The same scope was created in the known
+  runtime realm and attached through the dedicated Admin REST endpoint; source,
+  master-realm reference, and runtime representations matched, after which the
+  Windows authorization request rendered `Sign in to SecOps Operations`;
+- a same-volume Stage B restart skipped the existing realm as expected and
+  preserved discovery, clients, roles, groups, scopes, mappers, and mappings
+  without duplication. The updated source's `profile` object was not exercised
+  by a destructive fresh-volume import because resetting the retained volume
+  was prohibited; current runtime/source parity was verified instead;
+- CP2 O1–O7 and restart/idempotency are **PASS**. Actual emitted `ops_roles`
+  output is **UNVERIFIED — MANDATORY P2 ENTRY TEST**; and
+- cleanup removed the diagnostic container and temporary browser/Admin CLI
+  state. Stage A and Stage B are stopped, the provisioned
+  `task2-iam-keycloak-data` volume and ignored bootstrap credential are retained,
+  and ports `18082`/`18083` have no final WSL or Windows listener.
 
-P2 must not begin until CP1 and CP2 are completed. Its entry checks must also
-observe a real ID token and prove the exact `ops_roles` array, correct viewer
-and admin output, and absence of unrelated client-role leakage. P2 then owns
-the Flask callback, validation, ten-minute application session, server-side
-route RBAC, logout/CSRF behavior, and all negative tests retained in the test
-plan.
+P2 is **AUTHORIZED UNDER THE DOCUMENTED R8 EXCEPTION**. Its first integration
+test must complete a real authorization-code flow and prove viewer
+`["viewer"]`, admin exactly `viewer` plus `admin`, multivalued-array shape, and
+absence of unrelated client-role leakage before the application trusts
+`ops_roles`. P2 then owns the Flask callback, complete ID-token validation,
+ten-minute application session, server-side RBAC, logout/CSRF behavior, and all
+negative tests retained in the test plan. Independent LAN isolation remains
+unverified and R8 must be completed when a separate authorized vantage becomes
+available.

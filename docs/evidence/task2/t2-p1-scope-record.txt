@@ -1,6 +1,13 @@
 TASK 2 P1 SCOPE RECORD
 ============================
 
+CURRENT STATUS POINTER
+----------------------
+
+Historical scope records below remain unchanged. The latest authoritative
+resource and mutation record is the final continuation headed "FINAL
+SINGLE-HOST CONTINUATION SCOPE RECORD — 2026-09-24" at the end of this file.
+
 FINAL STATUS
 
 TASK2-P1 PARTIAL —
@@ -417,3 +424,186 @@ Final exact Task 2 runtime assertion:
 - dedicated volume: present, expected Compose ownership, documented pre-import
 - WSL listeners on 18082/18083: absent
 - runtime credential: UID/GID 1000:1000, mode 0600, 65 bytes
+
+
+FINAL SINGLE-HOST CONTINUATION SCOPE RECORD — 2026-09-24
+========================================================
+
+FINAL STATUS
+------------
+
+TASK2-P1 SINGLE-HOST RUNTIME & KEYCLOAK VERIFIED
+
+CP1 original contract: INCOMPLETE — independent R8 deferred
+CP1 single-host exception gate: PASS
+CP2: PASS
+P2: AUTHORIZED UNDER DOCUMENTED R8 EXCEPTION
+
+STARTING GATE
+-------------
+
+- actual branch: temp/work-in-progress
+- actual starting HEAD:
+  f7a52d63025dba62a1f7ca106e0329d6a5156971
+- reviewed checkpoint ancestor result: exit 0
+- starting worktree: clean
+- intervening commits: none
+- branch or worktree created: no
+
+AUTHORIZED TRACKED MUTATIONS
+----------------------------
+
+Modified only:
+
+- task2/README.md
+- task2/test-plan.md
+- task2/keycloak/ops-realm.json
+- docs/evidence/task2/t2-p1-execution.txt
+- docs/evidence/task2/t2-p1-scope-record.txt
+
+No tracked file was added. Every prohibited path was preserved.
+
+Realm-source mutation:
+
+- added Keycloak 26.7.4's version-matched standard profile client scope and
+  its 14 standard protocol mappers after actual import logs and authorization
+  behavior proved the missing-scope defect
+- preserved the existing ops-dashboard-roles scope, mapper, roles, groups,
+  clients, and corrected clientScopeMappings entry
+
+Documentation mutations:
+
+- recorded the explicit single-host R8 exception without weakening original R8
+- separated original CP1 INCOMPLETE from the exception-gate PASS
+- documented residual LAN risk and P2 entry conditions
+- documented the verified KC_CLI_PASSWORD and temporary-config procedure
+- added a structured profile-scope source regression alongside the existing
+  clientScopeMappings regression
+- recorded actual Stage B, CP2, restart, cleanup, and P2 handoff results
+
+The sandboxed patch helper failed before changing a file with the known
+"mountinfo path is not absolute" environment error. The system apply_patch
+helper was then used for only the allowlisted paths above.
+
+IGNORED RUNTIME FILES
+---------------------
+
+Reused and retained without printing or overwriting:
+
+- task2/.runtime/ — UID/GID 1000:1000, mode 0700
+- task2/.runtime/keycloak-bootstrap-admin-password — UID/GID 1000:1000,
+  mode 0600, 65 bytes, ignored and untracked
+
+No repository-local token, code, cookie, client secret, private key, browser
+profile, Admin CLI config, or other runtime output was retained.
+
+TASK-2-OWNED RUNTIME MUTATIONS
+------------------------------
+
+Reused:
+
+- exact pinned Keycloak and Alpine images
+- stopped Stage A container
+- dedicated task2-iam-oidc network
+- documented pre-import task2-iam-keycloak-data volume
+- ignored bootstrap credential
+
+Created and retained:
+
+- task2-iam-keycloak-stage-b-1, final state stopped
+- imported realm ops in task2-iam-keycloak-data
+- runtime-generated confidential ops-dashboard credential, never printed
+- standard profile scope and its default attachment to ops-dashboard after the
+  deterministic first-import defect was proved
+
+Created or restarted and removed:
+
+- task2-iam-diagnostic-1
+- task2-iam-secret-read-check, auto-removed
+- unique Windows Chrome profiles for landing and authorization-page checks
+- unique /tmp/task2-p1-kcadm.XXXXXX Admin CLI directories and files
+
+Never created:
+
+- a P2 Flask container or source file
+- an extra OIDC test client
+- a direct-access password grant
+- a replacement Keycloak volume or deployment
+
+PERSISTENT-STATE DISPOSITION
+----------------------------
+
+Initial current state was reconciled to the documented pre-import master-only
+volume by exact ownership/reference inspection plus a current Stage A HTTP 404
+for realm ops. Stage B then imported realm ops once. The import succeeded but
+exposed a missing standard profile scope. The persistent state was known and
+unambiguous, so the version-matched scope was created once and attached through
+the dedicated Admin REST endpoint. No realm or volume was deleted, reset,
+recreated, or repeatedly imported.
+
+The final volume is provisioned state. Stage B restart used the same volume,
+skipped the existing realm, and preserved all verified objects without
+duplication.
+
+RESOURCE OWNERSHIP AND FINAL STATE
+----------------------------------
+
+- Stage A: present, stopped, project task2-iam, service keycloak-stage-a,
+  exact reviewed image, retained volume
+- Stage B: present, stopped, project task2-iam, service keycloak-stage-b,
+  exact reviewed image, read-only import mount, retained volume
+- diagnostic: absent
+- secret readability probe: absent
+- network: task2-iam-oidc retained, project task2-iam, no active members
+- volume: task2-iam-keycloak-data retained, project task2-iam, provisioned
+- WSL listeners 18082/18083: absent
+- Windows listeners 18082/18083: absent
+- Task-2 Chrome process/profile: absent
+- Admin CLI temporary config/directory: absent
+
+R8 AND OWNER-AUTHORIZED SCOPE
+-----------------------------
+
+No independent LAN endpoint was available. No container, WSL instance, local
+process, Windows terminal, or local VM was promoted to independent evidence.
+Same-host Windows and WSL non-loopback diagnostics all rejected port 18082,
+but these support only HOST-LOCAL EXPOSURE CHECKS: OBSERVED PASS.
+
+R8 remains DEFERRED and independent LAN isolation remains UNVERIFIED. The
+owner-authorized exception permitted Stage B and P2 handoff only after every
+other CP1 item and CP2 passed.
+
+EXECUTION BOUNDARIES
+--------------------
+
+No Task 1 or Kubernetes access occurred. No unrelated Docker identity was
+inventoried or mutated. No prune or volume removal ran. No Docker daemon,
+firewall, WSL network, DNS, hosts, nftables, or iptables configuration changed.
+No Git stage, commit, push, reset, merge, rebase, stash, branch, or worktree
+operation occurred.
+
+FINAL VALIDATION POINTER
+------------------------
+
+The exact final Git status, validation commands, and allowlist result are
+recorded in the final validation section appended after the checks complete.
+
+FINAL VALIDATION
+----------------
+
+Observed at 2026-09-23T19:06:46Z.
+
+- realm JSON validation: exit 0
+- Compose validation: exit 0
+- documented clientScopeMappings/profile regression: PASS
+- complete static Compose and realm assertions: PASS
+- git diff --check: exit 0
+- git diff --cached --name-only: empty
+- git status --short --untracked-files=all: exactly the five modified
+  allowlisted tracked paths
+- git diff --name-only: exactly the same five paths
+- runtime credential ignore check: matched task2/.gitignore
+- runtime credential tracked lookup: absent/untracked
+
+No staged path, untracked non-ignored path, or out-of-allowlist mutation was
+present.

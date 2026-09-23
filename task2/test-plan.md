@@ -46,8 +46,56 @@ scopes = {
 }
 
 assert "ops-dashboard-roles" in scopes
+assert "profile" in scopes
+
+assert set(scopes) == {
+    "profile",
+    "ops-dashboard-roles",
+}
+
+profile = scopes["profile"]
+assert profile["protocol"] == "openid-connect"
+assert profile["attributes"] == {
+    "include.in.token.scope": "true",
+    "consent.screen.text": "${profileScopeConsentText}",
+    "display.on.consent.screen": "true",
+}
+
+profile_mapper_names = {
+    item["name"]
+    for item in profile["protocolMappers"]
+}
+assert profile_mapper_names == {
+    "picture",
+    "full name",
+    "username",
+    "updated at",
+    "birthdate",
+    "gender",
+    "locale",
+    "zoneinfo",
+    "profile",
+    "family name",
+    "nickname",
+    "given name",
+    "website",
+    "middle name",
+}
+
+username_mapper = next(
+    item
+    for item in profile["protocolMappers"]
+    if item["name"] == "username"
+)
+assert username_mapper["config"]["claim.name"] == (
+    "preferred_username"
+)
+assert username_mapper["config"]["id.token.claim"] == "true"
 
 assert "ops-dashboard-roles" in (
+    clients["ops-dashboard"]["defaultClientScopes"]
+)
+assert "profile" in (
     clients["ops-dashboard"]["defaultClientScopes"]
 )
 
@@ -61,7 +109,7 @@ for client_id in (
         )
     )
 
-print("PASS: declared client-scope mapping")
+print("PASS: declared client-scope mapping and profile scope")
 PY
 ```
 
@@ -78,6 +126,23 @@ PY
   that the test device has an appropriate path to the Windows host or its LAN.
   If that control cannot be established, record `R8: INCONCLUSIVE`; an arbitrary
   timeout is not isolation evidence.
+
+### Single-host exception disposition
+
+The R8 row and its original pass condition remain mandatory for the original
+CP1 contract. When no genuinely independent LAN endpoint is available, Stage B
+and P2 handoff may proceed only when all of the following are true:
+
+- the owner explicitly authorizes the exception for that execution;
+- R1–R7, R9, and R10 pass with current observed evidence;
+- Windows and WSL listener/binding checks plus safe same-host non-loopback
+  diagnostics show no actual unintended exposure; and
+- the result is recorded as original CP1 **INCOMPLETE**, R8 **DEFERRED**, and
+  the separate single-host exception gate **PASS**.
+
+The exception never converts a failed or observed-exposure result into a
+deferral, never proves LAN isolation, and does not remove the future
+independent R8 test.
 
 ## P1 checkpoint 1 — Stage A runtime feasibility before realm provisioning
 
@@ -113,12 +178,13 @@ identity, digest, readiness, binding, diagnostic, Windows, and exposure checks.
 
 ### Mandatory Stage A to Stage B transition
 
-Only after CP1 passes: identify and stop the exact Stage A service, prove port
-`18082` is released and no active Stage A container owns `auth.localhost`,
-preserve the named data volume, and start only Stage B. Verify Stage B uses the
-same pinned image, network, alias, port, and volume, and that exactly one active
-Keycloak service serves the path. Starting a Stage B profile does not
-implicitly stop Stage A.
+Only after the original CP1 contract passes, or the explicitly authorized
+single-host exception gate passes: identify and stop the exact Stage A service,
+prove port `18082` is released and no active Stage A container owns
+`auth.localhost`, preserve the named data volume, and start only Stage B.
+Verify Stage B uses the same pinned image, network, alias, port, and volume, and
+that exactly one active Keycloak service serves the path. Starting a Stage B
+profile does not implicitly stop Stage A.
 
 ## P1 checkpoint 2 — Stage B actual OIDC provider after realm provisioning
 
@@ -130,7 +196,7 @@ implicitly stop Stage A.
 | O4 | Inspect the `ops-dashboard` client and its intended scopes. | Exact callback only; code flow and PKCE S256 enabled; implicit/direct grants/service account disabled; client secret is runtime-only. |
 | O5 | Inspect client scopes, the role mapper, groups, client roles, and group-to-role mappings for viewer, admin, and unrelated-role users. | The dedicated mapper is **CONFIGURED**, full scope is off, and only `ops-dashboard` roles are configured to feed `ops_roles`. Record this as configuration evidence, not observed token output. |
 | O6 | Record the issued-token verification disposition. If a separate bounded OIDC test client is expressly included in P1, use an interactive authorization-code flow and validate redacted ID-token evidence; otherwise defer this check to P2. | Either validated evidence shows viewer `["viewer"]`, admin exactly `viewer` and `admin`, and no unrelated role leakage, or actual output is explicitly **UNVERIFIED** with a mandatory P2 entry check. A configured mapper alone never passes token-output verification, and direct-access password grants remain disabled. |
-| O7 | Construct a valid authorization-code request for `ops-dashboard`. | The realm login page is reachable with the exact redirect and PKCE S256 request. No Flask callback or end-to-end application SSO is claimed. |
+| O7 | Construct a valid authorization-code request for `ops-dashboard`. | The realm login page is reachable with `scope=openid profile`, the exact redirect, high-entropy state and nonce, and PKCE S256. An `invalid_scope` redirect fails O7. No Flask callback or end-to-end application SSO is claimed. |
 
 P1 checkpoint 2 accepts O1–O5 plus an explicit O6 disposition and O7; it does
 not depend on a completed Flask callback. If O6 is deferred, P2 must complete a
