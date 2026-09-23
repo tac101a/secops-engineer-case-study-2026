@@ -1,0 +1,9 @@
+# Runtime credentials and operator-local overrides
+.env
+.env.*
+!.env.example
+.runtime/
+
+# Local runtime output
+*.log
+*.tmp

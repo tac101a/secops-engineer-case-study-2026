@@ -1,0 +1,310 @@
+TASK 2 P1 EXECUTION EVIDENCE
+=================================
+
+FINAL DISPOSITION
+
+TASK2-P1 PARTIAL —
+RUNTIME OR HOST EXPOSURE GATE PENDING
+
+CP1: INCOMPLETE / BLOCKED
+CP2: NOT RUN
+P2: NOT AUTHORIZED TO START
+
+The verified Keycloak 26.7.4 manifest resolved, but its final image layer did
+not complete during several bounded cached pulls. No unverified image was used
+and no Stage A resource was created. Stage B and realm provisioning were not
+attempted.
+
+STARTING GATE
+
+Opening gate executed before: 2026-09-23T13:39:12Z
+Exact opening-gate timestamp: not separately captured
+Expected branch: temp/work-in-progress
+Actual branch: temp/work-in-progress
+Expected reviewed checkpoint: 1fea0957be5437948467d6e9470418d1d7523810
+Actual starting HEAD: 1fea0957be5437948467d6e9470418d1d7523810
+Commit subject: wip: task2-p0-patch
+Starting git status --short --untracked-files=all: <empty; clean>
+Ancestry command:
+git merge-base --is-ancestor
+1fea0957be5437948467d6e9470418d1d7523810 HEAD
+Exit status: 0
+Intervening commits: none; HEAD was the reviewed checkpoint.
+
+REQUIRED SOURCE REVIEW
+
+OBSERVED PASS
+
+Read before implementation:
+
+- task2/README.md
+- task2/architecture.md
+- task2/threat-model.md
+- task2/test-plan.md
+- docs/evidence/task2/t2-p0-preflight.txt
+- docs/evidence/task2/t2-p0-scope-record.txt
+- .gitignore
+- .env.example
+- docs/case-study-secops-engineer-2026.pdf, including Task 2 Option A
+
+The local PDF is four pages with SHA-256
+bf509a32052527444b4fc75c7492c263705606c66fe01e0ce4ff097958c2f6de.
+The host lacked pdftotext and other PDF utilities; its embedded compressed text
+and Unicode maps were read locally without changing the PDF. Option A requires
+centralized identity design for two or three internal applications and a
+working OIDC/SSO POC for at least one application. The P0 architecture remains
+the technical source of truth.
+
+CURRENT PREFLIGHT
+
+Timestamp: 2026-09-23T13:39:12Z
+
+OBSERVED PASS — Docker client:
+Docker version 29.3.0, build 5927d80
+
+OBSERVED PASS — Docker Compose:
+Docker Compose version v5.1.0
+
+OBSERVED PASS — daemon and host platform:
+ServerVersion=29.3.0
+Architecture=x86_64
+OSType=linux
+KernelVersion=5.15.167.4-microsoft-standard-WSL2
+Host: Linux 5.15.167.4-microsoft-standard-WSL2 x86_64
+
+OBSERVED PASS — exact intended names were free before image pulls:
+- task2-iam-keycloak-stage-a-1
+- task2-iam-keycloak-stage-b-1
+- task2-iam-diagnostic-1
+- task2-iam-oidc
+- task2-iam-keycloak-data
+
+OBSERVED PASS — WSL listener preflight:
+ss -ltn 'sport = :18082 or sport = :18083'
+returned only the header; no matching WSL listener was present.
+
+OBSERVED PASS — Windows listener preflight:
+PowerShell Get-NetTCPConnection reported no listener on 18082 or 18083.
+
+OBSERVED PASS — Windows DNS observation:
+Resolve-DnsName returned ::1 and 127.0.0.1 for both auth.localhost and
+ops.localhost.
+
+UNVERIFIED — Windows browser behavior:
+No service existed to test in an actual browser. DNS behavior is not promoted
+to browser evidence.
+
+HISTORICAL REPORTED and RECONFIRMED — WSL CLI DNS:
+getent ahostsv4 auth.localhost exited 2 with no result.
+getent ahostsv4 ops.localhost exited 2 with no result.
+This does not predict Windows browser handling of the special-use suffix.
+
+IMAGE INTEGRITY AND REGISTRY
+
+Timestamp: 2026-09-23T13:39:51Z
+
+Official sources:
+- Keycloak image source: official Keycloak container documentation and
+  quay.io/keycloak/keycloak
+- Diagnostic image source: Docker Official Image docker.io/library/alpine;
+  manifest annotation references github.com/alpinelinux/docker-alpine
+
+OBSERVED PASS — registry access and immutable resolution:
+
+Keycloak:
+Tag: quay.io/keycloak/keycloak:26.7.4
+Index digest:
+sha256:82a77884f3af238beab1e7afd63b5f530e1b5c0590bd7aa60b40a40463e29b2c
+Selected platform: linux/amd64
+Platform manifest digest:
+sha256:3d911baa186f352563854039b95f21a7e2c01c76b527fdc64f24a0885b927bdf
+
+Diagnostic:
+Tag: docker.io/library/alpine:3.22.1
+Index digest:
+sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1
+Selected platform: linux/amd64
+Platform manifest digest:
+sha256:eafc1edb577d2e9b458664a15f23ea1c370214193226069eb22921169fc7e43f
+
+OBSERVED PASS — diagnostic image local inspection:
+Image ID:
+sha256:eafc1edb577d2e9b458664a15f23ea1c370214193226069eb22921169fc7e43f
+OS=linux
+ARCH=amd64
+Repo digest:
+alpine@sha256:eafc1edb577d2e9b458664a15f23ea1c370214193226069eb22921169fc7e43f
+
+BLOCKED — Keycloak local image transfer:
+At 2026-09-23T13:46:39Z,
+docker compose --project-directory task2 --profile '*' pull
+completed the Alpine image but did not finish the Keycloak image.
+
+Subsequent exact-digest attempts used:
+docker pull
+quay.io/keycloak/keycloak:26.7.4@sha256:3d911baa186f352563854039b95f21a7e2c01c76b527fdc64f24a0885b927bdf
+
+Observed intermediate output included:
+- dcee140b22ee: Already exists
+- bb7474a486db: Download complete
+- bb7474a486db: Pull complete
+- b021fe485c81 remained in Pulling fs layer state
+
+No registry error was returned; the blob transfer did not complete within the
+bounded attached attempts. Tool-level termination left four exact P1-owned
+docker pull client processes. At 2026-09-23T14:17:39Z they were identified by
+exact Keycloak digest and terminated with SIGTERM. A following process check
+returned no rows.
+
+Final exact image inspection result:
+Error response from daemon: No such image:
+quay.io/keycloak/keycloak:26.7.4@sha256:3d911baa186f352563854039b95f21a7e2c01c76b527fdc64f24a0885b927bdf
+Exit status: 1
+
+No alternate tag, floating tag, or unverified image was used. No Docker-wide
+cleanup or prune was run.
+
+STATIC CONFIGURATION VALIDATION
+
+OBSERVED PASS — task2/keycloak/ops-realm.json parsed successfully with
+python3 -m json.tool.
+
+OBSERVED PASS — docker compose --profile '*' config --quiet exited 0.
+
+Rendered model summary:
+Project: task2-iam
+Profiles: diagnostic, stage-a, stage-b
+Services: diagnostic, keycloak-stage-a, keycloak-stage-b
+Network: task2-iam-oidc
+Volume: task2-iam-keycloak-data
+Images: exact platform-specific digests recorded above
+
+OBSERVED PASS — secret-safe structural assertions confirmed:
+
+- both Keycloak stages use the same digest, linux/amd64, port, environment,
+  network alias, persistent volume, capability drop, and no-new-privileges;
+- only 127.0.0.1:18082:18082 is published;
+- Stage A has no --import-realm;
+- Stage B has --import-realm and only the required read-only realm bind mount;
+- the diagnostic service has no port, volume, Docker socket, or privilege;
+- no service references a Docker socket;
+- the diagnostic command has a bounded 600-second lifetime.
+
+OBSERVED PASS — static realm assertions confirmed:
+
+- realm ops is enabled;
+- ops-dashboard is confidential, standard flow is on, PKCE S256 is required,
+  the redirect URI is exact, and implicit/direct/service-account grants and
+  Full Scope Allowed are off;
+- asset-inventory and runbook-portal are disabled design-only clients;
+- all required client roles, groups, and explicit group-role mappings exist;
+- ops-dashboard-roles is the only custom scope in the file and is a default
+  scope only for ops-dashboard;
+- the User Client Role mapper is restricted to client ID ops-dashboard and
+  maps multivalued String claim ops_roles to the ID token only;
+- the dedicated scope mapping lists only viewer and admin;
+- no JSON key named secret exists.
+
+This is static configuration validation, not imported Keycloak state and not
+token-output evidence.
+
+CHECKPOINT 1 RESULTS
+
+R1 — Task 2 isolation:
+CONFIGURED / PARTIAL OBSERVED PASS for the rendered model.
+Runtime ownership labels: UNVERIFIED because no resource was created.
+
+R2 — Docker runtime:
+Daemon and Compose validation: OBSERVED PASS.
+Stage A startup: BLOCKED by incomplete verified Keycloak image pull.
+
+R3 — image integrity:
+Registry resolution: OBSERVED PASS.
+Diagnostic local image/platform: OBSERVED PASS.
+Keycloak local image/platform: BLOCKED; exact image absent.
+
+R4 — Keycloak process/listener:
+NOT RUN.
+
+R5 — Docker DNS and diagnostic HTTP:
+NOT RUN. No diagnostic container was created.
+
+R6 — WSL host path:
+NOT RUN. Preflight DNS failure is recorded separately.
+
+R7 — Windows browser:
+UNVERIFIED / NOT RUN. No service was available.
+
+R8 — independent external exposure:
+UNVERIFIED / NOT RUN. No service was available.
+
+R9 — future Flask port:
+OBSERVED PASS for point-in-time WSL and Windows preflight only; no conflict was
+shown on 18083. Flask was not created and no response was required.
+
+R10 — admin boundary:
+CONFIGURED: no management port is published.
+Observed runtime result: NOT RUN.
+
+CP1 DISPOSITION:
+INCOMPLETE / BLOCKED.
+Realm ops was not provisioned.
+
+STAGE TRANSITION
+
+NOT RUN. Stage A never started. There was no Keycloak container or data volume
+to stop or preserve, and port 18082 remained unused by Task 2.
+
+CHECKPOINT 2 RESULTS
+
+Stage B startup/import: NOT RUN
+O1 discovery: NOT RUN
+O2 advertised endpoints: NOT RUN
+O3 JWKS: NOT RUN
+O4 actual client configuration: NOT RUN
+O5 actual authorization configuration: NOT RUN
+O6 ACTUAL ops_roles TOKEN OUTPUT:
+UNVERIFIED — MANDATORY P2 ENTRY TEST
+O7 realm authorization page: NOT RUN
+Optional restart/idempotency:
+RESTART/IDEMPOTENCY: NOT VERIFIED
+
+DIAGNOSTIC CLEANUP AND FINAL RUNTIME STATE
+
+At 2026-09-23T14:17:39Z exact-name inspection reported:
+
+- task2-iam-keycloak-stage-a-1: absent
+- task2-iam-keycloak-stage-b-1: absent
+- task2-iam-diagnostic-1: absent
+- task2-iam-oidc: absent
+- task2-iam-keycloak-data: absent
+
+No diagnostic container existed to remove. No Keycloak service is running.
+No Task 2 data volume exists. The verified Alpine image remains in the local
+image store; no image prune was performed. No runtime credential file was
+created.
+
+REMAINING P1 AND P2 PREREQUISITES
+
+P1 must resume at the image-pull and CP1 gate. It must complete current Stage A
+runtime, Windows-browser, and independent external-exposure evidence before
+Stage B. It must then perform the actual mutually exclusive transition, startup
+import, discovery/issuer/JWKS checks, actual client/group/role/scope inspection,
+and authorization-page test.
+
+P2 must not start until CP1 and CP2 pass. Actual ops_roles output remains a
+mandatory P2 entry test, followed by the Flask callback, token validation,
+ten-minute signed application session, server-side RBAC, logout/CSRF, and all
+negative security tests in task2/test-plan.md.
+
+BOUNDARY CONFIRMATION
+
+No Kubernetes command or API access occurred.
+No command or operation in this P1 execution targeted Task 1 resources or the
+interrupted D3 environment.
+No claim is made that Task 1 runtime was independently verified unchanged.
+No DNS, hosts, firewall, Docker daemon, nftables, or iptables setting changed.
+No branch/worktree, stage, commit, push, reset, rebase, merge, or stash
+operation occurred.
+No password, client secret, token, code, cookie, or private key is in this
+record.

@@ -5,29 +5,48 @@ result, and a redacted artifact. Secrets, authorization codes, cookies, and raw
 tokens are never retained. `PASS` requires observed behavior; configuration
 inspection alone is insufficient. `UNVERIFIED` is not a pass.
 
-## P1 checkpoint 1 — runtime feasibility before realm provisioning
+## P1 checkpoint 1 — Stage A runtime feasibility before realm provisioning
+
+Stage A starts Keycloak without importing realm `ops`. CP1 requires no Flask
+application, callback, ID token, or target realm.
 
 | ID | Verification | Pass condition |
 |---|---|---|
-| R1 | Record Task 1 container, network, and volume identities before and after P1 setup. | No Task 1 object is changed, stopped, recreated, attached, or removed. Task 2 names are under the `task2-iam` project only. |
-| R2 | Query Docker daemon and validate/render the P1 Compose model. | Daemon responds; the model contains Keycloak, an explicitly scoped temporary diagnostic service, the dedicated network/volume, and only the intended loopback publish. No finished Flask service is required. |
-| R3 | Resolve and inspect image manifests. | Tags correspond to selected versions; immutable digests and the actual architecture are recorded before execution. |
-| R4 | Start Keycloak and a temporary diagnostic container owned by the isolated Task 2 Compose project; inspect network membership, Docker DNS, and HTTP connectivity from the diagnostic container. | Only intended Task 2 services join the dedicated network; `auth.localhost` resolves to Keycloak; the diagnostic container reaches Keycloak; it has a bounded lifecycle and explicit Task 2 cleanup ownership; nothing attaches to Task 1. |
-| R5 | Inspect WSL sockets, reach Keycloak from WSL, and check intended Flask port `18083` for conflicts where possible. | The actual `18082` listener is loopback only and the canonical Keycloak Host value answers. Port `18083` has no detected conflict; it is not required to listen or answer before P2. |
-| R6 | Test Keycloak from the Windows browser and inspect Windows listeners/reservations. | `http://auth.localhost:18082` loads and Windows shows no non-loopback Keycloak bind. Record browser/version and exact address. Do not mark the future Flask endpoint reachable. |
-| R7 | Attempt Keycloak access from a second LAN host or equivalent Windows-side interface test. | Port `18082` is not reachable through a LAN, Wi-Fi, VPN, or other non-loopback address. P2 repeats this exposure test for Flask after Flask exists. |
-| R8 | Inspect Keycloak administration reachability. | Admin UI is available through the intended local Keycloak URL only; no separate admin/management port is published. |
+| R1 | Validate the rendered Compose model and inspect only the exact Task 2 service, network, and volume names plus their Compose ownership labels. | The model is project `task2-iam`, contains only the two mutually exclusive Keycloak stages and bounded diagnostic service, uses only `task2-iam-oidc` and `task2-iam-keycloak-data`, has no external network, and publishes only `127.0.0.1:18082:18082`. No command inventories or targets Task 1. |
+| R2 | Query the Docker daemon, validate Compose, and start only Stage A. | Daemon and Compose respond; Stage A starts successfully. No Flask service or `ops` import is present. |
+| R3 | Resolve and inspect both image manifests before use. | Explicit tags correspond to the selected versions; immutable index and `linux/amd64` manifest digests are recorded and the pulled local images match the host platform. |
+| R4 | Observe Keycloak readiness and its real internal listener. | The process answers the intended HTTP path on internal `0.0.0.0:18082`; running-container state alone is insufficient. |
+| R5 | From the bounded Task-2-owned diagnostic container, resolve and reach `auth.localhost:18082`. | The alias resolves to the active Stage A container and the HTTP request receives an actual Keycloak response. The diagnostic service joins only `task2-iam-oidc`, has no published port/host mount/socket/privilege, and is removed after active testing. |
+| R6 | Test the WSL host path and record ordinary DNS separately from any `curl --resolve` override. | The loopback-published canonical Host value answers; the override, if used, is not reported as normal DNS success. The WSL listener observation is recorded but is not used as Windows or LAN evidence. |
+| R7 | Use an actual Windows browser and inspect Windows listeners. | `http://auth.localhost:18082` loads a Keycloak page; browser/version, requested URL, actual behavior, and Windows listener address are recorded. |
+| R8 | Attempt access from a separate LAN host or technically equivalent independent external vantage. | `http://<WINDOWS_LAN_IP>:18082` is not reachable within a bounded timeout. A request from the same Windows host to its own LAN IP is not sufficient. |
+| R9 | Check the future Flask port without creating Flask. | Port `18083` has no detected WSL/Windows conflict where observable; it is not required to listen or answer. |
+| R10 | Inspect the administration boundary. | The admin UI shares the intended loopback Keycloak endpoint and no separate management/admin port is published. |
 
 General Internet egress denial, including an `internal: true` network, is
 **OPTIONAL HARDENING** rather than an IAM/SSO acceptance condition. If attempted,
 record it separately and prove that it does not break Docker DNS, Keycloak,
 discovery, JWKS, or browser access.
 
-Stop if any item fails. A WSL `ss` result cannot substitute for R6 or R7, and
+Stop if any item fails. A WSL `ss` result cannot substitute for R7 or R8, and
 P1 must not change firewall, WSL, Docker-daemon, DNS, or hosts-file settings to
 manufacture a pass without a separately approved design revision.
 
-## P1 checkpoint 2 — actual OIDC contract after minimal realm provisioning
+If owner-assisted R7/R8 evidence is pending, stop only Stage A when active
+testing ends, preserve `task2-iam-keycloak-data`, and record CP1 INCOMPLETE.
+On resume, historical observations do not pass the current checkpoint; repeat
+identity, digest, readiness, binding, diagnostic, Windows, and exposure checks.
+
+### Mandatory Stage A to Stage B transition
+
+Only after CP1 passes: identify and stop the exact Stage A service, prove port
+`18082` is released and no active Stage A container owns `auth.localhost`,
+preserve the named data volume, and start only Stage B. Verify Stage B uses the
+same pinned image, network, alias, port, and volume, and that exactly one active
+Keycloak service serves the path. Starting a Stage B profile does not
+implicitly stop Stage A.
+
+## P1 checkpoint 2 — Stage B actual OIDC provider after realm provisioning
 
 | ID | Verification | Pass condition |
 |---|---|---|
@@ -37,10 +56,11 @@ manufacture a pass without a separately approved design revision.
 | O4 | Inspect the `ops-dashboard` client and its intended scopes. | Exact callback only; code flow and PKCE S256 enabled; implicit/direct grants/service account disabled; client secret is runtime-only. |
 | O5 | Inspect client scopes, the role mapper, groups, client roles, and group-to-role mappings for viewer, admin, and unrelated-role users. | The dedicated mapper is **CONFIGURED**, full scope is off, and only `ops-dashboard` roles are configured to feed `ops_roles`. Record this as configuration evidence, not observed token output. |
 | O6 | Record the issued-token verification disposition. If a separate bounded OIDC test client is expressly included in P1, use an interactive authorization-code flow and validate redacted ID-token evidence; otherwise defer this check to P2. | Either validated evidence shows viewer `["viewer"]`, admin exactly `viewer` and `admin`, and no unrelated role leakage, or actual output is explicitly **UNVERIFIED** with a mandatory P2 entry check. A configured mapper alone never passes token-output verification, and direct-access password grants remain disabled. |
+| O7 | Construct a valid authorization-code request for `ops-dashboard`. | The realm login page is reachable with the exact redirect and PKCE S256 request. No Flask callback or end-to-end application SSO is claimed. |
 
-P1 checkpoint 2 accepts O1–O5 plus an explicit O6 disposition; it does not
-depend on a completed Flask callback. If O6 is deferred, P2 must complete a real
-authorization-code flow and validate an issued ID token before the RBAC
+P1 checkpoint 2 accepts O1–O5 plus an explicit O6 disposition and O7; it does
+not depend on a completed Flask callback. If O6 is deferred, P2 must complete a
+real authorization-code flow and validate an issued ID token before the RBAC
 integration can be accepted.
 
 ## P2 mandatory POC acceptance tests
