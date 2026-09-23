@@ -5,6 +5,80 @@ result, and a redacted artifact. Secrets, authorization codes, cookies, and raw
 tokens are never retained. `PASS` requires observed behavior; configuration
 inspection alone is insufficient. `UNVERIFIED` is not a pass.
 
+## P1 client-scope mapping regression check
+
+Run this structured source check from the repository root before starting
+Keycloak. It verifies the declared JSON representation only; a pass is
+`STATIC CONFIGURATION PASS`, not proof of a successful realm import or emitted
+token content.
+
+```bash
+python3 - <<'PY'
+import json
+from pathlib import Path
+
+realm = json.loads(
+    Path("task2/keycloak/ops-realm.json").read_text()
+)
+
+mappings = realm["clientScopeMappings"]
+assert set(mappings) == {"ops-dashboard"}
+
+entries = mappings["ops-dashboard"]
+assert len(entries) == 1
+
+mapping = entries[0]
+
+assert set(mapping) == {"clientScope", "roles"}
+assert mapping["clientScope"] == "ops-dashboard-roles"
+
+assert len(mapping["roles"]) == 2
+assert set(mapping["roles"]) == {"viewer", "admin"}
+
+clients = {
+    item["clientId"]: item
+    for item in realm["clients"]
+}
+
+scopes = {
+    item["name"]: item
+    for item in realm["clientScopes"]
+}
+
+assert "ops-dashboard-roles" in scopes
+
+assert "ops-dashboard-roles" in (
+    clients["ops-dashboard"]["defaultClientScopes"]
+)
+
+for client_id in (
+    "asset-inventory",
+    "runbook-portal",
+):
+    assert "ops-dashboard-roles" not in (
+        clients[client_id].get(
+            "defaultClientScopes", []
+        )
+    )
+
+print("PASS: declared client-scope mapping")
+PY
+```
+
+### Continuation safety notes
+
+- Reconcile only the exact Task 2 container, network, and volume identities
+  before creating resources. Reuse a volume only when trustworthy evidence
+  establishes its pre-import or provisioned state; unknown or partial state is
+  a stop condition, never a reason to delete the volume.
+- Inspect the exact image user and runtime-secret UID, GID, and mode, then prove
+  the Keycloak process can read the mounted secret without printing it. Host
+  mode `0600` by itself is not proof across every container runtime.
+- R8 needs both an independent vantage point and a connectivity control showing
+  that the test device has an appropriate path to the Windows host or its LAN.
+  If that control cannot be established, record `R8: INCONCLUSIVE`; an arbitrary
+  timeout is not isolation evidence.
+
 ## P1 checkpoint 1 — Stage A runtime feasibility before realm provisioning
 
 Stage A starts Keycloak without importing realm `ops`. CP1 requires no Flask

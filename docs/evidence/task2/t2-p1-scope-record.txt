@@ -261,3 +261,159 @@ made.
 No Task 1 file was modified.
 No branch or worktree was created.
 No Git stage, commit, push, reset, stash, merge, or rebase occurred.
+
+
+CONTINUATION SCOPE RECORD — 2026-09-23
+======================================
+
+CONTINUATION STATUS
+-------------------
+
+TASK2-P1 PARTIAL —
+RUNTIME OR HOST EXPOSURE GATE PENDING
+
+CP1: INCOMPLETE / BLOCKED
+CP2: NOT RUN
+P2: NOT AUTHORIZED TO START
+
+STARTING GATE
+-------------
+
+Actual starting branch: temp/work-in-progress
+Actual starting HEAD: a641aeb5588a5d282ed0cbfaaf1aacd5c1c390a5
+Reviewed checkpoint ancestor result: exit 0
+Starting worktree: clean
+Intervening commits: none
+Branch or worktree created: no
+
+AUTHORIZED TRACKED MUTATIONS
+----------------------------
+
+Modified only:
+
+- task2/keycloak/ops-realm.json
+- task2/test-plan.md
+- task2/README.md
+- docs/evidence/task2/t2-p1-execution.txt
+- docs/evidence/task2/t2-p1-scope-record.txt
+
+No tracked file was added. All prohibited files and paths were preserved.
+
+Exact configuration change:
+
+- clientScopeMappings.ops-dashboard[0].client removed
+- clientScopeMappings.ops-dashboard[0].clientScope set to
+  ops-dashboard-roles
+
+Documentation changes add the reproducible structured regression check,
+correct the observed OpenSSL command syntax, state the observed Stage A and
+Windows-browser results, document persistent-state/secret/LAN quality rules,
+and append this continuation without rewriting historical evidence.
+
+IGNORED RUNTIME FILES
+---------------------
+
+Created:
+
+- task2/.runtime/ directory, UID/GID 1000:1000, mode 0700
+- task2/.runtime/keycloak-bootstrap-admin-password, UID/GID 1000:1000,
+  mode 0600, ignored and untracked
+
+The secret value was never printed. No .env file, token, code, cookie, client
+secret, private key, or Admin CLI configuration was created in the repository.
+
+TASK-2-OWNED RUNTIME MUTATIONS
+------------------------------
+
+Created and intentionally retained:
+
+- exact Keycloak image digest
+  sha256:3d911baa186f352563854039b95f21a7e2c01c76b527fdc64f24a0885b927bdf
+- task2-iam-keycloak-stage-a-1, final state stopped/exited
+- task2-iam-oidc, Compose project task2-iam
+- task2-iam-keycloak-data, Compose project task2-iam
+
+Created and removed:
+
+- task2-iam-diagnostic-1
+- task2-iam-secret-read-check, isolated auto-removed readability probe
+- unique Windows Edge/Chrome temporary browser profiles
+
+Never created:
+
+- task2-iam-keycloak-stage-b-1
+- realm ops
+- temporary Admin CLI configuration
+- any P2 Flask resource
+
+The Stage A volume was created only after the exact-name preflight proved it
+absent. Stage A initialized master state, realm ops returned HTTP 404, and the
+volume is therefore documented as pre-import. It was preserved without reset
+or deletion after Stage A stopped.
+
+RESOURCE OWNERSHIP AND FINAL STATE
+----------------------------------
+
+- Stage A container: stopped, exact reviewed image, project task2-iam,
+  service keycloak-stage-a
+- Stage B container: absent
+- diagnostic container: absent
+- dedicated network: present, project task2-iam
+- dedicated volume: present, project task2-iam, documented pre-import state
+- WSL/Windows listeners 18082/18083: absent after cleanup
+- Task 2 browser processes/temp profiles: absent
+- bootstrap credential: present only at the approved ignored runtime path
+- verified immutable images: retained; no prune performed
+
+OWNER-ASSISTED EVIDENCE
+-----------------------
+
+Windows browser R7: OBSERVED PASS using Windows Google Chrome
+153.0.8010.53; title Sign in to Keycloak.
+
+Independent external exposure R8: INCONCLUSIVE / NOT RUN. No separate device
+or equivalent vantage and no connectivity control were available. No same-host
+substitute was accepted. CP1 remains incomplete and Stage B was not started.
+
+GIT AND EXECUTION BOUNDARIES
+----------------------------
+
+No staging, commit, push, reset, stash, rebase, merge, branch, or worktree
+operation occurred. No Kubernetes or Task 1 command ran. No unrelated Docker
+resource was inventoried or modified. No global Docker cleanup ran. No network,
+DNS, firewall, hosts, daemon, nftables, or iptables configuration changed.
+
+Final Git status and consistency results are appended below after all
+allowlisted content updates.
+
+FINAL GIT STATUS AND CONSISTENCY
+--------------------------------
+
+Observed at 2026-09-23T17:02:00Z.
+
+git status --short --untracked-files=all showed only:
+
+- modified docs/evidence/task2/t2-p1-execution.txt
+- modified docs/evidence/task2/t2-p1-scope-record.txt
+- modified task2/README.md
+- modified task2/keycloak/ops-realm.json
+- modified task2/test-plan.md
+
+git diff --name-only returned exactly the same five allowlisted tracked paths.
+git diff --cached --name-only: empty; nothing staged.
+git diff --check: exit 0 with no output.
+Realm JSON validation: exit 0.
+Compose validation: exit 0.
+Documented client-scope regression: PASS, exit 0.
+Runtime credential ignore check: matched task2/.gitignore.
+Runtime credential tracked-file lookup: exit 1, untracked.
+
+Final exact Task 2 runtime assertion:
+
+- Stage A: present, stopped, expected Compose ownership and exact image
+- Stage B: absent
+- diagnostic: absent
+- dedicated network: present, expected Compose ownership
+- dedicated volume: present, expected Compose ownership, documented pre-import
+- WSL listeners on 18082/18083: absent
+- runtime credential: UID/GID 1000:1000, mode 0600, 65 bytes

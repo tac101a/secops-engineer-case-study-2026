@@ -1,9 +1,11 @@
 # Task 2 — IAM/SSO proof of concept
 
-Status: **P1 partial — runtime gate pending.** The P1 configuration is present,
-but the verified Keycloak image did not finish downloading during this
-execution. No Task 2 container, network, volume, realm, or Flask application
-was created. CP1 and CP2 therefore remain incomplete.
+Status: **P1 partial — independent LAN exposure gate pending.** The exact
+pinned image and corrected realm source passed static validation. Stage A then
+passed the automated runtime, Docker DNS/HTTP, WSL host-path, and Windows
+Chrome checks from a proven absent-volume baseline. No independent LAN vantage
+was available, so R8 is inconclusive; Stage B and CP2 were not run, and P2
+remains unauthorized.
 
 This directory implements the Task 2 Option A foundation selected in the
 committed [architecture](architecture.md): Keycloak `26.7.4`, realm `ops`, and
@@ -46,15 +48,23 @@ loopback-bound local POC. This is not a production deployment.
 
 ## Runtime secret preparation
 
-The following procedure was **not run in this blocked execution**. Run it from
-`task2/` before the first startup:
+This continuation created the ignored runtime credential without printing it.
+When the file is absent on a fresh environment, run this from `task2/`:
 
 ```sh
 install -d -m 700 .runtime
-openssl rand -base64 48 -out .runtime/keycloak-bootstrap-admin-password
+openssl rand -base64 -out .runtime/keycloak-bootstrap-admin-password 48
 chmod 600 .runtime/keycloak-bootstrap-admin-password
 git check-ignore -v .runtime/keycloak-bootstrap-admin-password
 ```
+
+Do not overwrite an existing credential blindly. Reconcile its provenance,
+ownership, and mode first. This host observed directory mode `0700`, file mode
+`0600`, and host UID/GID `1000:1000`; the exact Keycloak image is configured as
+UID `1000` and a networkless read-only probe proved that user could read the
+mounted file without exposing its value. Repeat the access proof when host or
+container ownership semantics differ rather than assuming mode `0600` alone is
+sufficient.
 
 The file is mounted as a Compose secret and read inside the Keycloak process;
 do not print it, add it to `.env`, or copy it into evidence. The tracked realm
@@ -65,9 +75,11 @@ non-secret username placeholder.
 
 ## Stage A — pre-realm runtime
 
-The commands in this section are the required continuation procedure and are
-**not yet observed as successful**. First finish the verified image pull and
-confirm the exact local platform:
+The exact pinned image and Stage A were observed successfully in the current
+continuation. The retained Stage A container is stopped and its named volume is
+a documented pre-import state: master exists and realm `ops` returned HTTP
+`404`. Before resuming CP1, revalidate the exact image, resource identities,
+volume disposition, and current host state:
 
 ```sh
 docker compose --profile '*' pull
@@ -241,13 +253,21 @@ or NOT VERIFIED.
 
 Observed in this execution:
 
-- digest resolution and Compose/JSON validation passed;
-- the Alpine diagnostic image was pulled and inspected as `linux/amd64`;
-- the Keycloak tag resolved correctly, but its final image layer did not
-  complete after several bounded cached attempts;
-- no Stage A resource was created, so listener, Docker DNS/HTTP, browser, LAN,
-  CP1, Stage B, realm import, discovery, and CP2 are unverified;
-- no runtime secret file was created.
+- the `clientScopeMappings` source defect was corrected and the structured
+  regression check plus complete Compose/realm static assertions passed;
+- both immutable images are locally inspectable as `linux/amd64`, and the
+  Keycloak image ID equals the reviewed platform digest;
+- Stage A started from an absent volume, listened internally on
+  `0.0.0.0:18082`, returned HTTP `200` through the container, diagnostic, WSL,
+  and Windows-browser paths, and returned HTTP `404` for absent realm `ops`;
+- Windows Chrome `153.0.8010.53` rendered the page titled `Sign in to Keycloak`,
+  and the Windows listener was only `127.0.0.1:18082`;
+- R8 is **INCONCLUSIVE** because no independent LAN vantage and connectivity
+  control were available; CP1 therefore remains incomplete;
+- the diagnostic container was removed, Stage A was stopped, and the documented
+  pre-import `task2-iam-keycloak-data` volume was preserved; and
+- Stage B, import, Admin CLI inspection, CP2, and actual emitted `ops_roles`
+  output were not run.
 
 P2 must not begin until CP1 and CP2 are completed. Its entry checks must also
 observe a real ID token and prove the exact `ops_roles` array, correct viewer

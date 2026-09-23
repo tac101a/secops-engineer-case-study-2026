@@ -165,7 +165,7 @@
   "clientScopeMappings": {
     "ops-dashboard": [
       {
-        "client": "ops-dashboard-roles",
+        "clientScope": "ops-dashboard-roles",
         "roles": [
           "viewer",
           "admin"

@@ -308,3 +308,315 @@ No branch/worktree, stage, commit, push, reset, rebase, merge, or stash
 operation occurred.
 No password, client secret, token, code, cookie, or private key is in this
 record.
+
+
+CONTINUATION — SEMANTIC PATCH AND SAFE RUNTIME, 2026-09-23
+==========================================================
+
+CONTINUATION DISPOSITION
+------------------------
+
+TASK2-P1 PARTIAL —
+RUNTIME OR HOST EXPOSURE GATE PENDING
+
+CP1: INCOMPLETE / BLOCKED
+CP2: NOT RUN
+P2: NOT AUTHORIZED TO START
+
+R1 through R7, R9, and R10 have current observed evidence. R8 is
+INCONCLUSIVE because no separate LAN device or technically equivalent
+independent external vantage point was available, so no connectivity control
+or independent request to the Windows LAN address could be performed. Per the
+mandatory pause rule, Stage B was not started.
+
+CONTINUATION WINDOW AND OPENING GATE
+------------------------------------
+
+Continuation date: 2026-09-23 UTC
+Opening gate ran before the first recorded continuation timestamp
+2026-09-23T16:24:43Z; its exact UTC instant was not separately captured.
+
+Actual starting branch: temp/work-in-progress
+Actual starting HEAD: a641aeb5588a5d282ed0cbfaaf1aacd5c1c390a5
+Commit subject: wip: task2-p1
+Reviewed checkpoint: a641aeb5588a5d282ed0cbfaaf1aacd5c1c390a5
+Starting git status --short --untracked-files=all: <empty; clean>
+Ancestry command:
+git merge-base --is-ancestor
+a641aeb5588a5d282ed0cbfaaf1aacd5c1c390a5 HEAD
+Exit status: 0
+Intervening commits: none; HEAD was the reviewed checkpoint.
+
+REQUIRED SOURCE REVIEW
+----------------------
+
+OBSERVED PASS. The continuation read every required current Task 2 source and
+P0/P1 evidence file, reviewed the P1 delta from
+1fea0957be5437948467d6e9470418d1d7523810, and read the four-page assessment
+PDF locally. The PDF SHA-256 remained:
+bf509a32052527444b4fc75c7492c263705606c66fe01e0ce4ff097958c2f6de
+
+The official assessment still requires Option A to design centralized IAM for
+two or three internal applications and demonstrate OIDC/SSO for at least one.
+No P2 work or architecture redesign was authorized or performed.
+
+SEMANTIC CORRECTION
+-------------------
+
+Exact source correction in task2/keycloak/ops-realm.json:
+
+-        "client": "ops-dashboard-roles",
++        "clientScope": "ops-dashboard-roles",
+
+Every unrelated realm field was preserved.
+
+The copy-pasteable structured regression check was added to
+task2/test-plan.md. It asserted the exact outer client key, exact
+clientScope/roles entry shape, exact scope target, exact viewer/admin role set,
+scope existence, default attachment only to ops-dashboard, and absence from
+the two disabled design-only clients.
+
+Actual result:
+PASS: declared client-scope mapping
+Exit status: 0
+Classification: STATIC CONFIGURATION PASS
+
+This is source validation. It is not a successful import, observed Keycloak
+state, or emitted-token evidence.
+
+COMPLETE STATIC REVALIDATION
+----------------------------
+
+python3 -m json.tool task2/keycloak/ops-realm.json >/dev/null
+Exit status: 0
+
+docker compose --project-directory task2 --profile '*' config --quiet
+Exit status: 0
+
+Secret-safe structured assertions returned:
+STATIC CONFIGURATION PASS: Compose model
+STATIC CONFIGURATION PASS: realm model
+Exit status: 0
+
+The assertions covered the exact project, three services, immutable images,
+linux/amd64 platform, sole loopback publish, common network/alias/volume,
+mutually exclusive Stage A and Stage B commands, read-only Stage B import
+mount, bounded unprivileged diagnostic, no Flask or Task 1 reference, exact
+realm/clients/roles/groups/default scope/mapper/mapping, and absence of a
+tracked realm credential.
+
+INITIAL RUNTIME AND PERSISTENT-STATE RECONCILIATION
+---------------------------------------------------
+
+Before secret creation or Docker resource creation, exact-name inspection
+returned all five intended identities absent:
+
+- task2-iam-keycloak-stage-a-1
+- task2-iam-keycloak-stage-b-1
+- task2-iam-diagnostic-1
+- task2-iam-oidc
+- task2-iam-keycloak-data
+
+This established a new-volume Stage A baseline. No existing or unknown
+persistent state was reused or deleted.
+
+CURRENT HOST PREFLIGHT
+----------------------
+
+Recorded at 2026-09-23T16:24:43Z:
+
+- Docker client: 29.3.0
+- Docker Compose: v5.1.0
+- Docker daemon: 29.3.0, linux/x86_64
+- Host: Linux 5.15.167.4-microsoft-standard-WSL2 x86_64
+- WSL listeners on 18082/18083: absent before startup
+- Windows listeners on 18082/18083: absent before startup
+- Windows auth.localhost and ops.localhost DNS: ::1 and 127.0.0.1
+- ordinary WSL auth.localhost and ops.localhost DNS: exit 2, no result
+
+No DNS, hosts, firewall, WSL, or Docker daemon setting was modified.
+
+IMAGE ACQUISITION AND INTEGRITY
+-------------------------------
+
+At the current preflight the exact Keycloak image, absent at the end of the
+historical execution above, was locally inspectable. One bounded command then
+confirmed acquisition:
+
+timeout --signal=TERM --kill-after=15s 300s docker pull --platform linux/amd64
+quay.io/keycloak/keycloak:26.7.4@sha256:3d911baa186f352563854039b95f21a7e2c01c76b527fdc64f24a0885b927bdf
+
+Actual result: Image is up to date
+Exit status: 0
+
+OBSERVED PASS — exact local Keycloak image:
+- Image ID: sha256:3d911baa186f352563854039b95f21a7e2c01c76b527fdc64f24a0885b927bdf
+- RepoDigest: quay.io/keycloak/keycloak@sha256:3d911baa186f352563854039b95f21a7e2c01c76b527fdc64f24a0885b927bdf
+- OS/architecture: linux/amd64
+- configured image user: 1000
+- reviewed multiarchitecture index digest retained from the prior verification:
+  sha256:82a77884f3af238beab1e7afd63b5f530e1b5c0590bd7aa60b40a40463e29b2c
+
+OBSERVED PASS — exact local diagnostic image:
+- Image ID: sha256:eafc1edb577d2e9b458664a15f23ea1c370214193226069eb22921169fc7e43f
+- RepoDigest: alpine@sha256:eafc1edb577d2e9b458664a15f23ea1c370214193226069eb22921169fc7e43f
+- OS/architecture: linux/amd64
+- configured image user: empty/default
+
+No alternate tag, digest, or platform and no Docker-wide cleanup was used.
+
+BOOTSTRAP SECRET
+----------------
+
+The approved file was initially absent and was confirmed ignored and
+untracked. The prior README spelling
+"openssl rand -base64 48 -out ..." failed with this host's OpenSSL argument
+parser before creating the file. The supported equivalent was used and the
+README was corrected:
+
+openssl rand -base64 -out
+task2/.runtime/keycloak-bootstrap-admin-password 48
+
+Observed metadata without reading or printing the value:
+- directory UID/GID/mode: 1000:1000 / 0700
+- file UID/GID/mode: 1000:1000 / 0600
+- file size: 65 bytes
+- git check-ignore: matched task2/.gitignore
+- git ls-files --error-unmatch: exit 1, untracked
+
+An isolated, networkless, read-only, cap-dropped container using the exact
+Keycloak image ran as UID 1000, tested readability and nontrivial byte length,
+printed no value, returned secret_readability=PASS, and was auto-removed.
+Exit status: 0.
+
+STAGE A EXECUTION
+-----------------
+
+Start time: 2026-09-23T16:32:17Z
+Command:
+docker compose --project-directory task2 --profile stage-a
+--profile diagnostic up -d keycloak-stage-a diagnostic
+Exit status: 0
+
+OBSERVED PASS — runtime identity and ownership:
+- Stage A container ID prefix: ed9840e03b07
+- exact image ID: sha256:3d911baa186f352563854039b95f21a7e2c01c76b527fdc64f24a0885b927bdf
+- Compose project/service: task2-iam / keycloak-stage-a
+- command: start-dev; no --import-realm
+- network/alias: task2-iam-oidc / auth.localhost
+- volume: task2-iam-keycloak-data at /opt/keycloak/data
+- import mount: absent
+- publish: 127.0.0.1:18082 -> 18082/tcp only
+- diagnostic project/service: task2-iam / diagnostic
+- diagnostic mounts and host ports: none
+- diagnostic privileged: false; root filesystem read-only
+
+The log reported Keycloak 26.7.4 started in development mode and listening on
+http://0.0.0.0:18082. It initialized the master realm and temporary bootstrap
+administrator without printing the password.
+
+R4 OBSERVED PASS:
+- bounded WSL readiness poll reached master discovery with HTTP 200
+- an HTTP/1.1 request from inside the Keycloak container to its internal
+  listener returned HTTP/1.1 200 OK
+- the host request for realm ops discovery returned HTTP 404, proving realm
+  ops was absent in this newly created pre-import state
+
+R5 OBSERVED PASS:
+- diagnostic DNS resolved auth.localhost to active Stage A address 172.19.0.3
+- diagnostic HTTP reached master discovery and returned HTTP/1.1 200 OK
+
+R6 OBSERVED PASS with DNS limitation recorded separately:
+- WSL curl --resolve canonical-host request returned HTTP 200
+- ordinary WSL getent for auth.localhost exited 2 with no result
+- ss showed only 127.0.0.1:18082; port 18083 remained absent
+
+R7 WINDOWS-BROWSER OBSERVED PASS:
+- active Windows listener: 127.0.0.1:18082 only
+- Windows auth.localhost DNS: ::1 and 127.0.0.1
+- first Edge headless attempt failed before usable page evidence with Windows
+  error 577 and was not counted as a pass
+- Google Chrome version 153.0.8010.53 opened
+  http://auth.localhost:18082 using a unique temporary profile
+- browser exit: 0
+- rendered title: Sign in to Keycloak
+- rendered DOM contained the Keycloak marker
+- the unique Chrome profile was removed; no Task 2 browser process remained
+
+R8 INCONCLUSIVE / NOT RUN:
+No independent LAN device or equivalent external vantage was accessible.
+Therefore no Windows-LAN-IP request and no approved connectivity control were
+performed. A same-host, WSL, or arbitrary timeout was not promoted to evidence.
+
+R9 OBSERVED PASS: port 18083 had no WSL or Windows listener.
+
+R10 OBSERVED PASS: only 18082/tcp was published on Windows/WSL loopback; no
+separate management or administration port was published.
+
+CP1: INCOMPLETE / BLOCKED solely on current independent R8 evidence.
+
+OWNER-ASSISTED RESUMPTION REQUIREMENT
+------------------------------------
+
+On resume, historical Stage A evidence does not pass a new checkpoint. Recheck
+the exact container/image/volume state, restart Stage A and diagnostic, and
+repeat readiness, binding, diagnostic, WSL, Windows browser, and exposure
+checks. From a genuinely separate LAN device, first establish an approved
+non-sensitive connectivity control to the Windows host or its LAN (for
+example, an ARP response on the same subnet or an already approved existing
+service), then use a bounded request to
+http://<WINDOWS_LAN_IP>:18082. Do not change firewall or expose Task 2 to make
+the control work. Redact the private address in public evidence.
+
+STAGE B AND CP2
+---------------
+
+Stage A to Stage B transition: NOT RUN
+Stage B startup/import: NOT RUN
+Partial import concern: none; realm ops was never imported
+Admin CLI authentication/configuration: NOT RUN
+Temporary Admin CLI state created: none
+O1 discovery for realm ops: NOT RUN
+O2 endpoint consistency: NOT RUN
+O3 JWKS: NOT RUN
+O4 actual client state: NOT RUN
+O5 actual roles/groups/scope/mapper/mapping: NOT RUN
+Actual imported client-scope mapping: UNVERIFIED / NOT RUN
+O7 authorization page for realm ops: NOT RUN
+RESTART/IDEMPOTENCY: NOT VERIFIED
+
+ACTUAL ops_roles TOKEN OUTPUT:
+UNVERIFIED — MANDATORY P2 ENTRY TEST
+
+CP2: NOT RUN
+P2: NOT AUTHORIZED TO START
+
+MANDATORY PAUSE CLEANUP AND FINAL RUNTIME STATE
+------------------------------------------------
+
+Cleanup began at 2026-09-23T16:47:56Z.
+
+- task2-iam-diagnostic-1: stopped and removed
+- task2-iam-keycloak-stage-a-1: stopped, retained, Compose ownership verified
+- task2-iam-keycloak-stage-b-1: absent
+- task2-iam-oidc: retained, Compose project task2-iam
+- task2-iam-keycloak-data: retained, Compose project task2-iam
+- final WSL and Windows listeners on 18082/18083: absent
+- Task 2 browser processes and temporary browser directories: none
+- temporary secret-readability container: auto-removed
+- temporary Admin CLI configuration: none created
+
+The final volume is a documented pre-import Stage A state created from initial
+absence. It contains initialized master state, while actual HTTP evidence showed
+realm ops absent before Stage A was stopped. It was not deleted, reset, or
+repurposed.
+
+BOUNDARY CONFIRMATION FOR CONTINUATION
+--------------------------------------
+
+No Kubernetes or Task 1 command was run. No unrelated Docker identity was
+inspected, stopped, attached, or removed. No Docker prune ran. No DNS, hosts,
+firewall, WSL, Windows, or Docker daemon setting changed. No credential, token,
+authorization code, cookie, client secret, private key, or unrestricted Admin
+CLI response was printed or written to evidence. No Git stage, commit, push,
+reset, rebase, merge, or stash operation occurred.
