@@ -23,6 +23,61 @@ successful P0 does **not** show that the Docker daemon works, that containers
 can communicate, that a Windows browser can reach the services, that a realm
 exists, or that OIDC works.
 
+## Logical architecture
+
+This is the **proposed** P1/P2 shape; it is not a claim that any service is
+running in P0. Browser requests go directly to each application. Keycloak is
+the identity, group, and client-role authority, but it does not proxy ordinary
+application requests. Each application owns its authorization decisions.
+
+```mermaid
+flowchart LR
+  subgraph HOST["Windows / WSL host boundary — PROPOSED, not running in P0"]
+    B["Windows browser"]
+    KPORT["Loopback publish<br/>auth.localhost:18082<br/>127.0.0.1 only"]
+    OPORT["Loopback publish<br/>ops.localhost:18083<br/>127.0.0.1 only — P2 target"]
+
+    subgraph NET["Dedicated Task 2 Docker network — future P1/P2 POC"]
+      subgraph IDP["IdP trust boundary"]
+        KC["Keycloak<br/>OIDC issuer<br/>group and client-role authority<br/>IMPLEMENTED IN FUTURE POC"]
+      end
+      subgraph OPSBOUNDARY["Ops Dashboard application-authorization trust boundary"]
+        OPS["Ops Dashboard<br/>mandatory POC<br/>IMPLEMENTED IN FUTURE POC"]
+        OPSAUTH["Server-side route authorization<br/>validated ops_roles only"]
+        OPS --> OPSAUTH
+      end
+      DIAG["Temporary P1 diagnostic container<br/>bounded lifecycle; P1 only"]
+    end
+
+    subgraph DESIGN["DESIGN ONLY — not deployed by this POC"]
+      subgraph ASSETBOUNDARY["Asset Inventory application-authorization trust boundary"]
+        ASSET["Asset Inventory"]
+        ASSETAUTH["Application-side authorization"]
+        ASSET --> ASSETAUTH
+      end
+      subgraph RUNBOOKBOUNDARY["Runbook Portal application-authorization trust boundary"]
+        RUNBOOK["Runbook Portal"]
+        RUNBOOKAUTH["Application-side authorization"]
+        RUNBOOK --> RUNBOOKAUTH
+      end
+    end
+  end
+
+  B -->|"OIDC browser redirects"| KPORT --> KC
+  B -->|"ordinary application requests"| OPORT --> OPS
+  DIAG -->|"Docker DNS and HTTP diagnostics"| KC
+  KC -.->|"OIDC issuer and group-derived client roles"| OPS
+  B -.->|"future direct application requests"| ASSET
+  B -.->|"future direct application requests"| RUNBOOK
+  KC -.->|"design-only OIDC trust"| ASSET
+  KC -.->|"design-only OIDC trust"| RUNBOOK
+
+  classDef poc fill:#e8f5e9,stroke:#2e7d32,color:#111;
+  classDef design fill:#fff8e1,stroke:#8d6e00,stroke-dasharray:5 5,color:#111;
+  class KC,OPS poc;
+  class ASSET,RUNBOOK design;
+```
+
 ## Selected stack and versions
 
 | Component | Selected version | Decision |
@@ -42,6 +97,44 @@ The versions were checked against primary release sources on 2026-09-23:
 [Gunicorn 26.2.2](https://gunicorn.org/news/). P1 must resolve image tags to
 immutable multi-architecture digests and record the selected platform before
 first use; P0 did not pull images.
+
+## IdP alternatives and selection
+
+All three candidates document OIDC capability. The configuration-complexity
+and case-study-fit statements below are project-specific engineering judgments,
+not product capability claims or a universal ranking.
+
+| Criterion | Keycloak | Authentik | ZITADEL |
+|---|---|---|---|
+| OIDC support | OIDC provider, discovery, clients, scopes, and protocol mappers are documented. | OAuth2/OIDC provider supports authorization code, PKCE, discovery, JWKS, and scope mappings. | OIDC applications, discovery/token claims, and project role claims are documented. |
+| Group and role modeling | Groups inherit role mappings; realm and client roles are distinct. | Hierarchical groups and inherited roles are documented. | Project roles and user grants are documented. A first-class user-group collection equivalent was not verified in the reviewed documentation: **UNVERIFIED**. |
+| Application-specific authorization | Client roles provide a native per-client namespace and role-scope mappings can limit token roles. | Application bindings and a per-application provider/policy model can gate access; exact application role claims require a project-defined mapping. | Roles are scoped to a project and shared by its applications; separate projects can provide separate security contexts. |
+| Token-claim mapping | Protocol mappers can place a selected client's roles in a named ID-token claim. | Python-expression scope mappings can return custom claims. | Standard project-role claims can be included in ID tokens; Actions can add custom claims. |
+| Local reproducibility | Official one-container `start-dev` example uses the development database and is the smallest fit for this bounded POC. | Official Compose path is reproducible but requires PostgreSQL and the Authentik services. | Official Compose path is reproducible but includes a proxy, API, login service, PostgreSQL, and an initialization job. |
+| Operational dependencies | One Keycloak container is sufficient only for this local dev-mode POC; production needs an external database and hardened startup. | PostgreSQL is required; the official small-install guidance specifies at least 2 CPU cores and 2 GB RAM. | PostgreSQL and HTTP/2-capable proxy behavior are explicit self-hosting considerations. |
+| Configuration complexity for this POC | Native group → client-role → dedicated claim controls align directly with the selected `ops_roles` contract. | Flexible mappings and policies can meet the design, but add expression and provider configuration for the exact claim contract. | Project roles fit application authorization, but the selected group-based model and exact top-level claim would need adaptation and additional verification. |
+| Relevant production expansion | Federation, external databases, clustering, delegated administration, and broader protocol support are documented expansion paths. | Multiple provider types, policy/flow composition, and group/application bindings support broader access patterns. | Organizations, project grants, stateless service scaling, and delegated B2B role administration are strong expansion paths. |
+
+Official sources reviewed:
+
+- Keycloak: [Server Administration Guide](https://www.keycloak.org/docs/latest/server_admin/),
+  [protocol-mapper reference](https://www.keycloak.org/admin-api/protocol-mappers),
+  and [Docker getting started](https://www.keycloak.org/getting-started/getting-started-docker).
+- Authentik: [OAuth2/OIDC provider](https://docs.goauthentik.io/add-secure-apps/providers/oauth2),
+  [groups](https://docs.goauthentik.io/users-sources/groups/manage_groups),
+  [Docker Compose installation](https://docs.goauthentik.io/install-config/install/docker-compose),
+  and [configuration](https://docs.goauthentik.io/install-config/configuration/).
+- ZITADEL: [projects, applications, and roles](https://zitadel.com/docs/guides/manage/console/projects-overview),
+  [claims](https://zitadel.com/docs/apis/openidoauth/claims),
+  [Docker Compose deployment](https://zitadel.com/docs/self-hosting/deploy/compose),
+  and [self-hosting requirements](https://zitadel.com/docs/self-hosting/manage/requirements).
+
+Keycloak is selected for this case study because its native client-role
+namespace, group-to-role inheritance, role-scope controls, and client-role
+protocol mapper match the exact authorization contract with the fewest local
+POC dependencies. Authentik and ZITADEL are credible alternatives; a different
+group model, claim contract, operating environment, or production roadmap
+could reasonably favor either one.
 
 ## P0 host observations
 
@@ -134,6 +227,39 @@ mismatched, reused, or expired state/nonce before creating an application
 session, exchanges the one-time code at the discovered token endpoint using
 client authentication, and verifies PKCE.
 
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Browser as Windows browser
+  participant Flask as Flask Ops Dashboard
+  participant Keycloak as Keycloak IdP
+
+  Browser->>Flask: GET http://ops.localhost:18083/protected
+  Flask->>Flask: Create one-time state, nonce, and PKCE verifier
+  Flask-->>Browser: 302 to Keycloak authorization endpoint with S256 challenge
+  Browser->>Keycloak: Authorization request
+  Keycloak->>Keycloak: Authenticate user and resolve group/client roles
+  Keycloak-->>Browser: 302 callback with authorization code and state
+  Browser->>Flask: GET /oidc/callback?code=...&state=...
+  Flask->>Flask: Validate and consume state; load bound nonce and verifier
+  Flask->>Keycloak: Back-channel code exchange with PKCE and confidential-client authentication
+  Keycloak-->>Flask: ID token and access token
+  Flask->>Flask: Validate ID token with Authlib/OIDC primitives, including nonce
+  Flask->>Flask: Extract and validate dedicated ops_roles claim
+  Flask->>Flask: Create signed, absolute ten-minute application session
+  Browser->>Flask: Request protected route with session cookie
+  Flask->>Flask: Enforce required normalized role server-side
+  alt Required role is present
+    Flask-->>Browser: Authorized response
+  else Required role is absent
+    Flask-->>Browser: HTTP 403
+  end
+```
+
+The confidential-client token request is a Flask-to-Keycloak back-channel
+operation. The browser never receives the client secret and never performs the
+token exchange.
+
 Before trusting identity or roles, P2 must use discovery and the advertised
 JWKS to validate the ID token:
 
@@ -142,13 +268,27 @@ JWKS to validate the ID token:
 2. verify the signature against the discovery `jwks_uri`, refresh a bounded
    cache once for a previously unseen `kid`, and fail closed if no valid key is
    found;
-3. require exact `iss` equality with the fixed issuer, require `aud` to contain
-   only the `ops-dashboard` client as an accepted audience, and require
-   `azp=ops-dashboard` whenever `azp` is present or `aud` has multiple entries;
+3. require exact `iss` equality with the fixed issuer; accept `aud` only as the
+   single string `ops-dashboard` or an array containing exactly that one value;
+   reject missing, different, empty, or multiple-audience values; and, if
+   `azp` is present, require it to equal `ops-dashboard`;
 4. validate `exp`, `iat`, and `nbf` when present with at most 60 seconds of clock
    skew, plus the one-time callback `nonce`;
 5. require a non-empty string `sub`; treat `preferred_username` only as display
    text; and validate the role claim using the exact schema below.
+
+The exact single-audience rule is this bounded application's acceptance policy,
+not a claim that OIDC universally forbids multiple-audience ID tokens.
+
+P2 must use supported Authlib/OIDC primitives for standard discovery, state,
+nonce, signature, issuer, audience, time-claim, and other protocol validation
+wherever the selected version provides them. Application-specific code owns the
+exact audience policy above, the `ops_roles` schema and normalization, rejection
+of unrelated client roles, session construction, route authorization, and only
+narrowly identified library gaps. It must not become a custom general-purpose
+JWT or OIDC validation framework. P2 must confirm the actual behavior of
+Authlib `1.7.2` through its documentation and observed positive and negative
+tests; library behavior must not be assumed.
 
 These checks follow the [OIDC Core ID-token validation
 contract](https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation).
@@ -272,22 +412,35 @@ P1 must fail closed until all of the following are recorded:
 - the Docker daemon and Compose model are usable without altering Task 1;
 - resolved image digests and expected platforms match the selected versions;
 - the Compose resource names and network are isolated from Task 1;
-- container DNS resolves `auth.localhost` to the Keycloak service and both
-  containers can reach only intended peers;
-- WSL reaches both loopback-published ports, with explicit name override if
-  needed, and the actual host listeners are bound to loopback;
-- a Windows browser reaches both canonical names, Windows-side listeners are
-  observed, and a second LAN host or equivalent Windows-side test cannot reach
-  either endpoint.
+- Keycloak starts on the dedicated Task 2 network;
+- a temporary diagnostic container owned by the `task2-iam` Compose project
+  resolves `auth.localhost` to Keycloak and reaches its intended HTTP endpoint;
+- that diagnostic resource has an explicit bounded lifecycle and Task 2 cleanup
+  ownership, with no attachment to or cleanup of Task 1 resources;
+- WSL reaches the loopback-published Keycloak endpoint, with explicit name
+  override if needed, and the actual `18082` host listener is loopback only;
+- a Windows browser reaches `http://auth.localhost:18082`, Windows-side
+  listeners are observed, and a second LAN host or equivalent Windows-side test
+  cannot reach the Keycloak endpoint; and
+- intended Flask port `18083` has no detected conflict where the environment
+  permits checking it. No listener or HTTP response on `18083` is required in
+  P1 because Flask is a P2 implementation target.
+
+General Internet egress denial is **OPTIONAL HARDENING**, not a P1 IAM/SSO
+acceptance condition. If `internal: true` or another egress restriction is
+proposed, test it separately and do not allow it to break the mandatory Docker
+DNS, Keycloak, discovery, JWKS, or browser paths. The dedicated network,
+intended membership, Task 1 separation, and loopback-only host publish remain
+mandatory.
 
 P0 cannot supply the Windows results; they remain **UNVERIFIED**. A WSL-only
 socket check cannot pass this checkpoint.
 
 ### Checkpoint 2 — after minimal realm provisioning
 
-Before any Flask callback is implemented, P1 must retrieve
+Before P2 implements the Flask callback, P1 must retrieve
 `http://auth.localhost:18082/realms/ops/.well-known/openid-configuration` from
-the Flask container and the host path and prove:
+an authorized Task-2-owned diagnostic container and the host path and prove:
 
 - `issuer` is exactly `http://auth.localhost:18082/realms/ops`;
 - authorization, token, JWKS, and (if advertised) end-session endpoints use the
@@ -295,8 +448,17 @@ the Flask container and the host path and prove:
 - `jwks_uri` returns usable signing keys and expected algorithm metadata;
 - exact redirect URI, code flow, PKCE, client authentication, and disabled
   grants match this document;
-- client-scope evaluation and a real issued ID token confirm the exact
-  `ops_roles` shape and unrelated-role exclusion.
+- the intended client, client scopes, role mapper, groups, client roles, and
+  group-to-role mappings match this document.
+
+Configuration inspection records the mapper as **CONFIGURED**; it does not
+prove emitted token content. P1 may verify a real issued ID token only through
+a separate, bounded OIDC test client that is expressly included in the future
+P1 implementation scope and uses an appropriate interactive flow. P1 must not
+enable direct-access password grants merely to simplify testing. If that client
+is not included, actual `ops_roles` output remains **UNVERIFIED** and P2 must
+validate a real issued ID token—including exact shape and unrelated-role
+exclusion—before accepting the RBAC integration.
 
 Until a realm exists, the issuer and mapper are design values—not verified
 OIDC facts. Detailed pass/fail evidence belongs to [test-plan.md](test-plan.md).
