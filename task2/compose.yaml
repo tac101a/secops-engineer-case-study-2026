@@ -1,0 +1,86 @@
+name: task2-iam
+
+x-keycloak-common: &keycloak-common
+  image: quay.io/keycloak/keycloak:26.7.4@sha256:3d911baa186f352563854039b95f21a7e2c01c76b527fdc64f24a0885b927bdf
+  platform: linux/amd64
+  restart: "no"
+  init: true
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  environment:
+    KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_BOOTSTRAP_ADMIN_USERNAME:-task2-bootstrap-admin}
+    KC_HTTP_ENABLED: "true"
+    KC_HTTP_HOST: 0.0.0.0
+    KC_HTTP_PORT: "18082"
+    KC_HOSTNAME: http://auth.localhost:18082
+    KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "false"
+  entrypoint:
+    - /bin/bash
+    - -ec
+    - |
+      export KC_BOOTSTRAP_ADMIN_PASSWORD="$$(< /run/secrets/keycloak_bootstrap_admin_password)"
+      exec /opt/keycloak/bin/kc.sh "$$@"
+    - --
+  secrets:
+    - keycloak_bootstrap_admin_password
+  volumes:
+    - keycloak-data:/opt/keycloak/data
+  networks:
+    oidc:
+      aliases:
+        - auth.localhost
+  ports:
+    - "127.0.0.1:18082:18082"
+
+services:
+  keycloak-stage-a:
+    <<: *keycloak-common
+    profiles:
+      - stage-a
+    command:
+      - start-dev
+
+  keycloak-stage-b:
+    <<: *keycloak-common
+    profiles:
+      - stage-b
+    command:
+      - start-dev
+      - --import-realm
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+      - ./keycloak/ops-realm.json:/opt/keycloak/data/import/ops-realm.json:ro
+
+  diagnostic:
+    image: docker.io/library/alpine:3.22.1@sha256:eafc1edb577d2e9b458664a15f23ea1c370214193226069eb22921169fc7e43f
+    platform: linux/amd64
+    profiles:
+      - diagnostic
+    restart: "no"
+    init: true
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - sh
+      - -ec
+      - trap 'exit 0' TERM INT; sleep 600 & wait
+    networks:
+      - oidc
+
+networks:
+  oidc:
+    name: task2-iam-oidc
+    driver: bridge
+
+volumes:
+  keycloak-data:
+    name: task2-iam-keycloak-data
+
+secrets:
+  keycloak_bootstrap_admin_password:
+    file: ./.runtime/keycloak-bootstrap-admin-password

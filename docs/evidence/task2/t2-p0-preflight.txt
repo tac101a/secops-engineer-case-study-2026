@@ -1,0 +1,178 @@
+TASK 2 P0 PREFLIGHT EVIDENCE
+================================
+
+PURPOSE AND EVIDENCE CLASSIFICATION
+
+This record separates historical statements carried by the reviewed P0
+architecture from read-only checks repeated during the correction patch. It
+does not claim Docker runtime, container networking, Windows reachability,
+realm configuration, token issuance, or Flask/OIDC integration.
+
+HISTORICAL REPORTED
+-------------------
+
+Classification: HISTORICAL REPORTED
+Observation time reported by the source: 2026-09-23T07:42:56Z
+Source: task2/architecture.md as committed in
+e3ca2e8664582f8dc16fa95c0db0285085478170 (wip: task2-p0)
+
+The source reports:
+
+- host environment: WSL2, x86_64;
+- Git: 2.43.0;
+- Python: 3.12.3;
+- Docker CLI: 29.3.0;
+- Docker Compose CLI: v5.1.0;
+- no WSL TCP listeners on ports 18082 or 18083 at the observation time;
+- localhost resolved to 127.0.0.1;
+- auth.localhost and ops.localhost did not resolve through the observed WSL
+  resolver;
+- Windows-side checks were unavailable; and
+- the Docker daemon was intentionally not queried.
+
+The original raw terminal transcript and exit statuses are not present in the
+committed P0 artifacts. None of the statements above is represented as newly
+reproduced raw evidence or promoted to a new PASS.
+
+NEW CHECKS
+----------
+
+Check N1
+UTC timestamp: 2026-09-23T08:42:00Z
+Exact command: uname -srm
+Exit status: 0
+Relevant output:
+Linux 5.15.167.4-microsoft-standard-WSL2 x86_64
+Interpretation: the correction ran in an x86_64 WSL2 Linux environment.
+Limitations: this identifies the WSL kernel context, not Windows networking,
+Docker runtime state, or application readiness.
+
+Check N2
+UTC timestamp: 2026-09-23T08:42:00Z
+Exact command: git --version
+Exit status: 0
+Relevant output:
+git version 2.43.0
+Interpretation: the Git CLI is available at the reported version.
+Limitations: CLI availability is not a runtime or IAM readiness result.
+
+Check N3
+UTC timestamp: 2026-09-23T08:42:00Z
+Exact command: python3 --version
+Exit status: 0
+Relevant output:
+Python 3.12.3
+Interpretation: the host Python CLI is available at the reported version.
+Limitations: this is not the selected future Python container version and does
+not validate Flask or Authlib.
+
+Check N4
+UTC timestamp: 2026-09-23T08:42:00Z
+Exact command: docker --version
+Exit status: 0
+Relevant output:
+Docker version 29.3.0, build 5927d80
+Interpretation: the Docker client executable is available.
+Limitations: this client-only version command did not query the Docker daemon.
+Daemon availability, image availability, containers, networks, volumes, DNS,
+and port publishing remain UNVERIFIED.
+
+Check N5
+UTC timestamp: 2026-09-23T08:42:01Z
+Exact command: docker compose version
+Exit status: 0
+Relevant output:
+Docker Compose version v5.1.0
+Interpretation: the Compose CLI plugin is available.
+Limitations: this command did not contact the Docker daemon, render a Task 2
+model, or verify runtime behavior.
+
+Check N6
+UTC timestamp: 2026-09-23T08:42:01Z
+Exact command: ss -ltn 'sport = :18082 or sport = :18083'
+Exit status: 0
+Relevant output:
+State Recv-Q Send-Q Local Address:Port Peer Address:PortProcess
+Interpretation: no matching WSL TCP listener was shown at this instant.
+Limitations: this is a point-in-time WSL observation. It does not establish
+Windows listener or reservation state, browser reachability, loopback publish
+behavior, LAN exposure, or future port availability.
+
+Check N7
+UTC timestamp: 2026-09-23T08:42:01Z
+Exact command: getent ahostsv4 localhost
+Exit status: 0
+Relevant output:
+127.0.0.1       STREAM localhost
+127.0.0.1       DGRAM
+127.0.0.1       RAW
+Interpretation: the observed WSL resolver returned IPv4 loopback for localhost.
+Limitations: this does not test the selected application hostnames or Windows
+browser resolution.
+
+Check N8
+UTC timestamp: 2026-09-23T08:42:01Z
+Exact command: getent ahostsv4 auth.localhost
+Exit status: 2
+Relevant output:
+<empty>
+Interpretation: auth.localhost did not resolve through this WSL getent path.
+Limitations: this does not predict special-use .localhost behavior in a Windows
+browser. The P1 Windows and runtime checks remain UNVERIFIED.
+
+Check N9
+UTC timestamp: 2026-09-23T08:42:01Z
+Exact command: getent ahostsv4 ops.localhost
+Exit status: 2
+Relevant output:
+<empty>
+Interpretation: ops.localhost did not resolve through this WSL getent path.
+Limitations: this does not predict special-use .localhost behavior in a Windows
+browser or test the future P2 Flask endpoint.
+
+Check N10
+UTC timestamp: 2026-09-23T08:42:03Z
+Exact command: command -v powershell.exe
+Exit status: 0
+Relevant output:
+/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
+Interpretation: a PowerShell executable path is visible from WSL.
+Limitations: PowerShell was not executed and no Windows listener, reservation,
+resolver, firewall, browser, or external-exposure check was performed.
+Windows-side readiness remains UNVERIFIED.
+
+READINESS LAYERS
+----------------
+
+P0 HOST PREFLIGHT
+
+Observed only: WSL2/x86_64 context, CLI versions, point-in-time WSL listener
+absence, and WSL resolver results as recorded above. These checks do not prove a
+working service or reserve ports.
+
+P1 DOCKER RUNTIME AND NETWORKING
+
+UNVERIFIED. The Docker daemon was not queried. No Task 2 image, Compose model,
+container, network, volume, container DNS path, Keycloak process, loopback
+publish, Windows-browser path, or external-exposure result was exercised.
+
+P1 POST-REALM OIDC CONFIGURATION
+
+UNVERIFIED. No realm, discovery document, issuer, JWKS response, client, scope,
+role mapper, group mapping, or issued token was inspected. Future configuration
+inspection may establish CONFIGURED state but cannot by itself prove actual
+token claims.
+
+P2 ACTUAL FLASK/OIDC INTEGRATION
+
+UNVERIFIED. Flask does not exist in P0. No callback, confidential-client token
+exchange, Authlib validation behavior, real issued ID token, ops_roles output,
+session, route authorization, logout, or browser endpoint was exercised.
+
+BOUNDARY CONFIRMATION
+---------------------
+
+No Docker daemon access occurred. No image was pulled. No container, network,
+or volume operation occurred. No Keycloak or Flask process was started. No
+realm was provisioned. No Windows/WSL/DNS/firewall configuration was changed.
+No Kubernetes access occurred.

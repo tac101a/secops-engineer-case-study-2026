@@ -1,0 +1,153 @@
+TASK 2 P0 CORRECTION SCOPE RECORD
+==================================
+
+STARTING GATE
+-------------
+
+Expected branch: temp/work-in-progress
+Actual starting branch: temp/work-in-progress
+Actual starting HEAD: e3ca2e8664582f8dc16fa95c0db0285085478170
+Reviewed P0 checkpoint: e3ca2e8664582f8dc16fa95c0db0285085478170
+Starting worktree status from
+git status --short --untracked-files=all: <empty; clean>
+Ancestry check:
+git merge-base --is-ancestor
+e3ca2e8664582f8dc16fa95c0db0285085478170 HEAD
+Exit status: 0
+Intervening commits after the reviewed checkpoint: none; HEAD was the checkpoint.
+No branch or worktree was created.
+
+SOURCE MATERIAL INSPECTED
+-------------------------
+
+- task2/README.md
+- task2/architecture.md
+- task2/threat-model.md
+- task2/test-plan.md
+- docs/case-study-secops-engineer-2026.pdf, including Task 2 Option A,
+  analysis requirements, and output requirements
+- commit e3ca2e8664582f8dc16fa95c0db0285085478170 metadata and its
+  four-file mutation inventory
+- official Keycloak, Authentik, ZITADEL, OIDC, Flask, Docker, and Authlib
+  references linked from the reviewed and corrected architecture
+- the correction brief that authorized this five-path documentation patch
+
+The original commit added exactly:
+
+- task2/README.md
+- task2/architecture.md
+- task2/test-plan.md
+- task2/threat-model.md
+
+ORIGINAL ARTIFACT DEVIATION
+---------------------------
+
+The original prompt requested four files under docs/, task2/iam-sso/, and
+docs/evidence/task2/. The reviewed P0 commit instead created the four files
+listed above at task2/ and omitted the independent preflight and scope evidence
+records.
+
+This correction preserves the four reviewed paths and adds the two missing
+evidence records. It does not create an alternative README or architecture
+path. The approved final P0 inventory is exactly six files:
+
+1. task2/README.md
+2. task2/architecture.md
+3. task2/threat-model.md
+4. task2/test-plan.md
+5. docs/evidence/task2/t2-p0-preflight.txt
+6. docs/evidence/task2/t2-p0-scope-record.txt
+
+ACKNOWLEDGED DESIGN REFINEMENTS
+-------------------------------
+
+Originally proposed application names:
+
+- Ops Dashboard
+- Incident Console
+- Admin Portal
+
+Actual selected design retained by this correction:
+
+- Ops Dashboard
+- Asset Inventory
+- Runbook Portal
+
+Originally proposed realm: secops-lab
+Actual selected realm retained by this correction: ops
+
+These are acknowledged design changes, not security failures. The selected
+applications and realm are preserved.
+
+AUTHORIZED MUTATION INVENTORY
+-----------------------------
+
+Modified:
+
+- task2/README.md
+- task2/architecture.md
+- task2/test-plan.md
+
+Added:
+
+- docs/evidence/task2/t2-p0-preflight.txt
+- docs/evidence/task2/t2-p0-scope-record.txt
+
+Preserved byte-for-byte:
+
+- task2/threat-model.md
+- SHA-256 preservation baseline:
+  c2c6e72cbe38e203fc6c2d43878f15674919c7cd1c4842c8fdd5a38a51cea90d
+
+No Task 1, GitHub Actions, root README, Kubernetes, pre-existing evidence, or
+other repository path is in the final mutation inventory.
+
+REPEATED HOST CHECKS
+--------------------
+
+At 2026-09-23T08:42:00Z through 2026-09-23T08:42:03Z, the patch repeated only
+the authorized read-only checks for WSL identity, Git/Python/Docker/Compose CLI
+versions, WSL listeners on 18082/18083, WSL IPv4 resolution for localhost,
+auth.localhost, and ops.localhost, and PowerShell path visibility. Exact
+commands, exit statuses, output, interpretations, and limitations are recorded
+in docs/evidence/task2/t2-p0-preflight.txt.
+
+These checks did not contact the Docker daemon and did not establish Windows,
+container, Keycloak, realm, token, or Flask readiness.
+
+UNRESOLVED ENVIRONMENT PREREQUISITES
+------------------------------------
+
+The following remain UNVERIFIED for their owning future phases:
+
+- P1 Docker daemon availability and the rendered Compose model;
+- image digests and selected platform;
+- Task 2 container startup, dedicated-network membership, Docker DNS, and
+  diagnostic-container connectivity;
+- WSL/Windows loopback publishing, Windows browser resolution and reachability,
+  Windows listener/reservation state, and absence of unintended external
+  access;
+- Keycloak realm import, discovery metadata, exact issuer, JWKS content,
+  client/scopes, role mapper, and group/client-role mappings;
+- actual ops_roles output unless a separately scoped P1 OIDC test client
+  observes it; otherwise this is a mandatory P2 integration result;
+- actual Authlib behavior, Flask callback, session, authorization, logout, and
+  browser endpoint.
+
+EXECUTION-BOUNDARY CONFIRMATIONS
+--------------------------------
+
+- Docker daemon access: NONE
+- Docker image pulls: NONE
+- Container/network/volume operations: NONE
+- Keycloak or Flask startup: NONE
+- Realm provisioning: NONE
+- Windows/WSL/DNS/firewall configuration changes: NONE
+- Kubernetes access: NONE
+- Interrupted Task 1 runtime inspection or cleanup: NONE
+- Task 1 file modifications: NONE
+- P1 or P2 implementation: NONE
+- Git stage, commit, push, reset, stash, merge, or rebase: NONE
+- Branch or worktree creation: NONE
+
+This patch is documentation and read-only host preflight correction only.
