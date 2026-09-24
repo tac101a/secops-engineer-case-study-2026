@@ -371,16 +371,3 @@ Tài liệu sâu hơn:
 - [Task 1 before/after manifest bundle](deliverables/task1/README.md)
 - [Task 2 IAM architecture SVG](deliverables/task2/task2-iam-architecture.svg)
 
-## Giới hạn cần giữ nguyên khi trình bày
-
-- Không nói Task 1 đã “fully remediated”: F3 runtime enforcement và full AFTER
-  vẫn bị chặn.
-- Không nói Kyverno đang enforce live: policy POC hiện ở `Audit` và chỉ có kết
-  quả test offline.
-- Không nói corrected CI workflow đã là required gate: hosted run sau patch và
-  branch protection chưa được xác minh.
-- Không nói Task 2 đã hoàn tất end-to-end SSO: P2 chưa được triển khai.
-- Không nói port loopback chứng minh LAN isolation: independent R8 vẫn deferred.
-- Không dùng cấu hình local POC này làm mẫu production nếu chưa bổ sung TLS,
-  external database/recovery, HA, MFA/admin hardening, monitoring/audit, rate
-  limiting, rotation/revocation và quy trình upgrade.
