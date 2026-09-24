@@ -1,0 +1,179 @@
+# Representative insecure Task 1 assessment baseline.
+# Faithfully bundled from task1/insecure/namespace.yaml, demo-api.yaml,
+# demo-backend.yaml, and rbac.yaml. Documentation artifact only; do not apply
+# automatically to an existing cluster.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: secops-demo
+  labels:
+    app.kubernetes.io/part-of: secops-baseline
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-api
+  namespace: secops-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-api
+  template:
+    metadata:
+      labels:
+        app: demo-api
+    spec:
+      serviceAccountName: demo-api
+      containers:
+        - name: demo-api
+          image: secops-demo-api:phase-b
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: BACKEND_URL
+              value: http://demo-backend:8081
+          # H1/H4 candidate conditions: image USER 0, no privilege restrictions,
+          # writable root. Effective authority and extra writes await Phase C.
+          securityContext:
+            readOnlyRootFilesystem: false
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-api
+  namespace: secops-demo
+spec:
+  selector:
+    app: demo-api
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-backend
+  namespace: secops-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-backend
+  template:
+    metadata:
+      labels:
+        app: demo-backend
+    spec:
+      serviceAccountName: demo-backend
+      containers:
+        - name: demo-backend
+          image: secops-demo-backend:phase-b
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8081
+          # Same permissive process/filesystem baseline as demo-api.
+          securityContext:
+            readOnlyRootFilesystem: false
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-backend
+  namespace: secops-demo
+spec:
+  selector:
+    app: demo-backend
+  ports:
+    - name: http
+      port: 8081
+      targetPort: http
+---
+# Representative H2 fixture; neither application needs Kubernetes API access.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo-api
+  namespace: secops-demo
+automountServiceAccountToken: true
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo-backend
+  namespace: secops-demo
+automountServiceAccountToken: true
+---
+# Synthetic assessment target only; never consumed as application configuration.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: phase-c-fixture
+  namespace: secops-demo
+data:
+  marker: baseline
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: demo-api-fixture-access
+  namespace: secops-demo
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["phase-c-fixture"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: demo-api-fixture-access
+  namespace: secops-demo
+subjects:
+  - kind: ServiceAccount
+    name: demo-api
+    namespace: secops-demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: demo-api-fixture-access

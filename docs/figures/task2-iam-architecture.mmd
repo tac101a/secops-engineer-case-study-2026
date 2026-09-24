@@ -1,0 +1,45 @@
+%% Rendered with @mermaid-js/mermaid-cli 11.12.0; temporary npm and browser
+%% caches plus the required libasound runtime were isolated under /tmp.
+flowchart LR
+  subgraph HOST["Local Windows / WSL2 host boundary"]
+    B["Windows browser"]
+    KPORT["Loopback endpoint<br/>auth.localhost:18082"]
+    OPORT["Planned endpoint<br/>ops.localhost:18083"]
+
+    subgraph NET["Dedicated Task 2 Docker network · task2-iam-oidc"]
+      subgraph IDP["Identity provider — implemented and P1-verified"]
+        KC["Keycloak 26.7.4 · realm ops<br/>P1 provider verified under<br/>the single-host exception"]
+        IAM["Users · groups · client roles · scope mappings<br/>Confidential ops-dashboard client<br/>Authorization Code + PKCE S256 configured"]
+        CLAIM["Dedicated ID-token claim: ops_roles<br/>mapper configured<br/>actual emitted output NOT VERIFIED"]
+        KC --> IAM
+        IAM -.->|"mapper configured; issuance unverified"| CLAIM
+      end
+
+      subgraph APP["Application authorization — P2 planned"]
+        OPS["Ops Dashboard · NOT YET IMPLEMENTED<br/>planned token validation and ops_roles RBAC"]
+      end
+    end
+
+    DESIGN["DESIGN ONLY · disabled clients<br/>Asset Inventory · Runbook Portal"]
+    R8["DEFERRED / UNVERIFIED<br/>independent LAN isolation (R8)"]
+    LEGEND["Legend<br/>green + solid: verified P1 provider<br/>blue + dashed: planned P2 integration<br/>amber + dashed: design only<br/>red + dashed: deferred / unverified"]
+  end
+
+  B -->|"P1 browser access observed"| KPORT --> KC
+  B -.->|"P2 application requests"| OPORT -.-> OPS
+  OPS -.->|"planned code flow + PKCE S256"| KC
+  CLAIM -.->|"P2 must verify claim, then authorize"| OPS
+  KC -.->|"design-only OIDC trust"| DESIGN
+  KPORT -.->|"not independently tested"| R8
+
+  classDef verified fill:#e6f4ea,stroke:#1b7f3a,stroke-width:2px,color:#122;
+  classDef planned fill:#e8f0fe,stroke:#3267b1,stroke-width:2px,stroke-dasharray:6 4,color:#123;
+  classDef design fill:#fff4d6,stroke:#9a6b00,stroke-width:2px,stroke-dasharray:6 4,color:#321;
+  classDef unverified fill:#fde7e9,stroke:#b3261e,stroke-width:2px,stroke-dasharray:3 3,color:#321;
+  classDef legend fill:#f6f8fa,stroke:#6e7781,color:#24292f;
+
+  class KC,IAM,KPORT verified;
+  class OPORT,OPS planned;
+  class DESIGN design;
+  class CLAIM,R8 unverified;
+  class LEGEND legend;

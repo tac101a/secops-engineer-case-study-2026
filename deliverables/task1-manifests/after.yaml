@@ -1,0 +1,210 @@
+# Intended Task 1 post-hardening target-state bundle assembled from reviewed
+# repository sources. It is not proof of a fully verified integrated runtime.
+#
+# F3 NETWORKPOLICY CANDIDATE — RUNTIME ENFORCEMENT NOT VERIFIED.
+# Historical D3 tests admitted these policies but both required east-west
+# denials failed. Do not infer dataplane enforcement from this file.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: secops-demo
+  labels:
+    app.kubernetes.io/part-of: secops-baseline
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo-api
+  namespace: secops-demo
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo-backend
+  namespace: secops-demo
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-api
+  namespace: secops-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-api
+  template:
+    metadata:
+      labels:
+        app: demo-api
+    spec:
+      serviceAccountName: demo-api
+      containers:
+        - name: demo-api
+          image: secops-demo-api:phase-d1
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: BACKEND_URL
+              value: http://demo-backend:8081
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: api-tmp
+              mountPath: /tmp
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+      volumes:
+        - name: api-tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-api
+  namespace: secops-demo
+spec:
+  selector:
+    app: demo-api
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+# The backend workload is intentionally carried forward unchanged. The reviewed
+# remediation does not establish additional backend process/filesystem hardening.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-backend
+  namespace: secops-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-backend
+  template:
+    metadata:
+      labels:
+        app: demo-backend
+    spec:
+      serviceAccountName: demo-backend
+      containers:
+        - name: demo-backend
+          image: secops-demo-backend:phase-b
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8081
+          securityContext:
+            readOnlyRootFilesystem: false
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-backend
+  namespace: secops-demo
+spec:
+  selector:
+    app: demo-backend
+  ports:
+    - name: http
+      port: 8081
+      targetPort: http
+---
+# Candidate F3 desired state; static validation passed, runtime denial did not.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: demo-api-egress
+  namespace: secops-demo
+spec:
+  podSelector:
+    matchLabels:
+      app: demo-api
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: demo-backend
+      ports:
+        - protocol: TCP
+          port: 8081
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# Candidate F3 desired state; static validation passed, runtime denial did not.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: demo-backend-ingress
+  namespace: secops-demo
+spec:
+  podSelector:
+    matchLabels:
+      app: demo-backend
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: demo-api
+      ports:
+        - protocol: TCP
+          port: 8081
